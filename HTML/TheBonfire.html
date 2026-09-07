@@ -206,8 +206,9 @@
       return text
         // bold — **word**
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        // italic — *word* (not **)
-        .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
+        // italic — *word* (no lookbehind, so it parses on every browser;
+        // bold is replaced first, so any remaining * is a single italic marker)
+        .replace(/\*([^*\s][^*]*?)\*/g, '<em>$1</em>')
         // underline — _word_
         .replace(/\_(.+?)\_/g, '<u>$1</u>');
     }
