@@ -153,7 +153,6 @@
   ];
   let currentIndex = 0;
   let editingIndex = -1;
-  let fileHandle = null;  // File System Access API handle for entries.json (picked once per session)
 
   // ── LOAD ──
   async function loadEntries() {
@@ -278,48 +277,24 @@
   }
 
   // ── PERSIST TO FILE ──
-  // File System Access API (Chrome/Edge**: pick json/entries.json once per
-  // session, then write the full archive back. Falls back to Export JSON
-  // on browsers that don't support the API. A browser tab cannot silently
-  // edit a file on disk, so this is the only way to persist real edits.
-  async function persistEntries() {
-    if (typeof window.showSaveFilePicker !== 'function') {
-      alert('Auto-save needs Chrome/Edge (File System Access API). Exporting entries.json instead.');
-      exportJSON();
-      return 'exported';
-    }
-    try {
-      if (!fileHandle) {
-        fileHandle = await window.showSaveFilePicker({
-          suggestedName: 'entries.json',
-          types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
-        });
-        // first pick: if the file on disk has different content than what is shown
-        // (happens when opened via file://, where fetch() is blocked**, ask before
-        // clobbering it. Served over HTTP the contents match and this never fires.
+  // Writes the whole archive back to json/entries.json in place via the local
+  // server (server.js**, run with node server.js → http://localhost). No file
+  // dialogs or downloads — Save/Delete just POST the array to /api/entries.
 
-        let onDisk = null;
-        try { onDisk = JSON.parse(await (await fileHandle.getFile()).text()); } catch (e) { /* unreadable — allow overwrite below */ }
-        if (onDisk && JSON.stringify(onDisk) !== JSON.stringify(entries)) {
-          if (!confirm('entries.json on disk differs from what is shown.\nOverwrite it with the current archive?\n(Cancel loads the file content instead.**')) {
-            entries = onDisk;
-            currentIndex = 0;
-            editingIndex = -1;
-            renderSidebar();
-            renderEntry(0);
-            return 'loaded';
-          }
-        }
-      }
-      const writable = await fileHandle.createWritable();
-      await writable.write(JSON.stringify(entries, null, 2));
-      await writable.close();
+  async function persistEntries() {
+    try {
+      const res = await fetch('../api/entries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entries)
+      });
+      if (!res.ok) throw new Error('Server returned ' + res.status);
       return 'written';
     } catch (err) {
-      if (err.name === 'AbortError') return 'cancelled';
-      fileHandle = null;
-      alert('Could not write entries.json: ' + (err && err.message ? err.message : err));
-      return 'error';
+      // HTML opened without the server (e.g. double-clicked** — keep the
+      // in-memory edit, but nothing is written to disk until it's served
+      // via server.js. ("browser only" flash messages below.)
+      return 'offline';
     }
   }
 
@@ -348,10 +323,13 @@
     entries[editingIndex] = fieldsToEntry();
     renderSidebar();
     renderEntry(editingIndex);
-    // persist the whole archive back to the picked entries.json — this covers
-    // save of edited, and newly-created (New adds a draft; Save writes it) entries.
+    // persist the whole archive back to json/entries.json via the local server.
+    // ("browser only" below = opened without server.js — change lives in memory
+    // but won't survive a reload until the server writes it to disk.)
+
+
     const wrote = await persistEntries();
-    const msg = { written: 'Saved to file!', cancelled: 'Save cancelled', loaded: 'Loaded file — edit dropped', exported: 'Exported instead', error: 'Save failed' }[wrote] || 'Saved!';
+    const msg = wrote === 'written' ? 'Saved to file!' : 'Saved (browser only)';
     flashBtn('ed-save', msg);
   }
 
@@ -370,7 +348,7 @@
       document.getElementById('entryHeader').innerHTML = '';
       document.getElementById('entryBox').innerHTML = '';
     }
-    await persistEntries().then(w => flashBtn('ed-delete', w === 'written' ? 'Deleted' : 'Delete failed'));
+    await persistEntries().then(w => flashBtn('ed-delete', w === 'written' ? 'Deleted' : 'Deleted (browser only)'));
   }
 
   // ── EXPORT JSON ──
