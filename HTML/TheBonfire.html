@@ -16,153 +16,330 @@
     <div class="topbar-logo"></div>
     <span class="topbar-title">TheBonfire</span>
     <span class="topbar-sub">Eternal Hearthlight Office — Lore Archive</span>
+    <button class="editor-toggle" onclick="toggleEditor()" title="Open Entry Editor">&#9998;</button>
   </header>
+
+  <!-- EDITOR DROPDOWN -->
+  <div class="editor-panel" id="editorPanel">
+    <div class="editor-inner">
+      <div class="editor-heading">
+        <span>Entry Editor</span>
+        <div class="editor-actions">
+          <button class="ed-btn ed-new" onclick="newEntry()">New</button>
+          <button class="ed-btn ed-save" onclick="saveEntry()">Save</button>
+          <button class="ed-btn ed-delete" onclick="deleteEntry()">Delete</button>
+          <button class="ed-btn ed-export" onclick="exportJSON()">Export JSON</button>
+        </div>
+      </div>
+      <div class="editor-fields">
+        <div class="ed-row">
+          <div class="ed-field">
+            <label>ID</label>
+            <input type="text" id="ed-id" placeholder="EHO-005">
+          </div>
+          <div class="ed-field">
+            <label>Title</label>
+            <input type="text" id="ed-title" placeholder="Entry title">
+          </div>
+          <div class="ed-field">
+            <label>Author</label>
+            <input type="text" id="ed-author" placeholder="Author name">
+          </div>
+          <div class="ed-field">
+            <label>Date</label>
+            <input type="text" id="ed-date" placeholder="21XX">
+          </div>
+        </div>
+        <div class="ed-row">
+          <div class="ed-field">
+            <label>Status</label>
+            <input type="text" id="ed-status" placeholder="Active / Ongoing / Sealed...">
+          </div>
+          <div class="ed-field">
+            <label>Category</label>
+            <input type="text" id="ed-category" placeholder="Field Observation, Personal Log...">
+          </div>
+          <div class="ed-field">
+            <label>Tags <span class="ed-hint">(comma separated)</span></label>
+            <input type="text" id="ed-tags" placeholder="tag1, tag2, tag3">
+          </div>
+          <div class="ed-field ed-field-check">
+            <label>
+              <input type="checkbox" id="ed-restricted">
+              Restricted
+            </label>
+          </div>
+        </div>
+        <div class="ed-field ed-body-field">
+          <label>Body <span class="ed-hint">(blank line = new paragraph)</span></label>
+          <textarea id="ed-body" placeholder="Write the entry here..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="body">
 
     <!-- SIDEBAR -->
-    <nav class="sidebar">
+    <nav class="sidebar" id="sidebar">
       <div class="sidebar-label">Entries</div>
-
-      <a class="nav-item active" onclick="switchEntry(0); return false;" href="#">
-        <span class="entry-id">EHO — 001</span>
-        The Hearthlight Compact
-      </a>
-
-      <a class="nav-item" onclick="switchEntry(1); return false;" href="#">
-        <span class="entry-id">EHO — 002</span>
-        On the Nature of the Backstreets
-      </a>
-
-      <a class="nav-item" onclick="switchEntry(2); return false;" href="#">
-        <span class="entry-id">EHO — 003</span>
-        Field Notes — Director Salaknib
-      </a>
-
-      <a class="nav-item" onclick="switchEntry(3); return false;" href="#">
-        <span class="entry-id">EHO — 004</span>
-        The Wayward & The Hearth
-      </a>
-
+      <!-- populated by JS -->
     </nav>
 
     <!-- MAIN -->
     <main class="main">
-
-      <!-- ENTRY HEADERS -->
-      <div class="entry-header">
-
-        <div class="entry-header-data active" data-index="0">
-          <div class="entry-id-tag">EHO — 001</div>
-          <div class="entry-title">The Hearthlight Compact</div>
-          <div class="entry-meta">
-            <span>Origin Document</span>
-            <span>Director: Salaknib</span>
-            <span>Status: Active</span>
-          </div>
-        </div>
-
-        <div class="entry-header-data" data-index="1">
-          <div class="entry-id-tag">EHO — 002</div>
-          <div class="entry-title">On the Nature of the Backstreets</div>
-          <div class="entry-meta">
-            <span>Field Observation</span>
-            <span>Author: Unknown</span>
-            <span>Status: Ongoing</span>
-          </div>
-        </div>
-
-        <div class="entry-header-data" data-index="2">
-          <div class="entry-id-tag">EHO — 003</div>
-          <div class="entry-title">Field Notes — Director Salaknib</div>
-          <div class="entry-meta">
-            <span>Personal Log</span>
-            <span>Author: Salaknib</span>
-            <span>Status: Restricted</span>
-          </div>
-        </div>
-
-        <div class="entry-header-data" data-index="3">
-          <div class="entry-id-tag">EHO — 004</div>
-          <div class="entry-title">The Wayward & The Hearth</div>
-          <div class="entry-meta">
-            <span>Historical Record</span>
-            <span>Author: Office Archive</span>
-            <span>Status: Sealed</span>
-          </div>
-        </div>
-
+      <div class="entry-header" id="entryHeader">
+        <!-- populated by JS -->
       </div>
-
-      <!-- ENTRY BOX -->
       <div class="entry-box-wrap">
-        <div class="entry-box">
-
-          <!-- ENTRY 0 -->
-          <div class="entry-content active" data-index="0">
-            <p><span class="drop">T</span>here are those who build walls and those who build fires. The wall keeps things out. The fire keeps things alive. The Eternal Hearthlight Office was not built to be a fortress. It was built to be the light you can see from the road when you have been walking too long in the dark and you are beginning to wonder whether you have the wrong road or no road at all.</p>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-            <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
-            <p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.</p>
-            <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.</p>
-            <p>Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.</p>
-            <p>Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.</p>
-          </div>
-
-          <!-- ENTRY 1 -->
-          <div class="entry-content" data-index="1">
-            <p><span class="drop">T</span>he Backstreets do not care about you. That is the first thing to understand. They are not hostile in the way that a predator is hostile — they do not select targets, do not stalk, do not plan. They are simply indifferent, which is in some ways worse, because indifference does not tire and cannot be reasoned with and will be there every morning you wake up inside it.</p>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-            <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
-            <p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.</p>
-            <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.</p>
-            <p>Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.</p>
-          </div>
-
-          <!-- ENTRY 2 -->
-          <div class="entry-content" data-index="2">
-            <p><span class="drop">I</span> write this not because anyone asked me to. I write this because the habit was given to me by someone who understood that writing things down is the only reliable way to keep them from being taken. He is not here. The habit remains. I suppose that is the point.</p>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-            <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
-            <p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.</p>
-            <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.</p>
-            <p>The office is warm tonight. Everyone is fed. I checked twice. I will check again before I sleep, which will be late, which is fine. The fire does not go out on its own. Someone has to tend it. I do not mind. I just wish, sometimes, that someone would ask if I was tired.</p>
-          </div>
-
-          <!-- ENTRY 3 -->
-          <div class="entry-content" data-index="3">
-            <p><span class="drop">T</span>hey came in two directions. The ones who kept moving became the Wayward Travelers — named honestly, because they had somewhere once and the having of it is now the thing that follows them. The ones who stopped, who turned around and built something in the wreckage, became us. Neither choice was wrong. Both choices cost something.</p>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-            <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
-            <p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.</p>
-            <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.</p>
-            <p>The door between us is open. It will stay open. If the Wayward find their way back — and some will, eventually, because wandering has a way of circling — there will be a fire here. There will always be a fire here. That is the only promise the Hearthlight makes and the only one it intends to keep.</p>
-          </div>
-
+        <div class="entry-box" id="entryBox">
+          <!-- populated by JS -->
         </div>
       </div>
-
     </main>
+
   </div>
 </div>
 
 <script>
-  function switchEntry(index) {
-    document.querySelectorAll('.nav-item').forEach((el, i) => {
-      el.classList.toggle('active', i === index);
-    });
-    document.querySelectorAll('.entry-content').forEach(el => {
-      el.classList.toggle('active', parseInt(el.dataset.index) === index);
-    });
-    document.querySelectorAll('.entry-header-data').forEach(el => {
-      el.classList.toggle('active', parseInt(el.dataset.index) === index);
-    });
-    document.querySelector('.entry-box').scrollTop = 0;
+  // Built-in fallback so the archive renders even when opened via file://
+  // (browsers block fetch() of local files). Served over HTTP, this is
+  // replaced by the contents of ../json/entries.json.
+  let entries = [
+    {
+      "id": "EHO-001",
+      "title": "The Hearthlight Compact",
+      "author": "Salaknib",
+      "date": "21XX",
+      "status": "Active",
+      "restricted": false,
+      "category": "Origin",
+      "tags": ["founding", "doctrine", "salaknib"],
+      "body": "There are those who build walls and those who build fires. The wall keeps things out. The fire keeps things alive. The Eternal Hearthlight Office was not built to be a fortress. It was built to be the light you can see from the road when you have been walking too long in the dark and you are beginning to wonder whether you have the wrong road or no road at all.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    },
+    {
+      "id": "EHO-002",
+      "title": "On the Nature of the Backstreets",
+      "author": "Unknown",
+      "date": "21XX",
+      "status": "Ongoing",
+      "restricted": false,
+      "category": "Field Observation",
+      "tags": ["backstreets", "field", "environment"],
+      "body": "The Backstreets do not care about you. That is the first thing to understand. They are not hostile in the way that a predator is hostile — they do not select targets, do not stalk, do not plan. They are simply indifferent, which is in some ways worse, because indifference does not tire and cannot be reasoned with.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    },
+    {
+      "id": "EHO-003",
+      "title": "Field Notes — Director Salaknib",
+      "author": "Salaknib",
+      "date": "21XX",
+      "status": "Restricted",
+      "restricted": true,
+      "category": "Personal Log",
+      "tags": ["salaknib", "personal", "director"],
+      "body": "I write this not because anyone asked me to. I write this because the habit was given to me by someone who understood that writing things down is the only reliable way to keep them from being taken. He is not here. The habit remains. I suppose that is the point.\n\nThe office is warm tonight. Everyone is fed. I checked twice. I will check again before I sleep, which will be late, which is fine. The fire does not go out on its own. Someone has to tend it. I do not mind. I just wish, sometimes, that someone would ask if I was tired."
+    },
+    {
+      "id": "EHO-004",
+      "title": "The Wayward & The Hearth",
+      "author": "Office Archive",
+      "date": "21XX",
+      "status": "Sealed",
+      "restricted": false,
+      "category": "Historical Record",
+      "tags": ["wayward", "history", "founding"],
+      "body": "They came in two directions. The ones who kept moving became the Wayward Travelers — named honestly, because they had somewhere once and the having of it is now the thing that follows them. The ones who stopped, who turned around and built something in the wreckage, became us. Neither choice was wrong. Both choices cost something.\n\nThe door between us is open. It will stay open. If the Wayward find their way back — and some will, eventually, because wandering has a way of circling — there will be a fire here. There will always be a fire here. That is the only promise the Hearthlight makes and the only one it intends to keep."
+    }
+  ];
+  let currentIndex = 0;
+  let editingIndex = -1;
+
+  // ── LOAD ──
+  async function loadEntries() {
+    try {
+      const res = await fetch('../json/entries.json?nocache=' + Date.now());
+      entries = await res.json();
+    } catch(e) {
+      // fetch unavailable (e.g. file://) — keep the embedded fallback entries
+    }
+    renderSidebar();
+    renderEntry(0);
   }
+
+  // ── SIDEBAR ──
+  function renderSidebar() {
+    const nav = document.getElementById('sidebar');
+    nav.innerHTML = '<div class="sidebar-label">Entries</div>';
+    entries.forEach((e, i) => {
+      const a = document.createElement('a');
+      a.className = 'nav-item' + (i === currentIndex ? ' active' : '');
+      a.href = '#';
+      a.innerHTML = `
+        <span class="entry-id">${e.id}</span>
+        ${e.restricted ? '<span class="restricted-badge">&#128274;</span> ' : ''}${e.title}
+      `;
+      a.onclick = (ev) => { ev.preventDefault(); switchEntry(i); };
+      nav.appendChild(a);
+    });
+  }
+
+  // ── RENDER ENTRY ──
+  function renderEntry(index) {
+    if (!entries.length) return;
+    currentIndex = index;
+    const e = entries[index];
+
+    // header
+    document.getElementById('entryHeader').innerHTML = `
+      <div class="entry-id-tag">${e.id} &mdash; ${e.category}</div>
+      <div class="entry-title">${e.title}${e.restricted ? ' <span class="restricted-badge">&#128274;</span>' : ''}</div>
+      <div class="entry-meta">
+        <span>${e.author}</span>
+        <span>${e.date}</span>
+        <span>${e.status}</span>
+        <span class="entry-tags">${(e.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</span>
+      </div>
+    `;
+
+    // inline markdown parser
+    function parseInline(text) {
+      return text
+        // bold — **word**
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        // italic — *word* (not **)
+        .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
+        // underline — _word_
+        .replace(/\_(.+?)\_/g, '<u>$1</u>');
+    }
+
+    // split on double (or more) newlines → paragraphs
+    // single newlines within a paragraph → <br>
+    const blocks = e.body.split(/\n{2,}/);
+    const box = document.getElementById('entryBox');
+    box.innerHTML = blocks.map((block, i) => {
+      // empty block = intentional blank space
+      if (!block.trim()) return '<div class="spacer"></div>';
+      // parse inline formatting, preserve single newlines as <br>
+      const lines = block.split('\n').map(parseInline).join('<br>');
+      if (i === 0) {
+        const first = lines.charAt(0);
+        const rest = lines.slice(1);
+        return `<p><span class="drop">${first}</span>${rest}</p>`;
+      }
+      return `<p>${lines}</p>`;
+    }).join('');
+    box.scrollTop = 0;
+  }
+
+  function switchEntry(index) {
+    currentIndex = index;
+    renderSidebar();
+    renderEntry(index);
+  }
+
+  // ── EDITOR TOGGLE ──
+  function toggleEditor() {
+    const panel = document.getElementById('editorPanel');
+    const open = panel.classList.toggle('open');
+    if (open) loadEditorFields(currentIndex);
+  }
+
+  function loadEditorFields(index) {
+    editingIndex = index;
+    const e = entries[index] || {};
+    document.getElementById('ed-id').value       = e.id       || '';
+    document.getElementById('ed-title').value    = e.title    || '';
+    document.getElementById('ed-author').value   = e.author   || '';
+    document.getElementById('ed-date').value     = e.date     || '';
+    document.getElementById('ed-status').value   = e.status   || '';
+    document.getElementById('ed-category').value = e.category || '';
+    document.getElementById('ed-tags').value     = (e.tags||[]).join(', ');
+    document.getElementById('ed-restricted').checked = e.restricted || false;
+    document.getElementById('ed-body').value     = e.body     || '';
+  }
+
+  function fieldsToEntry() {
+    return {
+      id:         document.getElementById('ed-id').value.trim(),
+      title:      document.getElementById('ed-title').value.trim(),
+      author:     document.getElementById('ed-author').value.trim(),
+      date:       document.getElementById('ed-date').value.trim(),
+      status:     document.getElementById('ed-status').value.trim(),
+      restricted: document.getElementById('ed-restricted').checked,
+      category:   document.getElementById('ed-category').value.trim(),
+      tags:       document.getElementById('ed-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+      body:       document.getElementById('ed-body').value
+    };
+  }
+
+  // ── NEW ENTRY ──
+  function newEntry() {
+    const blank = {
+      id: 'EHO-' + String(entries.length + 1).padStart(3,'0'),
+      title: 'New Entry',
+      author: '',
+      date: '21XX',
+      status: 'Active',
+      restricted: false,
+      category: '',
+      tags: [],
+      body: ''
+    };
+    entries.push(blank);
+    editingIndex = entries.length - 1;
+    loadEditorFields(editingIndex);
+    renderSidebar();
+  }
+
+  // ── SAVE ENTRY ──
+  function saveEntry() {
+    if (editingIndex < 0) return;
+    entries[editingIndex] = fieldsToEntry();
+    renderSidebar();
+    renderEntry(editingIndex);
+    flashBtn('ed-save', 'Saved!');
+  }
+
+  // ── DELETE ENTRY ──
+  function deleteEntry() {
+    if (editingIndex < 0 || !entries.length) return;
+    if (!confirm(`Delete "${entries[editingIndex].title}"?`)) return;
+    entries.splice(editingIndex, 1);
+    editingIndex = Math.max(0, editingIndex - 1);
+    currentIndex = editingIndex;
+    renderSidebar();
+    if (entries.length) {
+      loadEditorFields(editingIndex);
+      renderEntry(editingIndex);
+    } else {
+      document.getElementById('entryHeader').innerHTML = '';
+      document.getElementById('entryBox').innerHTML = '';
+    }
+  }
+
+  // ── EXPORT JSON ──
+  function exportJSON() {
+    const blob = new Blob([JSON.stringify(entries, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'entries.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    flashBtn('ed-export', 'Exported!');
+  }
+
+  function flashBtn(cls, text) {
+    const btn = document.querySelector('.' + cls);
+    const orig = btn.textContent;
+    btn.textContent = text;
+    btn.style.color = 'var(--ember-bright)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1800);
+  }
+
+  // ── SIDEBAR click loads editor fields too ──
+  // already handled in switchEntry → renderSidebar onclick
+
+  loadEntries();
 </script>
 
 </body>

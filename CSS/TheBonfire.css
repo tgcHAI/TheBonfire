@@ -293,3 +293,180 @@ body::before {
 .entry-content.active { display: block; }
 .entry-header-data { display: none; }
 .entry-header-data.active { display: block; }
+
+/* ── EDITOR TOGGLE BUTTON ── */
+.editor-toggle {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: var(--text-faint);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.15s;
+    font-family: inherit;
+}
+.editor-toggle:hover {
+    color: var(--ember);
+    text-shadow: 0 0 8px rgba(196,127,23,0.5);
+}
+
+/* ── EDITOR PANEL ── */
+.editor-panel {
+    position: fixed;
+    top: 48px;
+    left: 0;
+    right: 0;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, border-color 0.3s;
+    z-index: 100;
+}
+.editor-panel.open {
+    max-height: 380px;
+    border-color: var(--border);
+}
+.editor-inner {
+    padding: 16px 24px 20px;
+}
+.editor-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--text-dim);
+}
+.editor-actions {
+    display: flex;
+    gap: 8px;
+}
+.ed-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    padding: 3px 12px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    letter-spacing: 0.08em;
+}
+.ed-btn:hover { color: var(--ember); border-color: var(--ember); }
+.ed-save:hover { color: #6dbe6d; border-color: #6dbe6d; }
+.ed-delete:hover { color: #be6d6d; border-color: #be6d6d; }
+
+.editor-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.ed-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+.ed-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.ed-field label {
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+}
+.ed-hint {
+    opacity: 0.6;
+    font-size: 9px;
+}
+.ed-field input[type="text"] {
+    background: var(--panel-raised);
+    border: 1px solid var(--border-dim);
+    color: var(--text);
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    padding: 5px 8px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+.ed-field input[type="text"]:focus {
+    border-color: var(--ember);
+}
+.ed-field-check {
+    justify-content: flex-end;
+    padding-bottom: 2px;
+}
+.ed-field-check label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--text-dim);
+    font-size: 11px;
+}
+.ed-field-check input[type="checkbox"] {
+    accent-color: var(--ember);
+    width: 13px;
+    height: 13px;
+    cursor: pointer;
+}
+.ed-body-field { margin-top: 2px; }
+.ed-body-field textarea {
+    background: var(--panel-raised);
+    border: 1px solid var(--border-dim);
+    color: var(--text);
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    padding: 8px 10px;
+    resize: vertical;
+    min-height: 80px;
+    max-height: 140px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s;
+}
+.ed-body-field textarea:focus {
+    border-color: var(--ember);
+}
+
+/* account for editor panel pushing layout */
+.body {
+    transition: margin-top 0.3s;
+}
+
+/* ── TAGS IN META ── */
+.entry-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-left: auto;
+}
+.tag {
+    font-size: 10px;
+    color: var(--text-faint);
+    border: 1px solid var(--border-dim);
+    padding: 1px 6px;
+    letter-spacing: 0.06em;
+}
+
+/* ── RESTRICTED BADGE ── */
+.restricted-badge {
+    font-size: 10px;
+    opacity: 0.6;
+}
+
+/* ── FORMATTING ── */
+.entry-content p strong,
+.entry-box p strong { color: var(--ember-bright); font-weight: 700; }
+
+.entry-box p em { font-style: italic; color: var(--text); opacity: 0.85; }
+
+.entry-box p u { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ember); }
+
+/* intentional blank line spacer */
+.spacer { height: 1.2em; display: block; }

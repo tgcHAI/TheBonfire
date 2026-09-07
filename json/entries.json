@@ -1,0 +1,46 @@
+[
+  {
+    "id": "EHO-001",
+    "title": "The Hearthlight Compact",
+    "author": "Salaknib",
+    "date": "21XX",
+    "status": "Active",
+    "restricted": false,
+    "category": "Origin",
+    "tags": ["founding", "doctrine", "salaknib"],
+    "body": "There are those who build walls and those who build fires. The wall keeps things out. The fire keeps things alive. The Eternal Hearthlight Office was not built to be a fortress. It was built to be the light you can see from the road when you have been walking too long in the dark and you are beginning to wonder whether you have the wrong road or no road at all.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+  },
+  {
+    "id": "EHO-002",
+    "title": "On the Nature of the Backstreets",
+    "author": "Unknown",
+    "date": "21XX",
+    "status": "Ongoing",
+    "restricted": false,
+    "category": "Field Observation",
+    "tags": ["backstreets", "field", "environment"],
+    "body": "The Backstreets do not care about you. That is the first thing to understand. They are not hostile in the way that a predator is hostile — they do not select targets, do not stalk, do not plan. They are simply indifferent, which is in some ways worse, because indifference does not tire and cannot be reasoned with.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+  },
+  {
+    "id": "EHO-003",
+    "title": "Field Notes — Director Salaknib",
+    "author": "Salaknib",
+    "date": "21XX",
+    "status": "Restricted",
+    "restricted": true,
+    "category": "Personal Log",
+    "tags": ["salaknib", "personal", "director"],
+    "body": "I write this not because anyone asked me to. I write this because the habit was given to me by someone who understood that writing things down is the only reliable way to keep them from being taken. He is not here. The habit remains. I suppose that is the point.\n\nThe office is warm tonight. Everyone is fed. I checked twice. I will check again before I sleep, which will be late, which is fine. The fire does not go out on its own. Someone has to tend it. I do not mind. I just wish, sometimes, that someone would ask if I was tired."
+  },
+  {
+    "id": "EHO-004",
+    "title": "The Wayward & The Hearth",
+    "author": "Office Archive",
+    "date": "21XX",
+    "status": "Sealed",
+    "restricted": false,
+    "category": "Historical Record",
+    "tags": ["wayward", "history", "founding"],
+    "body": "They came in two directions. The ones who kept moving became the Wayward Travelers — named honestly, because they had somewhere once and the having of it is now the thing that follows them. The ones who stopped, who turned around and built something in the wreckage, became us. Neither choice was wrong. Both choices cost something.\n\nThe door between us is open. It will stay open. If the Wayward find their way back — and some will, eventually, because wandering has a way of circling — there will be a fire here. There will always be a fire here. That is the only promise the Hearthlight makes and the only one it intends to keep."
+  }
+]
