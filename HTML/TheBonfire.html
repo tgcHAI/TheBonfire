@@ -153,6 +153,7 @@
   ];
   let currentIndex = 0;
   let editingIndex = -1;
+  let fileHandle = null;  // File System Access API handle for entries.json (picked once per session)
 
   // ── LOAD ──
   async function loadEntries() {
@@ -236,6 +237,9 @@
     currentIndex = index;
     renderSidebar();
     renderEntry(index);
+    // keep the editor form aligned with the entry being viewed when the panel
+    // is open (otherwise the form and editingIndex can silently point at another entry**
+    if (document.getElementById('editorPanel').classList.contains('open')) loadEditorFields(index);
   }
 
   // ── EDITOR TOGGLE ──
@@ -273,6 +277,52 @@
     };
   }
 
+  // ── PERSIST TO FILE ──
+  // File System Access API (Chrome/Edge**: pick json/entries.json once per
+  // session, then write the full archive back. Falls back to Export JSON
+  // on browsers that don't support the API. A browser tab cannot silently
+  // edit a file on disk, so this is the only way to persist real edits.
+  async function persistEntries() {
+    if (typeof window.showSaveFilePicker !== 'function') {
+      alert('Auto-save needs Chrome/Edge (File System Access API). Exporting entries.json instead.');
+      exportJSON();
+      return 'exported';
+    }
+    try {
+      if (!fileHandle) {
+        fileHandle = await window.showSaveFilePicker({
+          suggestedName: 'entries.json',
+          types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+        });
+        // first pick: if the file on disk has different content than what is shown
+        // (happens when opened via file://, where fetch() is blocked**, ask before
+        // clobbering it. Served over HTTP the contents match and this never fires.
+
+        let onDisk = null;
+        try { onDisk = JSON.parse(await (await fileHandle.getFile()).text()); } catch (e) { /* unreadable — allow overwrite below */ }
+        if (onDisk && JSON.stringify(onDisk) !== JSON.stringify(entries)) {
+          if (!confirm('entries.json on disk differs from what is shown.\nOverwrite it with the current archive?\n(Cancel loads the file content instead.**')) {
+            entries = onDisk;
+            currentIndex = 0;
+            editingIndex = -1;
+            renderSidebar();
+            renderEntry(0);
+            return 'loaded';
+          }
+        }
+      }
+      const writable = await fileHandle.createWritable();
+      await writable.write(JSON.stringify(entries, null, 2));
+      await writable.close();
+      return 'written';
+    } catch (err) {
+      if (err.name === 'AbortError') return 'cancelled';
+      fileHandle = null;
+      alert('Could not write entries.json: ' + (err && err.message ? err.message : err));
+      return 'error';
+    }
+  }
+
   // ── NEW ENTRY ──
   function newEntry() {
     const blank = {
@@ -293,16 +343,20 @@
   }
 
   // ── SAVE ENTRY ──
-  function saveEntry() {
+  async function saveEntry() {
     if (editingIndex < 0) return;
     entries[editingIndex] = fieldsToEntry();
     renderSidebar();
     renderEntry(editingIndex);
-    flashBtn('ed-save', 'Saved!');
+    // persist the whole archive back to the picked entries.json — this covers
+    // save of edited, and newly-created (New adds a draft; Save writes it) entries.
+    const wrote = await persistEntries();
+    const msg = { written: 'Saved to file!', cancelled: 'Save cancelled', loaded: 'Loaded file — edit dropped', exported: 'Exported instead', error: 'Save failed' }[wrote] || 'Saved!';
+    flashBtn('ed-save', msg);
   }
 
   // ── DELETE ENTRY ──
-  function deleteEntry() {
+  async function deleteEntry() {
     if (editingIndex < 0 || !entries.length) return;
     if (!confirm(`Delete "${entries[editingIndex].title}"?`)) return;
     entries.splice(editingIndex, 1);
@@ -316,6 +370,7 @@
       document.getElementById('entryHeader').innerHTML = '';
       document.getElementById('entryBox').innerHTML = '';
     }
+    await persistEntries().then(w => flashBtn('ed-delete', w === 'written' ? 'Deleted' : 'Delete failed'));
   }
 
   // ── EXPORT JSON ──
@@ -337,8 +392,8 @@
     setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1800);
   }
 
-  // ── SIDEBAR click loads editor fields too ──
-  // already handled in switchEntry → renderSidebar onclick
+  // sidebar clicks reload the editor fields when the editor panel is open
+  // (see switchEntry) — keeps editingIndex aligned with the shown entry
 
   loadEntries();
 </script>
