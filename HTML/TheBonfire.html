@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TheBonfire — Eternal Hearthlight Office</title>
+<title>Bonfire.bat — Eternal Hearthlight Office</title>
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../CSS/TheBonfire.css">
 </head>
@@ -213,16 +213,31 @@
         .replace(/\_(.+?)\_/g, '<u>$1</u>');
     }
 
-    // split on double (or more) newlines → paragraphs
-    // single newlines within a paragraph → <br>
-    const blocks = e.body.split(/\n{2,}/);
+    // Split on 3 newlines first (spacer) then 2 (paragraph).
+    // We tag each chunk so we know which gap preceded it.
     const box = document.getElementById('entryBox');
-    box.innerHTML = blocks.map((block, i) => {
-      // empty block = intentional blank space
-      if (!block.trim()) return '<div class="spacer"></div>';
-      // parse inline formatting, preserve single newlines as <br>
-      const lines = block.split('\n').map(parseInline).join('<br>');
-      if (i === 0) {
+    const chunks = [];
+    // Split on \n\n\n (spacer gap) — keep the delimiter type
+    const spacerParts = e.body.split(/\n{3}/);
+    spacerParts.forEach((part, si) => {
+      // Within each spacer-section, split on \n\n (normal paragraph gap)
+      const paraParts = part.split(/\n\n/);
+      paraParts.forEach((block, pi) => {
+        if (si > 0 && pi === 0) {
+          // this block follows a spacer gap — insert spacer before it
+          chunks.push({ type: 'spacer' });
+        }
+        chunks.push({ type: 'block', text: block });
+      });
+    });
+
+    let firstParagraph = true;
+    box.innerHTML = chunks.map(chunk => {
+      if (chunk.type === 'spacer') return '<div class="spacer"></div>';
+      if (!chunk.text.trim()) return ''; // skip empty
+      const lines = chunk.text.split('\n').map(parseInline).join('<br>');
+      if (firstParagraph) {
+        firstParagraph = false;
         const first = lines.charAt(0);
         const rest = lines.slice(1);
         return `<p><span class="drop">${first}</span>${rest}</p>`;
@@ -263,6 +278,14 @@
   }
 
   function fieldsToEntry() {
+    // Normalize body: collapse 3+ newlines to 2, ensure paragraph breaks
+    // are always \n\n so the renderer splits them correctly regardless of
+    // whether the user pressed Enter once or twice.
+    const rawBody = document.getElementById('ed-body').value;
+    const normalizedBody = rawBody
+      .replace(/\r\n/g, '\n')       // Windows line endings → unix
+      .replace(/\r/g, '\n')         // old Mac line endings → unix
+      .replace(/\n{4,}/g, '\n\n\n'); // 4+ newlines → exactly 3 (spacer max)
     return {
       id:         document.getElementById('ed-id').value.trim(),
       title:      document.getElementById('ed-title').value.trim(),
@@ -272,7 +295,7 @@
       restricted: document.getElementById('ed-restricted').checked,
       category:   document.getElementById('ed-category').value.trim(),
       tags:       document.getElementById('ed-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
-      body:       document.getElementById('ed-body').value
+      body:       normalizedBody
     };
   }
 
