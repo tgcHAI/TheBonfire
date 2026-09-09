@@ -1,12 +1,12 @@
 {
-
     "version": "0.2.0",
     "configurations": [
         {
             "type": "editor-browser",
             "request": "launch",
             "name": "Open TheBonfire.html",
-            "url": "http://localhost:4173/"
+            "url": "http://localhost:4173/",
+            "preLaunchTask": "Start TheBonfire server"
         }
     ]
 }

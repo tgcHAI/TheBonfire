@@ -229,7 +229,9 @@ body::before {
 .entry-box {
     height: 100%;
     overflow-y: auto;
-    padding: 20px 24px;
+    /* wheel-picker breathing room: viewport-relative so first/last lines
+       sit near the vertical centre regardless of the box width */
+    padding: 40vh 24px;
     background: var(--panel-raised);
     border: 1px solid var(--border-dim);
     border-radius: 12px;
@@ -238,19 +240,20 @@ body::before {
     transform-style: preserve-3d;
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
-    /* clip fade masks to the rounded box */
+    scroll-behavior: smooth;
+    /* fade strongest at edges, clear in the reading zone */
     -webkit-mask-image: linear-gradient(
         to bottom,
         transparent 0%,
-        black 12%,
-        black 88%,
+        black 18%,
+        black 82%,
         transparent 100%
     );
     mask-image: linear-gradient(
         to bottom,
         transparent 0%,
-        black 12%,
-        black 88%,
+        black 18%,
+        black 82%,
         transparent 100%
     );
 }

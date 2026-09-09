@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start TheBonfire server",
+            "type": "process",
+            "command": "node",
+            "args": ["${workspaceFolder}/server.js"],
+            "isBackground": true,
+            "group": "build",
+            "problemMatcher": {
+                "owner": "bonfire-server",
+                "pattern": { "regexp": "^$" },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "TheBonfire server running"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            }
+        }
+    ]
+}
