@@ -14,7 +14,7 @@
   <!-- TOP BAR -->
   <header class="topbar">
     <div class="topbar-logo"></div>
-    <span class="topbar-title">TheBonfire</span>
+    <span class="topbar-title">Bonfire.exe</span>
     <span class="topbar-sub">Eternal Hearthlight Office — Lore Archive</span>
     <button class="editor-toggle" onclick="toggleEditor()" title="Open Entry Editor">&#9998;</button>
   </header>
@@ -269,11 +269,6 @@
       body:       normalizedBody
     };
   }
-
-  // ── PERSIST TO FILE ──
-  // Writes the whole archive back to json/entries.json in place via the local
-  // server (server.js**, run with node server.js → http://localhost). No file
-  // dialogs or downloads — Save/Delete just POST the array to /api/entries.
 
   async function persistEntries() {
     try {
