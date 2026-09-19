@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#120d06">
 <title>Bonfire.bat — Eternal Hearthlight Office</title>
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../CSS/TheBonfire.css">
 </head>
 <body>
+
+<a class="skip-link" href="#main">Skip to content</a>
 
 <div class="shell">
 
@@ -16,7 +19,7 @@
     <div class="topbar-logo"></div>
     <span class="topbar-title">Bonfire.exe</span>
     <span class="topbar-sub">Eternal Hearthlight Office — Lore Archive</span>
-    <button class="editor-toggle" onclick="toggleEditor()" title="Open Entry Editor">&#9998;</button>
+    <button class="editor-toggle" onclick="toggleEditor()" title="Open Entry Editor" aria-label="Open the entry editor" aria-expanded="false">&#9998;</button>
   </header>
 
   <!-- EDITOR DROPDOWN -->
@@ -34,33 +37,33 @@
       <div class="editor-fields">
         <div class="ed-row">
           <div class="ed-field">
-            <label>ID</label>
+            <label for="ed-id">ID</label>
             <input type="text" id="ed-id" placeholder="EHO-005">
           </div>
           <div class="ed-field">
-            <label>Title</label>
+            <label for="ed-title">Title</label>
             <input type="text" id="ed-title" placeholder="Entry title">
           </div>
           <div class="ed-field">
-            <label>Author</label>
+            <label for="ed-author">Author</label>
             <input type="text" id="ed-author" placeholder="Author name">
           </div>
           <div class="ed-field">
-            <label>Date</label>
+            <label for="ed-date">Date</label>
             <input type="text" id="ed-date" placeholder="21XX">
           </div>
         </div>
         <div class="ed-row">
           <div class="ed-field">
-            <label>Status</label>
+            <label for="ed-status">Status</label>
             <input type="text" id="ed-status" placeholder="Active / Ongoing / Sealed...">
           </div>
           <div class="ed-field">
-            <label>Category</label>
+            <label for="ed-category">Category</label>
             <input type="text" id="ed-category" placeholder="Field Observation, Personal Log...">
           </div>
           <div class="ed-field">
-            <label>Tags <span class="ed-hint">(comma separated)</span></label>
+            <label for="ed-tags">Tags <span class="ed-hint">(comma separated)</span></label>
             <input type="text" id="ed-tags" placeholder="tag1, tag2, tag3">
           </div>
           <div class="ed-field ed-field-check">
@@ -71,7 +74,7 @@
           </div>
         </div>
         <div class="ed-field ed-body-field">
-          <label>Body <span class="ed-hint">(blank line = new paragraph)</span></label>
+          <label for="ed-body">Body <span class="ed-hint">(blank line = new paragraph)</span></label>
           <textarea id="ed-body" placeholder="Write the entry here..."></textarea>
         </div>
       </div>
@@ -87,7 +90,7 @@
     </nav>
 
     <!-- MAIN -->
-    <main class="main">
+    <main class="main" id="main">
       <div class="entry-header" id="entryHeader">
         <!-- populated by JS -->
       </div>
@@ -99,6 +102,10 @@
     </main>
 
   </div>
+
+  <!-- MOBILE: collapse/expand the entry list (hidden on desktop) -->
+  <button id="sidebarToggle" class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Hide the entry list" aria-expanded="true" aria-controls="sidebar">&#10094;</button>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 </div>
 
 <script>
@@ -141,7 +148,9 @@
     nav.innerHTML = '<div class="sidebar-label">Entries</div>';
     entries.forEach((e, i) => {
       const a = document.createElement('a');
-      a.className = 'nav-item' + (i === currentIndex ? ' active' : '');
+      const active = i === currentIndex;
+      a.className = 'nav-item' + (active ? ' active' : '');
+      if (active) a.setAttribute('aria-current', 'true');
       a.href = '#';
       a.innerHTML = `
         <span class="entry-id">${e.id}</span>
@@ -161,7 +170,7 @@
     // header
     document.getElementById('entryHeader').innerHTML = `
       <div class="entry-id-tag">${e.id} &mdash; ${e.category}</div>
-      <div class="entry-title">${e.title}${e.restricted ? ' <span class="restricted-badge">&#128274;</span>' : ''}</div>
+      <h1 class="entry-title">${e.title}${e.restricted ? ' <span class="restricted-badge">&#128274;</span>' : ''}</h1>
       <div class="entry-meta">
         <span>${e.author}</span>
         <span>${e.date}</span>
@@ -201,7 +210,7 @@
     });
 
     let firstParagraph = true;
-    box.innerHTML = chunks.map(chunk => {
+    const finalHtml = chunks.map(chunk => {
       if (chunk.type === 'spacer') return '<div class="spacer"></div>';
       if (!chunk.text.trim()) return ''; // skip empty
       const lines = chunk.text.split('\n').map(parseInline).join('<br>');
@@ -213,15 +222,105 @@
       }
       return `<p>${lines}</p>`;
     }).join('');
+    box.innerHTML = finalHtml;
     // Large top padding keeps the first line below the box top at
     // scrollTop = 0 (wheel-picker feel) — no extra calculation needed.
     box.scrollTop = 0;
+    animateEntryText(box);
+  }
+
+  // MATRIX-STYLE DECODE: gibberish decrypts left -> right.
+  // Glyphs are half-width katakana + ASCII symbols; layout stays steady.
+  const SCRAMBLE_GLYPHS = '?!@#$%^&*()_+-=[]{}|;:,./<>?0123456789<>/\\|~*+=';
+  const SCRAMBLE_DURATION = 20000; // ms for the wave to cross the whole entry
+  const ROLL_MS = 480;            // per-char slot roll: spins, decelerating, for 480ms before landing
+  const ROLL_GLYPHS = 14;         // reel steps over the spin, teasing the final char along the way
+  let entryRenderToken = 3;       // bumped per render; stale rAF loops stop instantly
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function animateEntryText(box) {
+    box.setAttribute('aria-busy', 'true');
+
+    // Only leaf text is scrambled; markup structure stays untouched.
+    const nodes = [];
+    const walker = document.createTreeWalker(box, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const el = walker.currentNode;
+      if (el.nodeValue.trim()) nodes.push({ el: el, final: el.nodeValue });
+    }
+    if (!nodes.length) { box.removeAttribute('aria-busy'); return; }
+
+    // Whitespace stays whitespace; decoded chars lock in place.
+    const scramble = (final, count) => {
+      let out = '';
+      for (let j = 0; j < final.length; j++) {
+        const c = final[j];
+        out += (j < count || c === ' ' || c === '\t') ? c
+             : SCRAMBLE_GLYPHS[(Math.random() * SCRAMBLE_GLYPHS.length) | 0];
+      }
+      return out;
+    };
+
+    // One wave over the flattened text; any length decodes in SCRAMBLE_DURATION.
+    let cursor = 0;
+    for (const t of nodes) { t.offset = cursor; cursor += t.final.length; }
+    const totalChars = Math.max(1, cursor);
+
+    // Static masks; jitter re-randomizes unrevealed glyphs for the shimmer.
+    const mask = nodes.map(t => scramble(t.final, 0));
+    const jitter = !prefersReducedMotion;
+
+    // Seeded now so real text never flashes.
+    for (let i = 0; i < nodes.length; i++) nodes[i].el.nodeValue = mask[i];
+
+    const token = ++entryRenderToken;
+    const start = performance.now() + 90; // brief all-gibberish beat before resolving
+    let complete = false;
+    const finish = () => { if (!complete) { complete = true; box.removeAttribute('aria-busy'); } };
+
+    const msPerChar = SCRAMBLE_DURATION / totalChars;
+    const tick = (now) => {
+      if (complete || entryRenderToken !== token) { clearInterval(fallbackTimer); return; }
+      // Per-char timeline: the wave locks char p at revealAt; for the 480ms before
+      // that it spins a decelerating slot reel, teasing the final char mid-spin.
+      let pending = 0;
+      for (let i = 0; i < nodes.length; i++) {
+        const t = nodes[i];
+        let out = '';
+        for (let j = 0; j < t.final.length; j++) {
+          const revealAt = start + (t.offset + j + 1) * msPerChar;
+          const rollPhase = (now - (revealAt - ROLL_MS)) / ROLL_MS;
+          if (rollPhase >= 1) { out += t.final[j]; continue; }
+          if (rollPhase >= 0 && jitter) {
+            const reel = Math.floor(ROLL_GLYPHS * (2 * rollPhase - rollPhase * rollPhase));
+            if (reel % 5 === 0) { out += t.final[j]; continue; }
+            out += SCRAMBLE_GLYPHS[((t.offset + j) * 7 + reel) % SCRAMBLE_GLYPHS.length];
+            continue;
+          }
+          const c = t.final[j];
+          if (c === ' ' || c === '\t') { out += c; continue; }
+          out += jitter ? SCRAMBLE_GLYPHS[(Math.random() * SCRAMBLE_GLYPHS.length) | 0] : mask[i][j];
+        }
+        if (out !== t.final) pending++;
+        t.el.nodeValue = out;
+      }
+      if (pending > 0) requestAnimationFrame(tick);
+      else finish();
+    };
+    // Watchdog: rAF is suspended in backgrounded tabs.
+    const fallbackTimer = setInterval(() => {
+      if (complete) { clearInterval(fallbackTimer); return; }
+      tick(performance.now());
+    }, 300);
+    requestAnimationFrame(tick);
   }
 
   function switchEntry(index) {
     currentIndex = index;
     renderSidebar();
     renderEntry(index);
+    // On phones the drawer overlays the text — dismiss it once an entry is picked.
+    if (isMobile() && !document.body.classList.contains('sidebar-collapsed')) setSidebar(false);
     // keep the editor form aligned with the entry being viewed when the panel
     // is open (otherwise the form and editingIndex can silently point at another entry**
     if (document.getElementById('editorPanel').classList.contains('open')) loadEditorFields(index);
@@ -231,8 +330,31 @@
   function toggleEditor() {
     const panel = document.getElementById('editorPanel');
     const open = panel.classList.toggle('open');
+    document.querySelector('.editor-toggle').setAttribute('aria-expanded', open ? 'true' : 'false');
     if (open) loadEditorFields(currentIndex);
   }
+
+  // MOBILE SIDEBAR DRAWER
+  function isMobile() {
+    return window.matchMedia('(max-width: 820px)').matches;
+  }
+
+  function setSidebar(open) {
+    document.body.classList.toggle('sidebar-collapsed', !open);
+    const btn = document.getElementById('sidebarToggle');
+    btn.innerHTML = open ? '&#10094;' : '&#10095;';
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? 'Hide the entry list' : 'Show the entry list');
+  }
+
+  function toggleSidebar() {
+    setSidebar(document.body.classList.contains('sidebar-collapsed'));
+  }
+
+  // tapping the dimmed area under the drawer dismisses it
+  document.getElementById('sidebarBackdrop').addEventListener('click', function() {
+    setSidebar(false);
+  });
 
   function loadEditorFields(index) {
     editingIndex = index;
@@ -335,7 +457,9 @@
       renderEntry(editingIndex);
     } else {
       document.getElementById('entryHeader').innerHTML = '';
-      document.getElementById('entryBox').innerHTML = '';
+      const emptyBox = document.getElementById('entryBox');
+      emptyBox.innerHTML = '';
+      emptyBox.removeAttribute('aria-busy');
     }
     await persistEntries().then(w => flashBtn('ed-delete', w === 'written' ? 'Deleted' : 'Deleted (browser only)'));
   }
@@ -367,3 +491,4 @@
 
 </body>
 </html>
+

@@ -9,8 +9,8 @@
     --ember-glow:   rgba(196, 127, 23, 0.15);
     --ember-glow2:  rgba(196, 127, 23, 0.06);
     --text:         #d4aa6a;
-    --text-dim:     #7a5c2e;
-    --text-faint:   #4a3818;
+    --text-dim:     #8a6734;
+    --text-faint:   #5a4522;
     --scanline:     rgba(0,0,0,0.18);
 }
 
@@ -473,3 +473,178 @@ body::before {
 
 /* intentional blank line spacer */
 .spacer { height: 1.2em; display: block; }
+
+/* ── MOBILE & ACCESSIBILITY ── */
+
+/* stop mobile browsers from auto-inflating text */
+html { -webkit-text-size-adjust: 100%; }
+
+/* keyboard/touch focus ring everywhere */
+:focus-visible {
+    outline: 2px solid var(--ember-bright);
+    outline-offset: 2px;
+}
+
+/* skip-link: hidden until focused */
+.skip-link {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 9998;
+    padding: 8px 14px;
+    background: var(--panel-raised);
+    border: 1px solid var(--ember);
+    color: var(--ember-bright);
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    text-decoration: none;
+    transform: translateY(-200%);
+    transition: transform 0.2s;
+}
+.skip-link:focus { transform: translateY(0); }
+
+/* no grey highlight flash when tapping on phones */
+body { -webkit-tap-highlight-color: transparent; }
+
+/* honor reduced motion: kill animations/transitions */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* the mobile arrow + backdrop only exist below the breakpoint */
+.sidebar-toggle,
+.sidebar-backdrop { display: none; }
+
+/* ── SMALL SCREENS (phones / slim tablets) ── */
+@media (max-width: 820px) {
+    /* lighter scanlines: keeps the CRT feel, cheaper to paint */
+    body { --scanline: rgba(0,0,0,0.05); }
+
+    .body { grid-template-columns: 1fr; }
+
+    .main {
+        padding: 14px 14px;
+        padding-left: max(14px, env(safe-area-inset-left));
+        padding-right: max(14px, env(safe-area-inset-right));
+    }
+
+    .topbar {
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+    }
+    .topbar-sub { display: none; }
+
+    /* sidebar slides over the content as a drawer */
+    .sidebar {
+        position: fixed;
+        top: 48px;
+        bottom: 0;
+        left: 0;
+        width: min(300px, 85vw);
+        z-index: 60;
+        padding-top: 12px;
+        box-shadow: 2px 0 18px rgba(0,0,0,0.55);
+        transform: translateX(0);
+        transition: transform 0.25s ease, visibility 0.25s;
+    }
+    body.sidebar-collapsed .sidebar {
+        transform: translateX(-100%);
+        visibility: hidden; /* also drops its links out of the tab order */
+    }
+
+    /* dimmed backdrop; tapping it closes the drawer */
+    .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        top: 48px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 55;
+        background: rgba(0,0,0,0.45);
+        transition: opacity 0.25s;
+    }
+    body.sidebar-collapsed .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    /* floating arrow handle pinned to the drawer's right edge */
+    .sidebar-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 50%;
+        left: calc(min(300px, 85vw) - 22px);
+        transform: translate(0, -50%);
+        width: 44px;
+        height: 44px;
+        z-index: 65;
+        background: var(--panel-raised);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--ember-bright);
+        font-family: 'Courier Prime', monospace;
+        font-size: 18px;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+        transition: transform 0.25s ease, color 0.15s;
+    }
+    body.sidebar-collapsed .sidebar-toggle {
+        transform: translate(calc(22px - min(300px, 85vw)), -50%);
+    }
+    .sidebar-toggle:hover { color: var(--ember); }
+
+    .ed-btn {
+        min-height: 40px;
+        padding: 8px 14px;
+    }
+    .nav-item { padding: 12px 16px; }
+    .editor-toggle {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .entry-title { font-size: 20px; }
+
+    /* bigger inputs stop iOS auto-zooming when a field is focused */
+    .ed-field input[type="text"],
+    .ed-body-field textarea { font-size: 16px; }
+
+    /* flatter, shorter run so the text is reachable */
+    .entry-box {
+        padding: 28vh 16px;
+        transform: none;
+    }
+
+    /* editor grid: two columns on slim screens */
+    .ed-row { grid-template-columns: repeat(2, 1fr); }
+
+    /* the open editor fills the remaining viewport and scrolls itself */
+    .editor-panel.open {
+        max-height: calc(100vh - 48px);
+        max-height: calc(100dvh - 48px);
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 520px) {
+    .ed-row { grid-template-columns: 1fr; }
+    .editor-actions { flex-wrap: wrap; }
+}
+
+/* landscape phones: keep the reading line in view */
+@media (max-height: 480px) {
+    .entry-box { padding: 12vh 16px; }
+    .main { padding: 10px 14px; }
+}
+
