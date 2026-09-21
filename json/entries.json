@@ -1,7 +1,7 @@
 [
   {
     "id": "EHO-001",
-    "title": "The Prolouge",
+    "title": "The Prologue",
     "author": "Salaknib",
     "date": "21XX",
     "status": "Archived",
@@ -23,7 +23,7 @@
     "tags": [
       "History"
     ],
-    "body": "Juxtapose Corporation, a small corporation, shut down just as soon as it was growing its numbers to match that of a Wing.\n\nIts Founder, who still remains unknown, created the _'Recall System'_, a multiple process system that takes our memories and imprints them into new bodies, husks. We can edit the aspects of our new bodies — gender and specific genes, even memories, from childhood to then.\n\nWhat the E.H.O uses, whatever I was able to repair, is remnants of it. It's not good, but at least its purpose is still around.\n\n\nJuxtapose Corporation is a corporation that aimed to be a Wing. Its Singularity is not the Recall System, but rather the surprising foresight of The Founder. A form of precognition — it's not foresight, but it's not seeing the future either. It's something else entirely. Make no sour judgment, my memories are not as sharp as they were 3 years prior to the incident. **Stress deals a great toll of damage.**\n\n\nThe Former Seatholders, called the **Seven Vanities**, were on their tailcoat reign on Juxtapose. They wanted to keep hold, so they turned cruel — crueler than they already were. They forced Employees to work tirelessly, to work under conditions that were inoperable, but it was all *'fine'* as the Recall System would just take the exhaustion out. So they worked. They worked until their hands broke, their starvation took them, their defiance paid with a shot to the head.\n\nVoxus was one such worker. He saw every aspect of the Corporation, and sought to take control. Once he was Head of the Memeticians, he gassed the Seven Vanities, and ushered in the Juxtapose Corporation many knew.\n\nI always saw him on his best, never the worst. I wonder if Voxus had one.\n\n\nAs to what happened...\n\nIt was a dark day. Multiple syndicates and offices broke in, trying to sink us. We were a dangerous power growing and it was something they deemed a threat. Insiders amongst us were leaking information to rivals — even our allies backstabbed us. **They were the ones who opened the door.**\n\nI do not forget that day. They butchered everyone in sight.\nLuckily, the Geothology Department broke away in time.\nSome of us got out, fled for safety — Voxus did issue the order.\nSome were not so lucky. Those bastards went for what we had, and in an effort to stop them, he flooded the whole headquarters with acid, killing everyone inside.\n\n_I escaped barely. It cost me my eye._\n\n\nThe Hearthlight Office, and its Eternal Flame, will not dim down now. My predecessor taught me much — made a database of people to keep watch and keep out.\n\nFrom one seed, another grows.\n\nI just wonder how he is."
+    "body": "\n\n **Juxtapose Corporation** \nA modest enterprise, collapsed just as it was expanding its numbers to match that of a Wing.\n\n\nIts founder, whose identity remains a mystery, created the Recall System. \nIt is a multi-step process that captures human memories and imprints them into new bodies, or husks. \nThrough this technology, they were able to modify physical forms, adjusting gender, specific genes, and even editing memories all the way from childhood up to the present.\n\n\nWhat the E.H.O. uses now, whatever fragments I managed to salvage, is merely a remnant of that system. \nIt is far from perfect, but at least its fundamental purpose survives.\n\n\nJuxtapose Corporation was an organization that aimed to become a Wing. \nHowever, its true Singularity was not the Recall System, but rather the astonishing foresight of the Founder. \nIt was a form of precognition—not quite traditional foresight, nor simply seeing the future. \nIt was something else entirely. Do not judge me too harshly, my memories are not as sharp as they were three years prior to the incident. \n*Stress takes a heavy toll.*\n\n\nNow, what was Juxtapose Co. before what was known? It's foggy, but I do know fragments.\nThe former Seatholders, known as **The Seven Vanities**, were holding tightly to their reign over Juxtapose. \nDesperate to keep their grip, they grew cruel—crueler than they already were. They forced employees to work tirelessly under impossible conditions. \nIt was all treated as fine because the Recall System could simply wipe away physical exhaustion. \nSo they worked. They worked until their hands broke, until starvation consumed them, or until their defiance was met with a bullet to the head.\n\n\nVoxus was one such worker. Having witnessed every layer of the corporation, he sought to take control. \nOnce he rose to Head of the Memeticians, he gassed the Seven Vanities and ushered in the era of Juxtapose Corporation that many came to know.\n\nI always saw him at his best, never his worst. I often wonder if Voxus even had a worst.\n\n\nNow, happened that day...was a grim one...\n\nIt was a dark day. \nMultiple syndicates and offices breached our perimeter, trying to sink us. \nWe were a growing power, a dangerous force they deemed a threat. Insiders leaked our secrets to rivals, and even our supposed allies backstabbed us. \nThey were the ones who unlocked the doors.\nI will never forget that day. They butchered everyone in sight.\n\nFortunately, the Geothology Department managed to break away in time. \nSome of us escaped and fled to safety, acting on Voxus's evacuation orders. \nOthers were not so lucky. Those bastards came for our assets, and in a desperate effort to stop them, Voxus flooded the entire headquarters with acid, killing everyone inside.\n\n\nI barely escaped. It cost me my eye.\n\nAs for what happened.\n\n\nThe Hearthlight Office and its Eternal Flame will not dim now. \nMy predecessor taught me well, leaving behind a database of individuals to watch and keep out.\n\nFrom one seed, another grows.\nI just wonder how he is.\n"
   },
   {
     "id": "EHO-003",
@@ -71,7 +71,7 @@
   },
   {
     "id": "TFB-01",
-    "title": "Theus",
+    "title": "The Tortured",
     "author": "Unknown",
     "date": "1550",
     "status": "Sealed",
@@ -85,7 +85,7 @@
   },
   {
     "id": "TFB-02",
-    "title": "Mute",
+    "title": "The Mute",
     "author": "Unknown",
     "date": "2056",
     "status": "Sealed",
@@ -99,7 +99,7 @@
   },
   {
     "id": "TFB-03",
-    "title": "Machine",
+    "title": "The Architect and Harbinger",
     "author": "Unknown",
     "date": "Error",
     "status": "Sealed",
@@ -113,7 +113,7 @@
   },
   {
     "id": "TFB-04",
-    "title": "Gambler",
+    "title": "The Semblance",
     "author": "Unknown",
     "date": "?1%&, !#. *%",
     "status": "Sealed",
@@ -124,5 +124,47 @@
       "RWBY"
     ],
     "body": "\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n**Who Flips The Coin of Fate**\n\n\nCome little ones, come and hear,\nOf a man who made the dark his frontier.\nNot because he wanted to, not because he sought,\nBut because the dark was something to be fought.\n\n\nHis name was Obs, Obadiah Mark,\nA Hunter burning bright against the dark.\nHe had a sister, Delilah, sharp and true,\nA friend called Ollie James who swung his hammer through,\nAnd Maeve who bore a greatsword like a wall,\nTogether they were DOOM, and answered every call.\n\n\nNear Shade they walked where Vacuo's reach ran thin,\nTo towns that needed help and let them in.\nThey were not famous. They were not renowned.\nThey were the ones who showed up and held the ground.\n\n\nObadiah was a funny man, or so they say,\nHe filled the gaps of battle with his wordplay.\nA quip for every Grimm, a jest for every blow,\nHe made the fight feel like a show.\n\n\nBut do not be mistaken, oh do not be fooled,\nThe man who joked in battle was not ruled\nBy carelessness or comfort or the ease\nOf one who does not know what darkness sees.\n\n\nFor all the hidden dangers, he well knew,\nIn a line of work where survivors are so few.\nYet he chose to wear a smile anyway,\nFor that is what divides the ones who runs away\nFrom the stalwarts who will stay.\n\n\nHe had a gun, and children, hear me well,\nA weapon built from something meant to clear hell.\nA double barrel, pump-action gun, something he designed,\nTwo-gauge shells of his own careful grind.\nThe recoil of a single shot would break an unprotected arm, \nmake no mistake. \nObs wore armor. Wore a brace. Wore more.\nProsthetic arms to bear where flesh would floor.\nAnd still when he would fire, \nthe world would make way,\nThe ground beneath him lurching and parting away.\n\n\nHe fired still.\nAs he always would.\n\n\nHe had a Semblance, simple it can be,\nCalled Come and Go, as waves and rivers be.\nFlip a coin and call it in the air,\nGuess right and fortune follows everywhere.\n\n\nThe best that could have happened, happens then.\nGuess wrong and worst descends on you and them.\n\n\nWhen Obs stood alone he always called it wrong,\nHe took the worst upon himself and held strong,\nSo worst had come and gone before it spread\nTo anyone he loved, leaving nightmares in its stead.\n\n\nWhen DOOM stood close he called it for the win,\nLuck bleeding outward, covering all of them.\nEveryone home. Everyone alive.\nHis Semblance bending so that they could thrive.\n\n\nHe carried all the bad luck in his chest,\nSo those beside him never felt the rest.\n\nThis is the whole of him.\nThis is every choice.\nEvery shell. Every joke.\nEvery raised and steady voice.\n\n\nThat night it broke was not a special night.\nNo prophecy. No sign. No fading light\nMore dramatic than the usual dark.\nJust the world doing what the world does,\nWhen a frantic panic rises up above,\n\nThe Grimm smell the fear from miles away,\nAnd the remaining hours turn to dust and gray.\n**Mantle was falling. Atlas came undone.**\nThe people moved like rivers, tried to run.\n\n\nBut the Grimm were voracious, the Grimm were incense,\nThe Grimm moved with them, hungry and immense,\nA tide of black against the last defense.\n\n\nNo matter what the ruin bought,\nThey stood their ground, \nTeam DOOM fought.\n\nObs called the coin and called it right,\nHe kept them moving through that hectic night.\nThe jokes came easy in the early hours,\nThe gun sang out and proved its fearsome powers.\n\nBut the horde did not thin.\nIt swelled. It grew.\nIt pressed and pressed until the jokes ran through\n\n\nAnd something in him that had always faced\nThe dark from a distanceturned and met its cold embrace.\nQuiet, children, he went quiet,Not the quiet of surrender.\nThe quiet of a man who hasdecided what will happenand is simply walking toward it.\n\n\nHe fired until the armor cracked its seams.\nHe fired until the prosthetics split their beams.\nHe fired until the arms themselves gave way,\nHe bled where metal met the flesh, and stayed.\n\n\nDelilah. Ollie. Maeve.\nThe precious few he had to save.\nNo matter how the monsters rave.\n\n\nThree names, repeated like a sacred hymn,\nThree reasons for each shell against the Grimm,\nThree lives that wouldn't flicker out or dim.\nBecause Obs had decided that they would,\n\n\nAnd Obadiah Mark was always good\nAt making the coin land exactly as he willed.\n\n\nThat was when something found him, past a veil\nOf darkness, snapping jaws, and shattered mail,\nA presence watching through the iron hail,\nIt understood the heavy price he carries\nWhen in the jaws of death a mortal tarries.\n\n\nA deal was offered in the roar and press.\nThe three would live.\nWould wake to nothing less\nThan health restored, the night unwound, made clean.\n\n\nIn exchange for this,Obs would come between\nOne world and the next, and not return.\n\n\n*He hesitated.*\n\n\nThe world began to blur.\nHe was not stone, children, he felt his spirit stir.\nTo leave the only home he had preferred.\n\n\nDelilah. Ollie. Maeve.\n*He said _yes._*\n\n\nNot with a coward's sigh,\nBut as a man who watches the coin fly.\nHe saw it land, he didn't blink an eye,\nHe knew the gamble, and he didn't lie.\n\n\nThe three were healed.\nThe Grimm were gone.\nObs vanished past the setting of the sun.\nAnd in the quiet space where worlds divide,\nA Hunter stood, his weapon cast aside,\n\n\nFor the first time without a war to hide.\nHe landed somewhere old.\n\n\nA city with no sky he recognized,\nWhere guns were banned and people were surprised\nBy nothing, having seen enough to know\nThat strange things come and stranger things always go.\n\nHe hid his gun.He worked the streets.\nHe learned The City's rhythms and its deceits,\nIts layers and its hungers and its cost,\nAnd moved through it as one who is not lost\n\n\nBut simply has not found the exit gate,\nAnd refuses to submit himself to fate.\n\n\nHe did not joke.\nHe held his tongue.\nThe air was wrong for songs he’d once have sung.\nThe dark was different here, too old and lit\nFrom somewhere underneath, and Obs had learned to fit.\n\n\nHe knew that laughter is a gift, not something earned\nBy pointing it at things too large to name.\nHe moved.\nHe watched. He waited. And he came,\n\n\nOne year into The City's grinding teeth,\nAcross a man called Lorenzio beneath\nThe weight of something Obs did not yet know\nBut recognized the shape of, even so.\n\n\nThe shape of someone carrying a load\nToo large for any single back, the road\nToo long for any single pair of feet.\nAnd side by side, \nthey walked the lonely street\n\n*But, dear children, this is where this story and another meet.*\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  },
+  {
+    "id": "TFB-05",
+    "title": "The Voidtouched",
+    "author": "Hey Kiddo",
+    "date": "1990",
+    "status": "Sealed",
+    "restricted": true,
+    "category": "Uncategorized",
+    "tags": [
+      "Fairy tale",
+      "Warframe"
+    ],
+    "body": "\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n**The Girl The Void Kept**\nOnce there was a little maid, \nWho slipped away from solid ground, \nAnd in the endless, heavy shade, \nThe hungry Void embraced and bound.\n\n\nThe dark is not a cruel thing, \nNor does it hate the life it takes.\nIt simply holds what time can bring, \nUncaring of the hearts it breaks.\n\n\nA thousand times she lived and died,\nIn quiet light and static air,\nWith every memory locked inside,\nRepeating what was written there.\n\n\nThe easy things were swept away,\nHer peace and rest left behind,\nYet wonder chose to softly stay,\nA tiny spark she kept confined.\n\n\nThen came the waking, cold and vast,\nPulled from the deep by waking eyes,\nTo bear the weight of ages past,\nBeneath strange and burning skies.\n\n\nShe pilots a Warframe through the fray,\nWhere every lethal step is weighed,\nYet sometimes plays a reckless way,\nWith hands a joyful child has made.\n\n\nAmidst screaming stars, a pact was spun,\nBy eldritch powers, dark and deep,\nWho watched her as the game begun,\nWhile shadows walked her endless sleep.\n\n\nShe found others in the night,\nThe broken, strangers, but weary souls\nWho gathered in the fading light,\nTo share the pain that each controls.\n\n\nThe kinship does not heal the scar,\nIt only helps to bear the load,\nTo watch the flickering from afar,\nAnd stay beside the lonely road.\n\n\nThe Void is neither harsh nor sweet,\nShe whispers in the quiet air,\nWhere all her shifting lives repeat,\nAnd wonder lingers, waiting there.\n\n\nThe curtain falls, the shadows fade,\nAnd as the final act begins,\nThe stage is set where she was laid,\nThe show ends, as it was played.\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  },
+  {
+    "id": "TFB-06",
+    "title": "The Midding",
+    "author": "[ ]",
+    "date": "",
+    "status": "Sealed, interlinked",
+    "restricted": true,
+    "category": "Uncategorized",
+    "tags": [
+      "Fairy tale",
+      "Elden Ring"
+    ],
+    "body": ""
+  },
+  {
+    "id": "EHO-012",
+    "title": "The Altschmerz",
+    "author": "[ ]",
+    "date": "xxxx",
+    "status": "Sealed, interlinked",
+    "restricted": true,
+    "category": "Uncategorized",
+    "tags": [
+      "Fairy tale",
+      "Dark Souls"
+    ],
+    "body": ""
   }
 ]
