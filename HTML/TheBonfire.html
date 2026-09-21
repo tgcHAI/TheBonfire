@@ -236,7 +236,6 @@
   // Unrevealed glyphs swap once per second per column (cadence defined inside
   // animateEntryText); as the wave passes, characters lock in permanently.
   let entryRenderToken = 3;       // bumped per render; stale rAF loops stop instantly
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function animateEntryText(box) {
     box.setAttribute('aria-busy', 'true');
@@ -266,9 +265,9 @@
     for (const t of nodes) { t.offset = cursor; cursor += t.final.length; }
     const totalChars = Math.max(1, cursor);
 
-    // Static masks; jitter keeps every unrevealed char switching glyphs.
+    // Static masks only seed the very first frame; from then on every unrevealed
+    // char swaps glyphs on the 1s cadence below (no reduced-motion freeze).
     const mask = nodes.map(t => scramble(t.final, 0));
-    const jitter = !prefersReducedMotion;
 
     // Seeded now so real text never flashes.
     for (let i = 0; i < nodes.length; i++) nodes[i].el.nodeValue = mask[i];
@@ -282,7 +281,7 @@
 
     // Unrevealed glyphs swap once per second per column; a per-column phase
     // keeps the field shifting out of sync, so it reads as a live scramble.
-    const SWITCH_MS = 10;                // cadence each column changes glyphs
+    const SWITCH_MS = 100;              // cadence each column changes glyphs
     const SWITCH_STAGGER = 41;             // ms phase offset between columns
     const SWITCH_ORIGIN = start - SWITCH_MS * 8; // mid-sequence on frame one
 
@@ -299,7 +298,6 @@
           if (now >= revealAt) { out += t.final[j]; continue; }
           const c = t.final[j];
           if (c === ' ' || c === '\t') { out += c; continue; }
-          if (!jitter) { out += mask[i][j]; continue; }
           // Column clock is positive for the whole run (SWITCH_ORIGIN sits 8
           // seconds before start), so the field is mid-sequence on frame one.
           const phaseMs = ((t.offset + j) * SWITCH_STAGGER) % SWITCH_MS;
