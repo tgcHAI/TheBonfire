@@ -232,9 +232,9 @@
   // MATRIX-STYLE DECODE: gibberish decrypts left -> right.
   // Glyphs are half-width katakana + ASCII symbols; layout stays steady.
   const SCRAMBLE_GLYPHS = '?!@#$%^&*()_+-=[]{}|;:,./<>?0123456789<>/\\|~*+=';
-  const SCRAMBLE_DURATION = 120000; // ms for the wave to cross the whole entry
-  const ROLL_MS = 480;            // per-char slot roll: spins, decelerating, for 480ms before landing
-  const ROLL_GLYPHS = 14;         // reel steps over the spin, teasing the final char along the way
+  const SCRAMBLE_DURATION = 90000; // ms for the wave to cross the whole entry
+  // Unrevealed glyphs swap once per second per column (cadence defined inside
+  // animateEntryText); as the wave passes, characters lock in permanently.
   let entryRenderToken = 3;       // bumped per render; stale rAF loops stop instantly
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -266,7 +266,7 @@
     for (const t of nodes) { t.offset = cursor; cursor += t.final.length; }
     const totalChars = Math.max(1, cursor);
 
-    // Static masks; jitter re-randomizes unrevealed glyphs for the shimmer.
+    // Static masks; jitter keeps every unrevealed char switching glyphs.
     const mask = nodes.map(t => scramble(t.final, 0));
     const jitter = !prefersReducedMotion;
 
@@ -279,27 +279,32 @@
     const finish = () => { if (!complete) { complete = true; box.removeAttribute('aria-busy'); } };
 
     const msPerChar = SCRAMBLE_DURATION / totalChars;
+
+    // Unrevealed glyphs swap once per second per column; a per-column phase
+    // keeps the field shifting out of sync, so it reads as a live scramble.
+    const SWITCH_MS = 10;                // cadence each column changes glyphs
+    const SWITCH_STAGGER = 41;             // ms phase offset between columns
+    const SWITCH_ORIGIN = start - SWITCH_MS * 8; // mid-sequence on frame one
+
     const tick = (now) => {
       if (complete || entryRenderToken !== token) { clearInterval(fallbackTimer); return; }
-      // Per-char timeline: the wave locks char p at revealAt; for the 480ms before
-      // that it spins a decelerating slot reel, teasing the final char mid-spin.
+      // Per-char timeline: the wave locks char p at revealAt; until then the
+      // column shows a scramble glyph that advances once per second.
       let pending = 0;
       for (let i = 0; i < nodes.length; i++) {
         const t = nodes[i];
         let out = '';
         for (let j = 0; j < t.final.length; j++) {
           const revealAt = start + (t.offset + j + 1) * msPerChar;
-          const rollPhase = (now - (revealAt - ROLL_MS)) / ROLL_MS;
-          if (rollPhase >= 1) { out += t.final[j]; continue; }
-          if (rollPhase >= 0 && jitter) {
-            const reel = Math.floor(ROLL_GLYPHS * (2 * rollPhase - rollPhase * rollPhase));
-            if (reel % 5 === 0) { out += t.final[j]; continue; }
-            out += SCRAMBLE_GLYPHS[((t.offset + j) * 7 + reel) % SCRAMBLE_GLYPHS.length];
-            continue;
-          }
+          if (now >= revealAt) { out += t.final[j]; continue; }
           const c = t.final[j];
           if (c === ' ' || c === '\t') { out += c; continue; }
-          out += jitter ? SCRAMBLE_GLYPHS[(Math.random() * SCRAMBLE_GLYPHS.length) | 0] : mask[i][j];
+          if (!jitter) { out += mask[i][j]; continue; }
+          // Column clock is positive for the whole run (SWITCH_ORIGIN sits 8
+          // seconds before start), so the field is mid-sequence on frame one.
+          const phaseMs = ((t.offset + j) * SWITCH_STAGGER) % SWITCH_MS;
+          const step = Math.floor((now - SWITCH_ORIGIN - phaseMs) / SWITCH_MS);
+          out += SCRAMBLE_GLYPHS[((t.offset + j) * 7 + step) % SCRAMBLE_GLYPHS.length];
         }
         if (out !== t.final) pending++;
         t.el.nodeValue = out;
