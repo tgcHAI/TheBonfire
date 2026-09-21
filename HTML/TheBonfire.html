@@ -232,7 +232,7 @@
   // MATRIX-STYLE DECODE: gibberish decrypts left -> right.
   // Glyphs are half-width katakana + ASCII symbols; layout stays steady.
   const SCRAMBLE_GLYPHS = '?!@#$%^&*()_+-=[]{}|;:,./<>?0123456789<>/\\|~*+=';
-  const SCRAMBLE_DURATION = 20000; // ms for the wave to cross the whole entry
+  const SCRAMBLE_DURATION = 120000; // ms for the wave to cross the whole entry
   const ROLL_MS = 480;            // per-char slot roll: spins, decelerating, for 480ms before landing
   const ROLL_GLYPHS = 14;         // reel steps over the spin, teasing the final char along the way
   let entryRenderToken = 3;       // bumped per render; stale rAF loops stop instantly
