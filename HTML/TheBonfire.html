@@ -1,3 +1,24 @@
+<!-- ___________________________________________  _______      _____  .____                               
+_____ _____ _____ ____  _   _    _    _                         
+| ____|_   _| ____|  _ \| \ | |  / \  | |                        
+|  _|   | | |  _| | |_) |  \| | / _ \ | |                        
+| |___  | | | |___|  _ <| |\  |/ ___ \| |___                     
+|_____|_|_|_|_____|_|_\_\_|_\_/_/   \_\_____|__ ____ _   _ _____ 
+| | | | ____|  / \  |  _ \_   _| | | | |   |_ _/ ___| | | |_   _|
+| |_| |  _|   / _ \ | |_) || | | |_| | |    | | |  _| |_| | | |  
+|  _  | |___ / ___ \|  _ < | | |  _  | |___ | | |_| |  _  | | |  
+|_|_|_|_____/_/___\_\_|_\_\|_|_|_| |_|_____|___\____|_| |_| |_|  
+ / _ \|  ___|  ___|_ _/ ___| ____|                               
+| | | | |_  | |_   | | |   |  _|                                 
+| |_| |  _| |  _|  | | |___| |___                                
+ \___/|_|   |_|   |___\____|_____|                               
+
+ Ymj Ktzsijw nx f hzwntzx rfs, bmt qnaji fx mj mni. 
+ Ujywnknji tk f btwqi, jshqtxji ts f qni. 
+ Mj qnaji fx f htbfwi, fqtsj fsi fqq xhfwji. 
+ Gzy mj xyjjqji mnx mjfwy, fsi rfij uqfsx ymfy mj xmfwji.
+--!>-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -230,8 +251,7 @@
   }
 
   // MATRIX-STYLE DECODE: gibberish decrypts left -> right.
-  // Glyphs are half-width katakana + ASCII symbols; layout stays steady.
-  const SCRAMBLE_GLYPHS = '?!@#$%^&*()_+-=[]{}|;:,./<>?0123456789<>/\\|~*+=';
+  const SCRAMBLE_GLYPHS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01';
   const SCRAMBLE_DURATION = 90000; // ms for the wave to cross the whole entry
   // Unrevealed glyphs swap once per second per column (cadence defined inside
   // animateEntryText); as the wave passes, characters lock in permanently.
@@ -282,8 +302,8 @@
     // Unrevealed glyphs swap once per second per column; a per-column phase
     // keeps the field shifting out of sync, so it reads as a live scramble.
     const SWITCH_MS = 100;              // cadence each column changes glyphs
-    const SWITCH_STAGGER = 41;             // ms phase offset between columns
-    const SWITCH_ORIGIN = start - SWITCH_MS * 8; // mid-sequence on frame one
+    const SWITCH_STAGGER = 100;             // ms phase offset between columns
+    const SWITCH_ORIGIN = start - SWITCH_MS * 10; // mid-sequence on frame one
 
     const tick = (now) => {
       if (complete || entryRenderToken !== token) { clearInterval(fallbackTimer); return; }
