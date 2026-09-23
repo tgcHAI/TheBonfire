@@ -145,6 +145,7 @@ let conversations = [{"id":"CONV-001","title":"Conversation Pit Testing.","statu
   const DEFAULT_DELAY_MS = 1600;   // gap before a message that doesn't set its own
   const SPEAKER_COLORS = 8;        // .spk-0 … .spk-7 in the stylesheet
   const DING_SRC = '../mats/sfx/message_out.mp3';
+  const GONE_OFFLINE_SRC = '../mats/sfx/gone_offline.mp3';
 
   let currentIndex = 0;
   let playing = false;
@@ -159,6 +160,7 @@ let conversations = [{"id":"CONV-001","title":"Conversation Pit Testing.","statu
   let endShown = false;
   let chatToken = 0;               // invalidated on switch so stale frames die
   let ding = null;                 // created on first Play (autoplay policy)
+  let endedTone = null;            // 'sign off' tone, primed with the ding
 
   // ── SIDEBAR ──
   function isMobile() {
@@ -324,6 +326,7 @@ let conversations = [{"id":"CONV-001","title":"Conversation Pit Testing.","statu
     playhead = 0;
     revealed = 0;
     endShown = false;
+    if (endedTone) { try { endedTone.pause(); endedTone.currentTime = 0; } catch (e) { /* not seekable yet */ } }
     msgNodes.forEach((el) => {
       el.classList.remove('in');
       el.classList.add('chat-pending');
@@ -350,6 +353,7 @@ let conversations = [{"id":"CONV-001","title":"Conversation Pit Testing.","statu
       resetPlayback();
     }
     primeDing();
+    primeOfflineTone();
     const token = chatToken;
     playing = true;
     lastFrame = performance.now();
@@ -374,6 +378,7 @@ let conversations = [{"id":"CONV-001","title":"Conversation Pit Testing.","statu
       if (revealed >= timeline.length) {
         playing = false;
         renderTransport();
+        playGoneOffline();
         showEndMarker();
         return;
       }
@@ -445,6 +450,29 @@ let conversations = [{"id":"CONV-001","title":"Conversation Pit Testing.","statu
     try { ding.pause(); ding.currentTime = 0; } catch (e) { /* not seekable yet */ }
     const p = ding.play();
     if (p && p.catch) p.catch(() => { /* a silent miss beats a broken transcript */ });
+  }
+
+  // The sign-off tone shares the autoplay restriction, so it is primed (muted)
+  // inside the same Play click that primes the ding.
+  function primeOfflineTone() {
+    if (!endedTone) { endedTone = new Audio(GONE_OFFLINE_SRC); endedTone.preload = 'auto'; }
+    endedTone.muted = true;
+    const started = endedTone.play();
+    const unlock = () => {
+      try { endedTone.pause(); endedTone.currentTime = 0; } catch (e) { /* not seekable yet */ }
+      endedTone.muted = false;
+    };
+    if (started && started.then) started.then(unlock, () => { endedTone.muted = false; });
+    else unlock();
+  }
+
+  // One shot when the timeline runs dry. resetPlayback() re-winds this element
+  // so a replay or conversation switch can't let it drone on mid-transcript.
+  function playGoneOffline() {
+    if (!endedTone) return;
+    try { endedTone.pause(); endedTone.currentTime = 0; } catch (e) { /* not seekable yet */ }
+    const p = endedTone.play();
+    if (p && p.catch) p.catch(() => { /* a silent miss beats a broken sign-off */ });
   }
 
   // ── INIT ──
