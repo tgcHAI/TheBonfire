@@ -113,6 +113,76 @@ body::before {
     margin-left: auto;
 }
 
+/* ── TOP BAR NAV (section icons) ── */
+.topbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 10px;
+}
+
+.topbar-nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 4px;
+    transition: background-color 0.15s;
+}
+
+.topbar-nav-item:hover { background: rgba(196,127,23,0.08); }
+
+/* The section icons are 75px flame glyphs with transparent backgrounds. They're
+   drawn directly as background images (no CSS-mask dependency) and tinted with
+   filters so idle/hover/active states keep the ember palette. */
+.nav-ico {
+    display: block;
+    width: 22px;
+    height: 22px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 22px 22px;
+    filter: brightness(0.78) sepia(0.95) saturate(2.3);
+    transition: filter 0.15s;
+}
+
+.nav-ico-files {
+    background-image: url('../mats/icons/Files_icon.png');
+}
+.nav-ico-conversations {
+    background-image: url('../mats/icons/Conversations_icon.png');
+}
+.nav-ico-personnel {
+    background-image: url('../mats/icons/Personnel_icon.png');
+}
+.nav-ico-lnf {
+    background-image: url('../mats/icons/LnF_icon.png');
+}
+
+.topbar-nav-item:hover .nav-ico {
+    filter: brightness(1) sepia(1) saturate(2.7) drop-shadow(0 0 4px rgba(196,127,23,0.5));
+}
+
+/* Active section: bright glyph plus a shaped glow. The drop-shadow sits on the
+   unfiltered parent so it surrounds the whole button. */
+.topbar-nav-item.active {
+    filter: drop-shadow(0 0 5px rgba(196,127,23,0.6));
+    animation: nav-pulse 3s ease-in-out infinite;
+}
+.topbar-nav-item.active .nav-ico {
+    filter: brightness(1.15) sepia(1) saturate(3.1) drop-shadow(0 0 6px rgba(232,160,32,0.8));
+}
+
+@keyframes nav-pulse {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(196,127,23,0.5)); }
+    50%      { filter: drop-shadow(0 0 10px rgba(232,160,32,0.9)); }
+}
+
+/* Sections whose pages don't exist yet stay dim and out of the tab order. */
+.topbar-nav-item.is-soon { cursor: not-allowed; }
+.topbar-nav-item.is-soon .nav-ico { opacity: 0.3; }
+.topbar-nav-item.is-soon:hover { background: transparent; }
+
 /* ── BODY LAYOUT ── */
 .body {
     grid-row: 2;
@@ -399,6 +469,19 @@ body::before {
 .ed-field input[type="text"]:focus {
     border-color: var(--ember);
 }
+.ed-field select {
+    background: var(--panel-raised);
+    border: 1px solid var(--border-dim);
+    color: var(--text);
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    padding: 5px 8px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+.ed-field select:focus {
+    border-color: var(--ember);
+}
 .ed-field-check {
     justify-content: flex-end;
     padding-bottom: 2px;
@@ -437,6 +520,47 @@ body::before {
     border-color: var(--ember);
 }
 
+/* ── CONVERSATION EDITOR MESSAGE LIST ── */
+/* The Pit's editor panel is taller than the Files one, and its message rows
+   flex-wrap so kind/name/time/delay/text/actions degrade gracefully on phones. */
+.conv-panel.open { max-height: 560px; }
+.conv-msg-list {
+    background: var(--panel-raised);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.conv-msg-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+}
+.conv-msg-row input[type="text"],
+.conv-msg-row input[type="number"],
+.conv-msg-row select.conv-msg-kind {
+    background: var(--panel);
+    border: 1px solid var(--border-dim);
+    color: var(--text);
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    padding: 3px 6px;
+    min-width: 0;
+}
+.conv-msg-kind { width: 62px; }
+.conv-msg-name { width: 130px; }
+.conv-msg-time { width: 58px; }
+.conv-msg-delay { width: 76px; }
+.conv-msg-text { flex: 1 1 160px; min-width: 130px; }
+.conv-msg-actions { display: flex; gap: 3px; }
+.conv-row-btn { padding: 1px 7px; min-width: 20px; }
+.ed-addmsg { margin-top: 6px; }
+
 /* account for editor panel pushing layout */
 .body {
     transition: margin-top 0.3s;
@@ -473,6 +597,221 @@ body::before {
 
 /* intentional blank line spacer */
 .spacer { height: 1.2em; display: block; }
+
+/* ── AIM-STYLE CHAT WINDOW (Conversation Pit) ── */
+.chat-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: var(--panel-raised);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 24px rgba(196,127,23,0.06), 0 0 0 1px rgba(0,0,0,0.4);
+}
+
+.chat-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 12px;
+    background: linear-gradient(180deg, #241a0c 0%, #17100a 100%);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.chat-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ember-bright);
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 10px rgba(196,127,23,0.45);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.08em;
+}
+
+.chat-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #6fbf4a;
+    box-shadow: 0 0 6px rgba(111,191,74,0.75);
+}
+.chat-status-dot.off {
+    background: var(--text-faint);
+    box-shadow: none;
+}
+
+/* decorative window buttons — AIM chrome flavour, non-functional */
+.chat-winbtns { display: flex; gap: 4px; margin-left: auto; }
+.chat-winbtn {
+    width: 14px;
+    height: 12px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    font-size: 8px;
+    line-height: 10px;
+    text-align: center;
+    color: var(--text-faint);
+}
+
+.chat-transport {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-dim);
+    background: var(--panel);
+    flex-shrink: 0;
+}
+
+.chat-btn {
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    background: transparent;
+    border: 1px solid var(--border-dim);
+    border-radius: 3px;
+    padding: 3px 12px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, text-shadow 0.15s;
+}
+.chat-btn:hover {
+    color: var(--ember);
+    border-color: var(--ember);
+    text-shadow: 0 0 8px rgba(196,127,23,0.5);
+}
+
+.chat-progress {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+}
+
+.chat-area {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px 18px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+.chat-area::-webkit-scrollbar { width: 4px; }
+.chat-area::-webkit-scrollbar-track { background: transparent; }
+.chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.chat-msg { margin-bottom: 14px; }
+
+.chat-name-row {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+}
+.chat-name { font-weight: 700; color: var(--spk, var(--ember)); }
+.chat-time { color: var(--text-faint); font-weight: 400; margin-left: 4px; }
+
+.chat-bubble {
+    display: block;
+    background: var(--panel);
+    border: 1px solid var(--border-dim);
+    border-left: 2px solid var(--spk, var(--ember));
+    border-radius: 2px 8px 8px 8px;
+    padding: 7px 11px;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--text);
+    max-width: 60ch;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* system/action lines: centred, dim, no bubble */
+.chat-action {
+    text-align: center;
+    font-size: 10.5px;
+    font-style: italic;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+    margin: 10px 0;
+}
+
+/* messages are pre-built but hidden until their timeline slot arrives */
+.chat-pending { display: none; }
+
+.chat-msg.in, .chat-action.in { animation: msg-in 0.28s ease-out both; }
+@keyframes msg-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* per-speaker tints (assigned by order of first appearance in JS) */
+.spk-0 { --spk: #e8a020; }
+.spk-1 { --spk: #c9a227; }
+.spk-2 { --spk: #b85c1e; }
+.spk-3 { --spk: #d98b5f; }
+.spk-4 { --spk: #8f4b2a; }
+.spk-5 { --spk: #b0a08c; }
+.spk-6 { --spk: #7f9a6a; }
+.spk-7 { --spk: #a9c4d8; }
+
+/* typing indicator — decorative, hidden from assistive tech */
+.chat-typing {
+    font-size: 10.5px;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+    margin: 0 0 14px;
+    display: none;
+}
+.chat-typing.on {
+    display: block;
+    animation: type-blink 1.4s ease-in-out infinite;
+}
+@keyframes type-blink {
+    0%, 100% { opacity: 0.45; }
+    50%      { opacity: 0.95; }
+}
+
+/* fake input strip — the pit is read-only */
+.chat-inputbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--panel);
+    flex-shrink: 0;
+}
+.chat-input {
+    flex: 1;
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--text-faint);
+    background: var(--bg);
+    border: 1px solid var(--border-dim);
+    border-radius: 3px;
+    padding: 5px 9px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.chat-inputbar .chat-hint {
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.08em;
+}
 
 /* ── MOBILE & ACCESSIBILITY ── */
 
@@ -538,6 +877,10 @@ body { -webkit-tap-highlight-color: transparent; }
         padding-right: max(12px, env(safe-area-inset-right));
     }
     .topbar-sub { display: none; }
+    .topbar-nav { margin-left: 4px; gap: 0; }
+    .nav-ico { width: 20px; height: 20px; background-size: 20px 20px; }
+    .chat-area { padding: 12px 10px; }
+    .chat-bubble { max-width: 100%; }
 
     /* sidebar slides over the content as a drawer */
     .sidebar {

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#120d06">
+<title>Conversation Pit — Eternal Hearthlight Office</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../CSS/TheBonfire.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="shell">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-logo"></div>
+    <span class="topbar-title">Bonfire.exe</span>
+    <nav class="topbar-nav" aria-label="Sections">
+      <a class="topbar-nav-item" href="TheBonfire.html" title="Files — the lore archive" aria-label="Files">
+        <span class="nav-ico nav-ico-files" aria-hidden="true"></span>
+      </a>
+      <a class="topbar-nav-item active" href="ConversationPit.html" aria-current="page" title="Conversation Pit" aria-label="Conversation Pit">
+        <span class="nav-ico nav-ico-conversations" aria-hidden="true"></span>
+      </a>
+      <span class="topbar-nav-item is-soon" role="link" aria-disabled="true" title="Personnel — coming soon" aria-label="Personnel — coming soon">
+        <span class="nav-ico nav-ico-personnel" aria-hidden="true"></span>
+      </span>
+      <span class="topbar-nav-item is-soon" role="link" aria-disabled="true" title="Lost and Found — coming soon" aria-label="Lost and Found — coming soon">
+        <span class="nav-ico nav-ico-lnf" aria-hidden="true"></span>
+      </span>
+    </nav>
+    <span class="topbar-sub">Eternal Hearthlight Office — Open Channel</span>
+    <button class="editor-toggle" onclick="toggleConvEditor()" title="Open Conversation Editor" aria-label="Open the conversation editor" aria-expanded="false">&#9998;</button>
+  </header>
+
+  <!-- EDITOR DROPDOWN -->
+  <div class="editor-panel conv-panel" id="convEditorPanel">
+    <div class="editor-inner">
+      <div class="editor-heading">
+        <span>Conversation Editor</span>
+        <div class="editor-actions">
+          <button class="ed-btn ed-new" onclick="newConversation()">New</button>
+          <button class="ed-btn ed-save" onclick="saveConversation()">Save</button>
+          <button class="ed-btn ed-delete" onclick="deleteConversation()">Delete</button>
+          <button class="ed-btn ed-export" onclick="exportConversations()">Export JSON</button>
+        </div>
+      </div>
+      <div class="editor-fields">
+        <div class="ed-row">
+          <div class="ed-field">
+            <label for="cd-id">ID</label>
+            <input type="text" id="cd-id" placeholder="CONV-004">
+          </div>
+          <div class="ed-field">
+            <label for="cd-title">Title</label>
+            <input type="text" id="cd-title" placeholder="Conversation title">
+          </div>
+          <div class="ed-field">
+            <label for="cd-status">Status</label>
+            <select id="cd-status">
+              <option value="Online">Online</option>
+              <option value="Offline">Offline</option>
+            </select>
+          </div>
+          <div class="ed-field ed-field-hint">
+            <label>Order</label>
+            <span class="ed-hint">Use the arrows on each line</span>
+          </div>
+        </div>
+        <div class="ed-field ed-body-field cnv-msg">
+          <label for="cd-msgList">Messages <span class="ed-hint">(chat = screen name + line; action = event line)</span></label>
+          <div class="conv-msg-list" id="cd-msgList">
+            <!-- populated by JS -->
+          </div>
+          <button class="ed-btn ed-addmsg" onclick="addMsgRow()">+ Add message</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- CONVERSATION LIST -->
+    <nav class="sidebar" id="sidebar" aria-label="Conversations">
+      <!-- populated by JS -->
+    </nav>
+
+    <!-- CHAT WINDOW -->
+    <main class="main" id="main">
+      <div class="chat-window">
+        <div class="chat-titlebar">
+          <span class="chat-title" id="chatTitle">Conversation Pit</span>
+          <span class="chat-status">
+            <span class="chat-status-dot" id="chatStatusDot"></span>
+            <span id="chatStatusText">Offline</span>
+          </span>
+          <div class="chat-winbtns" aria-hidden="true">
+            <span class="chat-winbtn">_</span>
+            <span class="chat-winbtn">&#9633;</span>
+            <span class="chat-winbtn">&#215;</span>
+          </div>
+        </div>
+
+        <div class="chat-transport">
+          <button class="chat-btn" id="playBtn" onclick="togglePlay()" aria-label="Play the conversation">&#9654; Play</button>
+          <button class="chat-btn" id="replayBtn" onclick="replayConversation()" aria-label="Replay the conversation from the start">&#8635; Replay</button>
+          <span class="chat-progress" id="chatProgress">0 / 0</span>
+        </div>
+
+        <div class="chat-area" id="chatArea" aria-live="polite" aria-label="Conversation transcript"></div>
+
+        <div class="chat-inputbar">
+          <span class="chat-input" id="chatInput" aria-hidden="true">observer mode — live feed</span>
+          <span class="chat-hint">read only</span>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <button id="sidebarToggle" class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Hide the conversation list" aria-expanded="true" aria-controls="sidebar">&#10094;</button>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+</div>
+
+<script>
+  // ─────────────────────────────────────────────────────────────────────────
+  // CONVERSATION PIT — realtime replay engine
+  //
+  // The channel is a read-only observer feed: the reader presses Play and the
+  // conversation unfolds message by message, with a typing indicator between
+  // lines and a soft ding on every arrival (AIM did the same). Timeline-driven,
+  // guarded by a render token so a mid-play switch never lets stale frames in.
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // Built-in fallback so the page still works when opened straight from disk.
+  // Every editor Save rewrites the block between the fallback markers below to
+  // mirror ../json/conversations.json, so file:// opens match the served version.
+// __CONV_FALLBACK_BEGIN__
+let conversations = [{"id":"CONV-001","title":"Conversation Pit Testing.","status":"Online","messages":[{"text":"joined in","time":"00:00","delayMs":1000,"type":"action","screenName":"Director joined in"},{"text":"joined in","time":"00:00","delayMs":1000,"type":"action","screenName":"Geramiah"},{"text":"Testing testing.","time":"00:00","delayMs":2000,"screenName":"Director"},{"text":"Well, looks like it works.","time":"00:00","delayMs":1000,"screenName":"Director"},{"text":"Alright, Gearvox.","time":"00:01","delayMs":2000,"screenName":"Director"},{"text":"This is how we will talk, you keep your safety, you stay the fuck away from me and my Office.","time":"00:01","delayMs":4000,"screenName":"Director"},{"text":"Fine. But is this rea","time":"00:03","delayMs":3000,"screenName":"Geramiah"},{"text":"Shut the fuck up.","time":"00:03","delayMs":40,"screenName":"Director"},{"text":"You do not get to make the decision on this matter.","time":"00:05","delayMs":4000,"screenName":"Director"},{"text":"I understand, Sani, you dislike that I exi","time":"00:06","delayMs":1000,"screenName":"Geramiah"},{"text":"Shut the fuck up.","time":"00:06","delayMs":100,"screenName":"Director"},{"text":"Sorry, I mean no offense. It just has slipped off my mind, you do not desire to be called like that.","time":"00:07","delayMs":3000,"screenName":"Geramiah"},{"text":"Save your excuses, you blood sucking parasite. Call me by my birthname and I will make what Voxus did look tame.","time":"00:08","delayMs":2000,"screenName":"Director"},{"text":"Starting today, all reports, requests, and updates come through this terminal.","time":"00:08","delayMs":3500,"screenName":"Director"},{"text":"If I catch you setting foot near MY part of the headquarters or near any living staff, I am going to skin you alive and make sure you die SCREAMING. Do you get that?","time":"00:09","delayMs":4500,"screenName":"Director"},{"text":"...I understood, Salaknib. I shall remain confined to the lower levels as requested.","time":"00:10","delayMs":3000,"screenName":"Geramiah"},{"text":"Don't talk like a fuckin' Boomer, this is instant messaging, not a shitting mail express. Don't message unless it's critical.","time":"00:10","delayMs":2000,"screenName":"Director"},{"text":"left the conversation.","time":"00:11","delayMs":1000,"type":"action","screenName":"Director"},{"text":"How do I leave this conver","time":"00:15","delayMs":2000,"screenName":"Geramiah"},{"text":"left the conversation.","time":"00:15","delayMs":10,"type":"action","screenName":"Geramiah"}]}];
+// __CONV_FALLBACK_END__
+// ── STATE ──
+  const DEFAULT_DELAY_MS = 1600;   // gap before a message that doesn't set its own
+  const SPEAKER_COLORS = 8;        // .spk-0 … .spk-7 in the stylesheet
+  const DING_SRC = '../mats/sfx/message_out.mp3';
+
+  let currentIndex = 0;
+  let playing = false;
+  let playhead = 0;                // ms elapsed in the conversation timeline
+  let revealed = 0;                // how many messages are on screen
+  let lastFrame = 0;               // rAF timestamp of the previous playback frame
+  let timeline = [];               // [{ at, i }] reveal times
+  let totalMs = 0;
+  let msgNodes = [];               // DOM nodes, one per message, pre-built hidden
+  let typingEl = null;
+  let promptEl = null;
+  let endShown = false;
+  let chatToken = 0;               // invalidated on switch so stale frames die
+  let ding = null;                 // created on first Play (autoplay policy)
+
+  // ── SIDEBAR ──
+  function isMobile() {
+    return window.matchMedia('(max-width: 820px)').matches;
+  }
+
+  function setSidebar(open) {
+    document.body.classList.toggle('sidebar-collapsed', !open);
+    const btn = document.getElementById('sidebarToggle');
+    btn.innerHTML = open ? '&#10094;' : '&#10095;';
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? 'Hide the conversation list' : 'Show the conversation list');
+  }
+
+  function toggleSidebar() {
+    setSidebar(document.body.classList.contains('sidebar-collapsed'));
+  }
+
+  // tapping the dimmed area under the drawer dismisses it
+  document.getElementById('sidebarBackdrop').addEventListener('click', function() {
+    setSidebar(false);
+  });
+
+  window.addEventListener('resize', () => {
+    if (!isMobile()) setSidebar(false);
+  });
+
+  // ── CONVERSATION DATA ──
+  async function loadConversations() {
+    try {
+      const res = await fetch('../json/conversations.json?nocache=' + Date.now());
+      if (res.ok) conversations = await res.json();
+    } catch (err) {
+      // fetch unavailable (e.g. file://) — keep the embedded fallback above
+    }
+    renderSidebar();
+    openConversation(0);
+  }
+
+  function renderSidebar() {
+    const nav = document.getElementById('sidebar');
+    nav.innerHTML = '<div class="sidebar-label">Conversations</div>';
+    conversations.forEach((c, i) => {
+      const a = document.createElement('a');
+      a.className = 'nav-item' + (i === currentIndex ? ' active' : '');
+      if (i === currentIndex) a.setAttribute('aria-current', 'true');
+      a.href = '#';
+      const id = document.createElement('span');
+      id.className = 'entry-id';
+      id.textContent = c.id;
+      a.appendChild(id);
+      a.appendChild(document.createTextNode(c.title));
+      a.onclick = (ev) => { ev.preventDefault(); openConversation(i); };
+      nav.appendChild(a);
+    });
+  }
+
+  // ── CHAT RENDERING ──
+  // Every speaker keeps one colour for the whole conversation, assigned by order
+  // of first appearance — the way AIM tinted screen names.
+  function speakerPalette(conv) {
+    const map = {};
+    let n = 0;
+    (conv.messages || []).forEach((m) => {
+      if (!m.screenName || map[m.screenName] !== undefined) return;
+      map[m.screenName] = 'spk-' + (n % SPEAKER_COLORS);
+      n++;
+    });
+    return map;
+  }
+
+  function renderChat(conv) {
+    const area = document.getElementById('chatArea');
+    area.innerHTML = '';
+    msgNodes = [];
+    const palette = speakerPalette(conv);
+
+    promptEl = document.createElement('div');
+    promptEl.className = 'chat-action';
+    promptEl.textContent = '— press play to open the channel —';
+    area.appendChild(promptEl);
+
+    conv.messages.forEach((msg, i) => {
+      const el = document.createElement('div');
+      if (msg.type === 'action') {
+        el.className = 'chat-action chat-pending';
+        el.textContent = (msg.screenName ? msg.screenName + ' ' : '') + msg.text;
+      } else {
+        el.className = 'chat-msg chat-pending ' + (palette[msg.screenName] || 'spk-0');
+        const row = document.createElement('div');
+        row.className = 'chat-name-row';
+        const name = document.createElement('span');
+        name.className = 'chat-name';
+        name.textContent = msg.screenName;
+        row.appendChild(name);
+        if (msg.time) {
+          const t = document.createElement('span');
+          t.className = 'chat-time';
+          t.textContent = '(' + msg.time + ')';
+          row.appendChild(t);
+        }
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble';
+        bubble.textContent = msg.text;
+        el.appendChild(row);
+        el.appendChild(bubble);
+      }
+      area.appendChild(el);
+      msgNodes.push(el);
+    });
+
+    typingEl = document.createElement('div');
+    typingEl.className = 'chat-typing';
+    typingEl.setAttribute('aria-hidden', 'true');
+    area.appendChild(typingEl);
+  }
+
+  function renderTitlebar(conv) {
+    document.getElementById('chatTitle').textContent = conv.title;
+    document.getElementById('chatStatusText').textContent = conv.status || 'Offline';
+    const online = (conv.status || '').toLowerCase() !== 'offline';
+    document.getElementById('chatStatusDot').classList.toggle('off', !online);
+  }
+
+  function renderTransport() {
+    const btn = document.getElementById('playBtn');
+    const conv = conversations[currentIndex] || { messages: [] };
+    btn.innerHTML = playing ? '&#10074;&#10074; Pause' : '&#9654; Play';
+    btn.setAttribute('aria-label', playing ? 'Pause the conversation' : 'Play the conversation');
+    document.getElementById('chatProgress').textContent = revealed + ' / ' + conv.messages.length;
+  }
+
+  // ── TIMELINE ──
+  // Reveal times accumulate each message's own delay, so the conversation reads
+  // at the pace the writer intended.
+  function buildTimeline(conv) {
+    let t = 0;
+    const steps = [];
+    (conv.messages || []).forEach((msg, i) => {
+      const delay = Number(msg.delayMs) > 0 ? Number(msg.delayMs) : DEFAULT_DELAY_MS;
+      t += delay;
+      steps.push({ at: t, i: i });
+    });
+    totalMs = t;
+    timeline = steps;
+  }
+
+  function openConversation(i) {
+    chatToken++;                  // kill any in-flight frame loop
+    currentIndex = i;
+    const conv = conversations[i];
+    renderSidebar();
+    renderTitlebar(conv);
+    buildTimeline(conv);
+    resetPlayback();
+    renderChat(conv);
+    renderTransport();
+    if (isMobile()) setSidebar(false);
+  }
+
+  function resetPlayback() {
+    playing = false;
+    playhead = 0;
+    revealed = 0;
+    endShown = false;
+    msgNodes.forEach((el) => {
+      el.classList.remove('in');
+      el.classList.add('chat-pending');
+    });
+    if (typingEl) typingEl.classList.remove('on');
+    if (promptEl) promptEl.style.display = '';
+    const area = document.getElementById('chatArea');
+    if (area) area.scrollTop = 0;
+    renderTransport();
+  }
+
+  // ── PLAYBACK ──
+  function togglePlay() {
+    if (playing) { pause(); return; }
+    play();
+  }
+
+  function play() {
+    if (playing) return;
+    const conv = conversations[currentIndex];
+    if (!conv) return;
+    // Already finished? Play starts it over rather than doing nothing.
+    if (revealed >= conv.messages.length && playhead >= totalMs) {
+      resetPlayback();
+    }
+    primeDing();
+    const token = chatToken;
+    playing = true;
+    lastFrame = performance.now();
+    renderTransport();
+    requestAnimationFrame(frame);
+
+    function frame(now) {
+      if (!playing || token !== chatToken) return;
+      // rAF is suspended in background tabs; clamping dt means the conversation
+      // waits for the reader instead of dumping a pile of messages at once.
+      const dt = Math.min(now - lastFrame, 250);
+      lastFrame = now;
+      playhead += dt;
+
+      while (revealed < timeline.length && playhead >= timeline[revealed].at) {
+        revealMessage(timeline[revealed].i);
+        revealed++;
+      }
+      updateTyping();
+      renderTransport();
+
+      if (revealed >= timeline.length) {
+        playing = false;
+        renderTransport();
+        showEndMarker();
+        return;
+      }
+      requestAnimationFrame(frame);
+    }
+  }
+
+  function pause() {
+    playing = false;
+    renderTransport();
+  }
+
+  function replayConversation() {
+    resetPlayback();
+    play();
+  }
+
+  function revealMessage(i) {
+    const el = msgNodes[i];
+    if (!el) return;
+    if (promptEl) { promptEl.style.display = 'none'; }
+    el.classList.remove('chat-pending');
+    el.classList.add('in');
+    dingNow();
+    const area = document.getElementById('chatArea');
+    area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
+  }
+
+  function updateTyping() {
+    if (!typingEl) return;
+    const conv = conversations[currentIndex];
+    const next = (conv.messages || [])[revealed];
+    // Only meaningful while more words are still coming.
+    if (!playing || !next || next.type === 'action') {
+      typingEl.classList.remove('on');
+      return;
+    }
+    typingEl.textContent = next.screenName + ' is typing\u2026';
+    typingEl.classList.add('on');
+  }
+
+  function showEndMarker() {
+    if (endShown) return;
+    endShown = true;
+    if (typingEl) typingEl.classList.remove('on');
+    const end = document.createElement('div');
+    end.className = 'chat-action';
+    end.textContent = '— end of conversation —';
+    document.getElementById('chatArea').appendChild(end);
+  }
+
+  // ── AUDIO ──
+  // Browsers only trust audio started by a user gesture, so Play primes the
+  // element (muted) inside the click; every later ding is therefore allowed.
+  function primeDing() {
+    if (!ding) { ding = new Audio(DING_SRC); ding.preload = 'auto'; }
+    ding.muted = true;
+    const started = ding.play();
+    const unlock = () => {
+      try { ding.pause(); ding.currentTime = 0; } catch (e) { /* not seekable yet */ }
+      ding.muted = false;
+    };
+    if (started && started.then) started.then(unlock, () => { ding.muted = false; });
+    else unlock();
+  }
+
+  function dingNow() {
+    if (!ding) return;
+    try { ding.pause(); ding.currentTime = 0; } catch (e) { /* not seekable yet */ }
+    const p = ding.play();
+    if (p && p.catch) p.catch(() => { /* a silent miss beats a broken transcript */ });
+  }
+
+  // ── INIT ──
+  loadConversations();
+// ── CONVERSATION EDITOR ──
+  // Entry-Editor-style dropdown for building conversations. Save POSTs the whole
+  // array to server.js (/api/conversations), which rewrites json/conversations.json
+  // AND the fallback block above in one atomic pass, so served and file:// opens
+  // can't drift apart.
+  function toggleConvEditor() {
+    const panel = document.getElementById('convEditorPanel');
+    const open = panel.classList.toggle('open');
+    document.querySelector('.editor-toggle').setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) loadConvEditorFields(currentIndex);
+  }
+
+  function flashBtn(cls, text) {
+    const btn = document.querySelector('.' + cls);
+    const orig = btn.textContent;
+    btn.textContent = text;
+    btn.style.color = 'var(--ember-bright)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1800);
+  }
+
+  function loadConvEditorFields(index) {
+    const c = conversations[index] || { messages: [] };
+    document.getElementById('cd-id').value = c.id || '';
+    document.getElementById('cd-title').value = c.title || '';
+    document.getElementById('cd-status').value = (c.status || 'Offline') === 'Offline' ? 'Offline' : 'Online';
+    renderMsgEditor(c.messages || []);
+  }
+
+  function renderMsgEditor(messages) {
+    const list = document.getElementById('cd-msgList');
+    list.innerHTML = '';
+    messages.forEach((m) => list.appendChild(buildMsgRow(m)));
+  }
+
+  function buildMsgRow(m) {
+    const row = document.createElement('div');
+    row.className = 'conv-msg-row';
+
+    const kind = document.createElement('select');
+    kind.className = 'conv-msg-kind';
+    kind.setAttribute('aria-label', 'Message kind');
+    const optChat = document.createElement('option');
+    optChat.value = 'chat'; optChat.textContent = 'chat';
+    const optAction = document.createElement('option');
+    optAction.value = 'action'; optAction.textContent = 'action';
+    kind.appendChild(optChat); kind.appendChild(optAction);
+    kind.value = m.type === 'action' ? 'action' : 'chat';
+
+    const name = document.createElement('input');
+    name.type = 'text'; name.className = 'conv-msg-name';
+    name.placeholder = 'screenName'; name.value = m.screenName || '';
+
+    const time = document.createElement('input');
+    time.type = 'text'; time.className = 'conv-msg-time';
+    time.placeholder = 'time'; time.value = m.time || '';
+
+    const delay = document.createElement('input');
+    delay.type = 'number'; delay.className = 'conv-msg-delay';
+    delay.min = '0'; delay.placeholder = 'delay ms';
+    delay.title = 'Delay before this line (ms)';
+    delay.value = m.delayMs != null ? m.delayMs : '';
+
+    const text = document.createElement('input');
+    text.type = 'text'; text.className = 'conv-msg-text';
+    text.placeholder = 'the line itself…'; text.value = m.text || '';
+
+    const actions = document.createElement('div');
+    actions.className = 'conv-msg-actions';
+    actions.appendChild(rowBtn('▲', 'Move message up', () => moveMsgRow(row, -1)));
+    actions.appendChild(rowBtn('▼', 'Move message down', () => moveMsgRow(row, 1)));
+    actions.appendChild(rowBtn('×', 'Remove message', () => row.remove()));
+
+    row.appendChild(kind); row.appendChild(name); row.appendChild(time);
+    row.appendChild(delay); row.appendChild(text); row.appendChild(actions);
+    return row;
+  }
+
+  function rowBtn(html, label, fn) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'ed-btn conv-row-btn';
+    b.innerHTML = html; b.title = label;
+    b.setAttribute('aria-label', label);
+    b.onclick = fn;
+    return b;
+  }
+
+  function moveMsgRow(row, dir) {
+    const list = row.parentNode;
+    const idx = Array.prototype.indexOf.call(list.children, row);
+    const target = idx + dir;
+    if (target < 0 || target >= list.children.length) return;
+    list.insertBefore(row, dir > 0 ? list.children[target + 1] : list.children[target]);
+  }
+
+function addMsgRow() {
+    document.getElementById('cd-msgList').appendChild(buildMsgRow({ type: 'chat' }));
+  }
+
+  function messagesFromEditor() {
+    return Array.from(document.querySelectorAll('#cd-msgList .conv-msg-row')).map((row) => {
+      const kind = row.querySelector('.conv-msg-kind').value;
+      const text = row.querySelector('.conv-msg-text').value.trim();
+      const name = row.querySelector('.conv-msg-name').value.trim();
+      if (!text && !name) return null;  // unfilled row — drop it
+      const msg = { text: text };
+      const time = row.querySelector('.conv-msg-time').value.trim();
+      if (time) msg.time = time;
+      const delay = row.querySelector('.conv-msg-delay').value;
+      if (delay !== '') msg.delayMs = Number(delay);
+      if (kind === 'action') {
+        msg.type = 'action';
+        if (name) msg.screenName = name;  // renderer prefixes it when present
+      } else {
+        msg.screenName = name;
+      }
+      return msg;
+    }).filter(Boolean);
+  }
+
+  function fieldsToConversation() {
+    return {
+      id: document.getElementById('cd-id').value.trim(),
+      title: document.getElementById('cd-title').value.trim(),
+      status: document.getElementById('cd-status').value,
+      messages: messagesFromEditor()
+    };
+  }
+
+  function validateConversation(conv) {
+    if (!conv.title) throw new Error('every conversation needs a title');
+    if (!conv.messages.length) throw new Error('add at least one message');
+    conv.messages.forEach((m) => {
+      if (!m.text) throw new Error('every message needs text');
+      if (m.type !== 'action' && !m.screenName) throw new Error('chat messages need a screenName');
+      if (m.delayMs != null && (!(m.delayMs >= 0) || m.delayMs > 86400000)) {
+        throw new Error('delayMs must be between 0 and 86400000');
+      }
+    });
+  }
+
+  async function persistConversations() {
+    try {
+      const res = await fetch('../api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(conversations)
+      });
+      if (!res.ok) {
+        // a rejected save must not masquerade as "browser only"
+        throw Object.assign(new Error('server rejected the save (' + res.status + ')'), { rejected: true });
+      }
+      return 'written';
+    } catch (err) {
+      if (err && err.rejected) throw err;
+      // no server (file:// open) — the edit stays in memory until the page is served
+      return 'offline';
+    }
+  }
+
+  async function saveConversation() {
+    if (!conversations.length) return;
+    const draft = fieldsToConversation();
+    try { validateConversation(draft); }
+    catch (err) { alert("Can't save: " + err.message); return; }
+    conversations[currentIndex] = draft;
+    openConversation(currentIndex);
+    let wrote = 'offline';
+    try { wrote = await persistConversations(); }
+    catch (err) { alert('Save failed: ' + err.message); }
+    flashBtn('ed-save', wrote === 'written' ? 'Saved to file!' : 'Saved (browser only)');
+  }
+
+  function newConversation() {
+    const blank = {
+      id: 'CONV-' + String(conversations.length + 1).padStart(3, '0'),
+      title: 'New Conversation',
+      status: 'Online',
+      messages: []
+    };
+    conversations.push(blank);
+    currentIndex = conversations.length - 1;
+    loadConvEditorFields(currentIndex);
+    openConversation(currentIndex);
+  }
+
+  async function deleteConversation() {
+    const c = conversations[currentIndex];
+    if (!c) return;
+    if (!confirm(`Delete "${c.title}"?`)) return;
+    conversations.splice(currentIndex, 1);
+    currentIndex = Math.max(0, currentIndex - 1);
+    if (conversations.length) {
+      loadConvEditorFields(currentIndex);
+      openConversation(currentIndex);
+    } else {
+      document.getElementById('chatTitle').textContent = 'Conversation Pit';
+      document.getElementById('chatStatusText').textContent = 'Offline';
+      document.getElementById('chatArea').innerHTML = '';
+      document.getElementById('chatProgress').textContent = '0 / 0';
+    }
+    let wrote = 'offline';
+    try { wrote = await persistConversations(); }
+    catch (err) { alert('Delete failed: ' + err.message); }
+    flashBtn('ed-delete', wrote === 'written' ? 'Deleted' : 'Deleted (browser only)');
+  }
+
+  function exportConversations() {
+    if (!conversations.length) return;
+    const blob = new Blob([JSON.stringify(conversations, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'conversations.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    flashBtn('ed-export', 'Exported!');
+  }
+
+</script>
+</body>
+</html>

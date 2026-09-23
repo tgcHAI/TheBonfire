@@ -17,6 +17,7 @@ const MIME = {
   '.js': 'application/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
+  '.mp3': 'audio/mpeg',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
   '.txt': 'text/plain; charset=utf-8',
@@ -78,6 +79,60 @@ function saveEntries(text) {
   fs.renameSync(tmp, file);
 }
 
+// Atomically replace json/conversations.json AND the embedded fallback in
+// HTML/ConversationPit.html, so a page opened from disk shows the same list.
+// The fallback block sits between the __CONV_FALLBACK_BEGIN__/__END__ markers.
+function saveConversations(text) {
+  const parsed = JSON.parse(text);
+  if (!Array.isArray(parsed)) {
+    throw new Error('Expected a JSON array of conversations');
+  }
+  for (const conv of parsed) {
+    if (!conv || typeof conv !== 'object') {
+      throw new Error('Every conversation must be a JSON object');
+    }
+    if (!conv.id || !conv.title || !Array.isArray(conv.messages)) {
+      throw new Error('Every conversation needs id, title and a messages array');
+    }
+    for (const msg of conv.messages) {
+      if (!msg || typeof msg !== 'object' || typeof msg.text !== 'string' || !msg.text) {
+        throw new Error('Every message needs a text field');
+      }
+      if (msg.type !== 'action' && !(typeof msg.screenName === 'string' && msg.screenName)) {
+        throw new Error('Chat messages need a screenName');
+      }
+      if (msg.delayMs !== undefined && !(Number(msg.delayMs) >= 0)) {
+        throw new Error('delayMs must be a non-negative number');
+      }
+    }
+  }
+
+  const file = path.join(ROOT, 'json', 'conversations.json');
+  const tmp = file + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(parsed, null, 2) + '\n', 'utf8');
+  fs.renameSync(tmp, file);
+
+  // Keep the page's embedded copy in lockstep. Messages are escaped so a
+  // crafted </script> inside a message can't break out of the inline script.
+  const htmlFile = path.join(ROOT, 'HTML', 'ConversationPit.html');
+  const html = fs.readFileSync(htmlFile, 'utf8');
+  const beginMark = '// __CONV_FALLBACK_BEGIN__';
+  const endMark = '// __CONV_FALLBACK_END__';
+  const bIdx = html.indexOf(beginMark);
+  const eIdx = html.indexOf(endMark);
+  if (bIdx < 0 || eIdx < 0) {
+    throw new Error('ConversationPit.html is missing its fallback markers');
+  }
+  const eol = html.includes('\r\n') ? '\r\n' : '\n';
+  const serialized = JSON.stringify(parsed).replace(/</g, '\\u003c');
+  const updated = html.slice(0, html.indexOf('\n', bIdx) + 1) +
+    'let conversations = ' + serialized + ';' + eol +
+    html.slice(eIdx);
+  const tmpHtml = htmlFile + '.tmp';
+  fs.writeFileSync(tmpHtml, updated, 'utf8');
+  fs.renameSync(tmpHtml, htmlFile);
+}
+
 const server = http.createServer((req, res) => {
   const urlPath = urlPathOf(req.url);
 
@@ -97,6 +152,23 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // API: replace the conversation archive in place (editor Save/Delete).
+  // Mirrors the entries route: same readBody/atomic-write flow.
+  if (req.method === 'POST' && urlPath === '/api/conversations') {
+    readBody(req, 10 * 1024 * 1024).then(
+      body => {
+        try {
+          saveConversations(body);
+          sendJson(res, 200, { ok: true });
+        } catch (e) {
+          sendJson(res, 400, { ok: false, error: e.message });
+        }
+      },
+      err => sendJson(res, 400, { ok: false, error: err.message })
+    );
+    return;
+  }
+
   // Only GET/HEAD may read static files.
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405);
@@ -104,7 +176,13 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  const rel = urlPath === '/' ? 'HTML/TheBonfire.html' : urlPath.replace(/^\//, '');
+  let rel = urlPath === '/' ? 'HTML/TheBonfire.html' : urlPath.replace(/^\//, '');
+  // The top bar's relative links (e.g. href="ConversationPit.html") resolve from
+  // the / boot page to root-relative paths, so fall back to HTML/ when a bare
+  // page name has no matching file in the repo root.
+  if (rel.indexOf('/') < 0 && !fs.existsSync(path.join(ROOT, rel))) {
+    rel = 'HTML/' + rel;
+  }
   const file = resolveInsideRoot(rel);
   if (!file) {
     res.writeHead(403);
