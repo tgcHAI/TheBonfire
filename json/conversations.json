@@ -2,7 +2,7 @@
   {
     "id": "CONV-001",
     "title": "Conversation Pit Testing.",
-    "status": "Online",
+    "status": "Offline",
     "messages": [
       {
         "text": "joined in",
@@ -43,15 +43,15 @@
         "screenName": "Director"
       },
       {
-        "text": "Fine. But is this rea",
+        "text": "Fine. But is this really=",
         "time": "00:03",
-        "delayMs": 3000,
+        "delayMs": 300,
         "screenName": "Geramiah"
       },
       {
         "text": "Shut the fuck up.",
         "time": "00:03",
-        "delayMs": 40,
+        "delayMs": 200,
         "screenName": "Director"
       },
       {
@@ -61,72 +61,228 @@
         "screenName": "Director"
       },
       {
-        "text": "I understand, Sani, you dislike that I exi",
+        "text": "I understand, Sani, you dislike that I exist at all. Precautions are important.",
         "time": "00:06",
         "delayMs": 1000,
         "screenName": "Geramiah"
       },
       {
-        "text": "Shut the fuck up.",
+        "text": "Hold your tongue, you bastard. Call me by my birthname and I will do as Voxus did to you.",
         "time": "00:06",
-        "delayMs": 100,
-        "screenName": "Director"
-      },
-      {
-        "text": "Sorry, I mean no offense. It just has slipped off my mind, you do not desire to be called like that.",
-        "time": "00:07",
-        "delayMs": 3000,
-        "screenName": "Geramiah"
-      },
-      {
-        "text": "Save your excuses, you blood sucking parasite. Call me by my birthname and I will make what Voxus did look tame.",
-        "time": "00:08",
-        "delayMs": 2000,
-        "screenName": "Director"
-      },
-      {
-        "text": "Starting today, all reports, requests, and updates come through this terminal.",
-        "time": "00:08",
         "delayMs": 3500,
         "screenName": "Director"
       },
       {
-        "text": "If I catch you setting foot near MY part of the headquarters or near any living staff, I am going to skin you alive and make sure you die SCREAMING. Do you get that?",
-        "time": "00:09",
-        "delayMs": 4500,
-        "screenName": "Director"
-      },
-      {
-        "text": "...I understood, Salaknib. I shall remain confined to the lower levels as requested.",
-        "time": "00:10",
+        "text": "Sorry, I mean no offense. It just has slipped off my mind, you do not desire to be called like that, not anymore.",
+        "time": "00:07",
         "delayMs": 3000,
         "screenName": "Geramiah"
-      },
+      }
+    ]
+  },
+  {
+    "id": "CONV-002",
+    "title": "Transmission — Origin Unknown",
+    "status": "Online",
+    "messages": [
       {
-        "text": "Don't talk like a fuckin' Boomer, this is instant messaging, not a shitting mail express. Don't message unless it's critical.",
-        "time": "00:10",
+        "text": "signal detected — origin unverified",
+        "time": "??:??",
         "delayMs": 2000,
-        "screenName": "Director"
+        "type": "action",
+        "screenName": "SYSTEM"
       },
       {
-        "text": "left the conversation.",
-        "time": "00:11",
+        "text": "unknown user connected",
+        "time": "??:??",
+        "delayMs": 1500,
+        "type": "action",
+        "screenName": "UNKNOWN"
+      },
+      {
+        "text": "Director joined",
+        "time": "??:??",
         "delayMs": 1000,
         "type": "action",
         "screenName": "Director"
       },
       {
-        "text": "How do I leave this conver",
-        "time": "00:15",
-        "delayMs": 2000,
-        "screenName": "Geramiah"
+        "text": "Alright, this isn't a funny joke, guys.",
+        "time": "??:??",
+        "delayMs": 1500,
+        "screenName": "Director"
       },
       {
-        "text": "left the conversation.",
-        "time": "00:15",
-        "delayMs": 10,
+        "text": "To whomever may be reading this...",
+        "time": "??:??",
+        "delayMs": 3000,
+        "screenName": "???"
+      },
+      {
+        "text": "Whoever is hijacking this terminal, knock it off before I trace your comms.",
+        "time": "??:??",
+        "delayMs": 2500,
+        "screenName": "Director"
+      },
+      {
+        "text": "I am transmitting this after a millennia of work to you...",
+        "time": "??:??",
+        "delayMs": 4000,
+        "screenName": "???"
+      },
+      {
+        "text": "I do not remember much now. My container has been compromised on the transit.",
+        "time": "??:??",
+        "delayMs": 5000,
+        "screenName": "???"
+      },
+      {
+        "text": "...I am not long to live, but I wish to impart what knowledge I bear.",
+        "time": "??:??",
+        "delayMs": 5000,
+        "screenName": "???"
+      },
+      {
+        "text": "I was... a leader? A director? Someone of grand importance to the Juxtapose Corporation.",
+        "time": "??:??",
+        "delayMs": 6000,
+        "screenName": "???"
+      },
+      {
+        "text": "Wait...",
+        "time": "??:??",
+        "delayMs": 2000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Who coded this script?",
+        "time": "??:??",
+        "delayMs": 3000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Time here is different. Vastly different.",
+        "time": "??:??",
+        "delayMs": 5000,
+        "screenName": "???"
+      },
+      {
+        "text": "I see my younger self, in flesh and bone, but my future self in its decayed form...",
+        "time": "??:??",
+        "delayMs": 5000,
+        "screenName": "???"
+      },
+      {
+        "text": "Eventualism. Concept Embodiment. Parallel worlds — whatever you may call it.",
+        "time": "??:??",
+        "delayMs": 5000,
+        "screenName": "???"
+      },
+      {
+        "text": "No... no, this phrasing...",
+        "time": "??:??",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "This isn't funny. How do you have his notes?",
+        "time": "??:??",
+        "delayMs": 3000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Sally... was it?",
+        "time": "??:??",
+        "delayMs": 6000,
+        "screenName": "???"
+      },
+      {
+        "text": "Daughter? Are you there?",
+        "time": "??:??",
+        "delayMs": 4000,
+        "screenName": "???"
+      },
+      {
+        "text": "...Voxus?",
+        "time": "??:??",
+        "delayMs": 2000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Where's... everyone?",
+        "time": "??:??",
+        "delayMs": 6000,
+        "screenName": "???"
+      },
+      {
+        "text": "It's... me, your father...",
+        "time": "??:??",
+        "delayMs": 5000,
+        "screenName": "???"
+      },
+      {
+        "text": "Can you not see me? I'm right beside you...",
+        "time": "??:??",
+        "delayMs": 5000,
+        "screenName": "???"
+      },
+      {
+        "text": "I'm here.",
+        "time": "??:??",
+        "delayMs": 1500,
+        "screenName": "Director"
+      },
+      {
+        "text": "Papa... I'm here, papa.",
+        "time": "??:??",
+        "delayMs": 2500,
+        "screenName": "Director"
+      },
+      {
+        "text": "Papa, I'm safe. Your little crest is still here, papa.",
+        "time": "??:??",
+        "delayMs": 3500,
+        "screenName": "Director"
+      },
+      {
+        "text": "signal degrading",
+        "time": "??:??",
+        "delayMs": 2000,
         "type": "action",
-        "screenName": "Geramiah"
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "unknown user disconnected",
+        "time": "??:??",
+        "delayMs": 1500,
+        "type": "action",
+        "screenName": "UNKNOWN"
+      },
+      {
+        "text": "No no no no NO, DAD—",
+        "time": "??:??",
+        "delayMs": 1000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Director has gone IDLE.",
+        "time": "??:??",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "Director"
+      },
+      {
+        "text": "papa...?",
+        "time": "??:??",
+        "delayMs": 10000,
+        "screenName": "Director"
+      },
+      {
+        "text": "connection lost — no reply address found",
+        "time": "??:??",
+        "delayMs": 3000,
+        "type": "action",
+        "screenName": "SYSTEM"
       }
     ]
   }
