@@ -284,7 +284,7 @@
         "screenName": "Director"
       },
       {
-        "text": "thi sin't fnuny, yo ug uys.",
+        "text": "th thi sin't funny, yo ug uys.",
         "time": "??:??",
         "delayMs": 2000,
         "screenName": "Director"
@@ -293,6 +293,787 @@
         "text": "connection lost — no reply address found",
         "time": "??:??",
         "delayMs": 3000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      }
+    ]
+  },
+  {
+    "id": "CONV-003",
+    "title": "Emergency Sector Assembly — Breach Investigation",
+    "status": "Online",
+    "messages": [
+      {
+        "text": "Director created the group",
+        "time": "00:00",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "Director invited Clockwise, MechaLord, Quackers, 500_hundred_enkephaline, green_flame448, Blackflame_burger&fries, Caeruleus Ignis Ex Gehenna, Lightwep_user, LarpitanClark, Foxtrot, Zips'n'zooms., johncontracts, Geramiah",
+        "time": "00:00",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "I am only going to ask this once.",
+        "time": "00:05",
+        "delayMs": 5000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Who routed the unverified signal into my primary terminal ten minutes ago?",
+        "time": "00:10",
+        "delayMs": 5000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Signal? Boss, my comms have been clear all morning.",
+        "time": "00:15",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Perimeter security showed zero inbound transmissions on external channels.",
+        "time": "00:22",
+        "delayMs": 7000,
+        "screenName": "MechaLord"
+      },
+      {
+        "text": "Don't play stupid with me. Someone bypassed internal firewalling.",
+        "time": "00:28",
+        "delayMs": 6000,
+        "screenName": "Director"
+      },
+      {
+        "text": "It was forged using deep Juxtapose legacy protocols.",
+        "time": "00:34",
+        "delayMs": 6000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Wait, legacy protocols? Those were purged three cycles ago.",
+        "time": "00:40",
+        "delayMs": 6000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "Unless somebody kept an offline override key.",
+        "time": "00:46",
+        "delayMs": 6000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "Looking at you, propaganda team. You guys run legacy archives all the time.",
+        "time": "00:53",
+        "delayMs": 7000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "Excuse me?! We run ads, not encrypted server breaches!",
+        "time": "01:00",
+        "delayMs": 7000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "Why don't you check the spy who literally steals data for a living?",
+        "time": "01:06",
+        "delayMs": 6000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "Hey! My ops are clean and approved directly by the Director!",
+        "time": "01:12",
+        "delayMs": 6000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "Both of you quiet down.",
+        "time": "01:18",
+        "delayMs": 6000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Diocletian, did any long-range ping pass through Sector 7?",
+        "time": "01:25",
+        "delayMs": 7000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Don't call me that.",
+        "time": "01:29",
+        "delayMs": 4000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "And no. Long-range sensors are clean. Nothing came from outside the dome.",
+        "time": "01:36",
+        "delayMs": 7000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Which means it came from inside.",
+        "time": "01:42",
+        "delayMs": 6000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "One of us broadcasted a fake script right to her terminal.",
+        "time": "01:48",
+        "delayMs": 6000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "It wasn't a fake script.",
+        "time": "01:53",
+        "delayMs": 5000,
+        "screenName": "Director"
+      },
+      {
+        "text": "It was...",
+        "time": "01:57",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Never mind what it was. I want to know WHO routed it.",
+        "time": "02:04",
+        "delayMs": 7000,
+        "screenName": "Director"
+      },
+      {
+        "text": "I can start pulling fingers off suspects until someone confesses.",
+        "time": "02:10",
+        "delayMs": 6000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "Jesus, Blackflame, put the pliers away for two seconds.",
+        "time": "02:16",
+        "delayMs": 6000,
+        "screenName": "Zips'n'zooms."
+      },
+      {
+        "text": "I was checking logistics terminals at 00:00, I have an audit log!",
+        "time": "02:22",
+        "delayMs": 6000,
+        "screenName": "johncontracts"
+      },
+      {
+        "text": "Audit logs can be spoofed in three seconds by anyone with root access.",
+        "time": "02:28",
+        "delayMs": 6000,
+        "screenName": "Lightwep_user"
+      },
+      {
+        "text": "Are you accusing me?",
+        "time": "02:32",
+        "delayMs": 4000,
+        "screenName": "johncontracts"
+      },
+      {
+        "text": "I'm saying you're the only one who handles contract routing infrastructure!",
+        "time": "02:37",
+        "delayMs": 5000,
+        "screenName": "Lightwep_user"
+      },
+      {
+        "text": "I was literally in the mess hall with Foxtrot and Larpitan!",
+        "time": "02:42",
+        "delayMs": 5000,
+        "screenName": "johncontracts"
+      },
+      {
+        "text": "Can confirm. He was eating lukewarm noodles.",
+        "time": "02:47",
+        "delayMs": 5000,
+        "screenName": "Foxtrot"
+      },
+      {
+        "text": "Yeah he didn't touch a keypad for the last hour.",
+        "time": "02:52",
+        "delayMs": 5000,
+        "screenName": "LarpitanClark"
+      },
+      {
+        "text": "Then who touched terminal 4B?",
+        "time": "02:57",
+        "delayMs": 5000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "Terminal 4B is in the lower sub-levels...",
+        "time": "03:02",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "joined the conversation",
+        "time": "03:07",
+        "delayMs": 5000,
+        "type": "action",
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Pardon the interruption, I saw an emergency broadcast active on—",
+        "time": "03:11",
+        "delayMs": 4000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Fuck off.",
+        "time": "03:11",
+        "delayMs": 500,
+        "screenName": "Director"
+      },
+      {
+        "text": "Fuck off.",
+        "time": "03:12",
+        "delayMs": 500,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Fuck off.",
+        "time": "03:12",
+        "delayMs": 500,
+        "screenName": "MechaLord"
+      },
+      {
+        "text": "Fuck off.",
+        "time": "03:13",
+        "delayMs": 500,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "Fuck off leech.",
+        "time": "03:13",
+        "delayMs": 500,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "Fuck off.",
+        "time": "03:14",
+        "delayMs": 500,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Fuck off.",
+        "time": "03:14",
+        "delayMs": 500,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "Fuck off bloodsucker.",
+        "time": "03:15",
+        "delayMs": 500,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "Fuck off.",
+        "time": "03:15",
+        "delayMs": 500,
+        "screenName": "Zips'n'zooms."
+      },
+      {
+        "text": "Fuck off.",
+        "time": "03:16",
+        "delayMs": 500,
+        "screenName": "Lightwep_user"
+      },
+      {
+        "text": "Fuck off.",
+        "time": "03:16",
+        "delayMs": 500,
+        "screenName": "LarpitanClark"
+      },
+      {
+        "text": "Fuck off.",
+        "time": "03:17",
+        "delayMs": 500,
+        "screenName": "Foxtrot"
+      },
+      {
+        "text": "Fuck off.",
+        "time": "03:17",
+        "delayMs": 500,
+        "screenName": "johncontracts"
+      },
+      {
+        "text": "...I know when I am not wanted.",
+        "time": "03:22",
+        "delayMs": 5000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "left the conversation",
+        "time": "03:24",
+        "delayMs": 2000,
+        "type": "action",
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Disgusting creature.",
+        "time": "03:28",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Wait.",
+        "time": "03:32",
+        "delayMs": 4000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "Geramiah lives in the sub-levels.",
+        "time": "03:37",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "Terminal 4B is in the sub-levels.",
+        "time": "03:42",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "Did that leech hack the Director's terminal?!",
+        "time": "03:46",
+        "delayMs": 4000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "Let me bring the interrogation kit right now I'll tear his—",
+        "time": "03:50",
+        "delayMs": 4000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "NO! It wasn't him!",
+        "time": "03:54",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "He doesn't have the codes. He doesn't know the name Voxus.",
+        "time": "04:00",
+        "delayMs": 6000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Director... you sound shaken.",
+        "time": "04:05",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "What was in that transmission?",
+        "time": "04:10",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "That is none of your concern!",
+        "time": "04:14",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Boss, if someone broke past MechaLord's perimeter shielding, it IS our concern.",
+        "time": "04:20",
+        "delayMs": 6000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Hey! My shields didn't fail!",
+        "time": "04:24",
+        "delayMs": 4000,
+        "screenName": "MechaLord"
+      },
+      {
+        "text": "The signal didn't hit the outer wall, it spawned INSIDE the mainframe!",
+        "time": "04:29",
+        "delayMs": 5000,
+        "screenName": "MechaLord"
+      },
+      {
+        "text": "Like a phantom packet!",
+        "time": "04:33",
+        "delayMs": 4000,
+        "screenName": "MechaLord"
+      },
+      {
+        "text": "Phantom packet? You mean someone hardwired a transponder inside the facility?",
+        "time": "04:39",
+        "delayMs": 6000,
+        "screenName": "Zips'n'zooms."
+      },
+      {
+        "text": "That's impossible, I check every wire coming through Sector 2!",
+        "time": "04:44",
+        "delayMs": 5000,
+        "screenName": "Zips'n'zooms."
+      },
+      {
+        "text": "Unless you missed one.",
+        "time": "04:48",
+        "delayMs": 4000,
+        "screenName": "Lightwep_user"
+      },
+      {
+        "text": "I DON'T MISS WIRES YOU LIGHTWEIGHT FRAUD",
+        "time": "04:51",
+        "delayMs": 3000,
+        "screenName": "Zips'n'zooms."
+      },
+      {
+        "text": "Calm down!",
+        "time": "04:54",
+        "delayMs": 3000,
+        "screenName": "Foxtrot"
+      },
+      {
+        "text": "We are turning on each other over a glitch!",
+        "time": "04:58",
+        "delayMs": 4000,
+        "screenName": "Foxtrot"
+      },
+      {
+        "text": "IT WAS NOT A GLITCH!",
+        "time": "05:02",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "It knew my name.",
+        "time": "05:06",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "It knew...",
+        "time": "05:10",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "It knew things only HE would know.",
+        "time": "05:15",
+        "delayMs": 5000,
+        "screenName": "Director"
+      },
+      {
+        "text": "He?",
+        "time": "05:18",
+        "delayMs": 3000,
+        "screenName": "LarpitanClark"
+      },
+      {
+        "text": "Who is he?",
+        "time": "05:22",
+        "delayMs": 4000,
+        "screenName": "LarpitanClark"
+      },
+      {
+        "text": "Is this about the old founder?",
+        "time": "05:27",
+        "delayMs": 5000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "The one who vanished during the dimensional jump testing?",
+        "time": "05:33",
+        "delayMs": 6000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "Shut your mouth!",
+        "time": "05:36",
+        "delayMs": 3000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Do not speak his name in this chat!",
+        "time": "05:40",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Director, if Voxus is somehow broadcasting from—",
+        "time": "05:45",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "I SAID SHUT UP!",
+        "time": "05:48",
+        "delayMs": 3000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Look at the logs, someone had to execute the relay script from a local drive!",
+        "time": "05:54",
+        "delayMs": 6000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "I'm looking at the relay trace right now...",
+        "time": "05:59",
+        "delayMs": 5000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "It came from...",
+        "time": "06:02",
+        "delayMs": 3000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "Wait. It came from the Media & PR server?",
+        "time": "06:07",
+        "delayMs": 5000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "QUACKERS YOU REROUTED IT?!",
+        "time": "06:11",
+        "delayMs": 4000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "WHAT?! NO! NO I DIDN'T!",
+        "time": "06:14",
+        "delayMs": 3000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "I WAS SCHEDULED TO BROADCAST THE QUARTERLY PROMO AT MIDNIGHT!",
+        "time": "06:18",
+        "delayMs": 4000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "The automated queue must have picked up the signal file because it was tagged urgent!",
+        "time": "06:24",
+        "delayMs": 6000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "Who placed the file in your upload folder?",
+        "time": "06:29",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "I don't know! The file name was just hex code!",
+        "time": "06:33",
+        "delayMs": 4000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "You absolute idiot, you let an untracked payload execute on executive channels!",
+        "time": "06:39",
+        "delayMs": 6000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "I'm going to break your keyboard over your head!",
+        "time": "06:43",
+        "delayMs": 4000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "It wasn't a payload! It was a audio-text stream!",
+        "time": "06:47",
+        "delayMs": 4000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "It was decaying in real time!",
+        "time": "06:51",
+        "delayMs": 4000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "Decaying? Like temporal degradation?",
+        "time": "06:56",
+        "delayMs": 5000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Yes! Like... like someone typing from somewhere far away...",
+        "time": "07:01",
+        "delayMs": 5000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "Or somewhere when...",
+        "time": "07:04",
+        "delayMs": 3000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "Enough.",
+        "time": "07:10",
+        "delayMs": 6000,
+        "screenName": "Director"
+      },
+      {
+        "text": "My head hurts.",
+        "time": "07:14",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Director, should we lock down the facility?",
+        "time": "07:20",
+        "delayMs": 6000,
+        "screenName": "MechaLord"
+      },
+      {
+        "text": "I can raise heavy blast doors across all sectors in thirty seconds.",
+        "time": "07:26",
+        "delayMs": 6000,
+        "screenName": "MechaLord"
+      },
+      {
+        "text": "No. Blast doors won't keep out...",
+        "time": "07:31",
+        "delayMs": 5000,
+        "screenName": "Director"
+      },
+      {
+        "text": "They won't help.",
+        "time": "07:35",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "This conversation is over.",
+        "time": "07:40",
+        "delayMs": 5000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Alright. Everyone, shut up, we're checking into this later, you guys go back to work.",
+        "time": "07:47",
+        "delayMs": 7000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Quacks, Mecha. Office. Now.",
+        "time": "07:52",
+        "delayMs": 5000,
+        "screenName": "Director"
+      },
+      {
+        "text": "You too Ember Lords.",
+        "time": "07:56",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Understood.",
+        "time": "08:01",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Moving to executive suite.",
+        "time": "08:06",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "On my way, Ma'am.",
+        "time": "08:11",
+        "delayMs": 5000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Bringing my kit just in case.",
+        "time": "08:16",
+        "delayMs": 5000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "I'm coming, please don't fire me Director I swear I didn't mean to—",
+        "time": "08:21",
+        "delayMs": 5000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "Just get up here Quackers.",
+        "time": "08:26",
+        "delayMs": 5000,
+        "screenName": "MechaLord"
+      },
+      {
+        "text": "The rest of you, scrub the logs from your local stations.",
+        "time": "08:32",
+        "delayMs": 6000,
+        "screenName": "Director"
+      },
+      {
+        "text": "If I see a single word of this transmission leaked to the lower staff...",
+        "time": "08:38",
+        "delayMs": 6000,
+        "screenName": "Director"
+      },
+      {
+        "text": "I will personally execute you.",
+        "time": "08:43",
+        "delayMs": 5000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Understood, Ma'am.",
+        "time": "08:48",
+        "delayMs": 5000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "Log wiped on my end.",
+        "time": "08:53",
+        "delayMs": 5000,
+        "screenName": "johncontracts"
+      },
+      {
+        "text": "Wiping now.",
+        "time": "08:58",
+        "delayMs": 5000,
+        "screenName": "Zips'n'zooms."
+      },
+      {
+        "text": "Director left the conversation",
+        "time": "09:05",
+        "delayMs": 7000,
+        "type": "action",
+        "screenName": "Director"
+      },
+      {
+        "text": "Man... what the hell was that about?",
+        "time": "09:12",
+        "delayMs": 7000,
+        "screenName": "Foxtrot"
+      },
+      {
+        "text": "Don't ask questions if you value your neck. Just wipe your screen.",
+        "time": "09:20",
+        "delayMs": 8000,
+        "screenName": "LarpitanClark"
+      },
+      {
+        "text": "Yeah... whatever you say.",
+        "time": "09:28",
+        "delayMs": 8000,
+        "screenName": "Foxtrot"
+      },
+      {
+        "text": "Director ended the session",
+        "time": "10:00",
+        "delayMs": 32000,
         "type": "action",
         "screenName": "SYSTEM"
       }
