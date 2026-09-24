@@ -119,12 +119,6 @@
         "screenName": "???"
       },
       {
-        "text": "Whoever is hijacking this terminal, knock it off before I trace your comms.",
-        "time": "??:??",
-        "delayMs": 2500,
-        "screenName": "Director"
-      },
-      {
         "text": "I am transmitting this after a millennia of work to you...",
         "time": "??:??",
         "delayMs": 4000,
@@ -143,19 +137,19 @@
         "screenName": "???"
       },
       {
-        "text": "I was... a leader? A director? Someone of grand importance to the Juxtapose Corporation.",
+        "text": "I was... a leader? A director? Someone of grand importance to a place called...Juxtapose Corporation?",
         "time": "??:??",
         "delayMs": 6000,
         "screenName": "???"
       },
       {
-        "text": "Wait...",
+        "text": "NOT funny, you guys. Cut it off.",
         "time": "??:??",
         "delayMs": 2000,
         "screenName": "Director"
       },
       {
-        "text": "Who coded this script?",
+        "text": "This is taking it a step too far.",
         "time": "??:??",
         "delayMs": 3000,
         "screenName": "Director"
@@ -163,7 +157,7 @@
       {
         "text": "Time here is different. Vastly different.",
         "time": "??:??",
-        "delayMs": 5000,
+        "delayMs": 3000,
         "screenName": "???"
       },
       {
@@ -173,19 +167,19 @@
         "screenName": "???"
       },
       {
+        "text": "Whoever is hijacking this terminal, know that you're in trouble.",
+        "time": "??:??",
+        "delayMs": 2500,
+        "screenName": "Director"
+      },
+      {
         "text": "Eventualism. Concept Embodiment. Parallel worlds — whatever you may call it.",
         "time": "??:??",
         "delayMs": 5000,
         "screenName": "???"
       },
       {
-        "text": "No... no, this phrasing...",
-        "time": "??:??",
-        "delayMs": 4000,
-        "screenName": "Director"
-      },
-      {
-        "text": "This isn't funny. How do you have his notes?",
+        "text": "Where the hell is this coming from. How do you have his notes?",
         "time": "??:??",
         "delayMs": 3000,
         "screenName": "Director"
@@ -203,9 +197,9 @@
         "screenName": "???"
       },
       {
-        "text": "...Voxus?",
+        "text": "What?",
         "time": "??:??",
-        "delayMs": 2000,
+        "delayMs": 1000,
         "screenName": "Director"
       },
       {
@@ -215,7 +209,7 @@
         "screenName": "???"
       },
       {
-        "text": "It's... me, your father...",
+        "text": "I can't feel anything",
         "time": "??:??",
         "delayMs": 5000,
         "screenName": "???"
@@ -223,7 +217,7 @@
       {
         "text": "Can you not see me? I'm right beside you...",
         "time": "??:??",
-        "delayMs": 5000,
+        "delayMs": 1000,
         "screenName": "???"
       },
       {
@@ -233,13 +227,13 @@
         "screenName": "Director"
       },
       {
-        "text": "Papa... I'm here, papa.",
+        "text": "Papa... I'm here, papa. Can't you see my messages?",
         "time": "??:??",
         "delayMs": 2500,
         "screenName": "Director"
       },
       {
-        "text": "Papa, I'm safe. Your little crest is still here, papa.",
+        "text": "Papa, I'm safe. Your little crest is still here, p",
         "time": "??:??",
         "delayMs": 3500,
         "screenName": "Director"
@@ -252,14 +246,32 @@
         "screenName": "SYSTEM"
       },
       {
-        "text": "unknown user disconnected",
+        "text": "disconnected",
         "time": "??:??",
         "delayMs": 1500,
         "type": "action",
         "screenName": "UNKNOWN"
       },
       {
-        "text": "No no no no NO, DAD—",
+        "text": "No no no no NO, DAD",
+        "time": "??:??",
+        "delayMs": 1000,
+        "screenName": "Director"
+      },
+      {
+        "text": "P",
+        "time": "??:??",
+        "delayMs": 100,
+        "screenName": "Director"
+      },
+      {
+        "text": "Apa",
+        "time": "??:??",
+        "delayMs": 200,
+        "screenName": "Director"
+      },
+      {
+        "text": "papa...?",
         "time": "??:??",
         "delayMs": 1000,
         "screenName": "Director"
@@ -272,9 +284,9 @@
         "screenName": "Director"
       },
       {
-        "text": "papa...?",
+        "text": "thi sin't fnuny, yo ug uys.",
         "time": "??:??",
-        "delayMs": 10000,
+        "delayMs": 2000,
         "screenName": "Director"
       },
       {
