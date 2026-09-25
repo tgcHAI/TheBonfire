@@ -126,8 +126,9 @@
 </div>
 
 <script>
-let conversations = [{"id":"CONV-LOCKED","title":"Locked Terminal","status":"Offline","messages":[{"type":"action","text":"You have no access to this terminal. Refresh or enter your credentials right.","delayMs":1600}]}];
-// __CONV_FALLBACK_END__
+// Conversations load from json/conversations.json over HTTP; there is no
+// embedded copy, so the JSON file is the single source of truth.
+let conversations = [];
 // ── STATE ──
   const DEFAULT_DELAY_MS = 1600;   // gap before a message that doesn't set its own
   const SPEAKER_COLORS = 8;        // .spk-0 … .spk-7 in the stylesheet
@@ -181,10 +182,11 @@ let conversations = [{"id":"CONV-LOCKED","title":"Locked Terminal","status":"Off
       const res = await fetch('../json/conversations.json?nocache=' + Date.now());
       if (res.ok) conversations = await res.json();
     } catch (err) {
-      // fetch unavailable (e.g. file://) — keep the embedded fallback above
+      // fetch unavailable (e.g. file://) — no embedded copy, so the page
+      // simply starts empty until it is served and the JSON can be fetched
     }
     renderSidebar();
-    openConversation(0);
+    if (conversations.length) openConversation(0);
   }
 
   function renderSidebar() {
@@ -465,8 +467,7 @@ let conversations = [{"id":"CONV-LOCKED","title":"Locked Terminal","status":"Off
 // ── CONVERSATION EDITOR ──
   // Entry-Editor-style dropdown for building conversations. Save POSTs the whole
   // array to server.js (/api/conversations), which rewrites json/conversations.json
-  // AND the fallback block above in one atomic pass, so served and file:// opens
-  // can't drift apart.
+  // — the single source the page loads (there is no embedded copy in this HTML).
   function toggleConvEditor() {
     const panel = document.getElementById('convEditorPanel');
     const open = panel.classList.toggle('open');
@@ -610,8 +611,15 @@ function addMsgRow() {
         body: JSON.stringify(conversations)
       });
       if (!res.ok) {
-        // a rejected save must not masquerade as "browser only"
-        throw Object.assign(new Error('server rejected the save (' + res.status + ')'), { rejected: true });
+        // surface the server's own reason (validation, markers, etc.) instead
+        // of hiding behind a bare status code; a rejected save must not
+        // masquerade as "browser only"
+        let detail = '';
+        try {
+          const body = await res.json();
+          if (body && body.error) detail = ': ' + body.error;
+        } catch (_) { /* non-JSON body — keep just the status */ }
+        throw Object.assign(new Error('server rejected the save (' + res.status + ')' + detail), { rejected: true });
       }
       return 'written';
     } catch (err) {

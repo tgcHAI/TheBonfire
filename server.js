@@ -79,9 +79,8 @@ function saveEntries(text) {
   fs.renameSync(tmp, file);
 }
 
-// Atomically replace json/conversations.json AND the embedded fallback in
-// HTML/ConversationPit.html, so a page opened from disk shows the same list.
-// The fallback block sits between the __CONV_FALLBACK_BEGIN__/__END__ markers.
+// Atomically replace json/conversations.json — the single source of truth.
+// The page loads this file over HTTP; there is no embedded copy in the HTML.
 function saveConversations(text) {
   const parsed = JSON.parse(text);
   if (!Array.isArray(parsed)) {
@@ -111,26 +110,6 @@ function saveConversations(text) {
   const tmp = file + '.tmp';
   fs.writeFileSync(tmp, JSON.stringify(parsed, null, 2) + '\n', 'utf8');
   fs.renameSync(tmp, file);
-
-  // Keep the page's embedded copy in lockstep. Messages are escaped so a
-  // crafted </script> inside a message can't break out of the inline script.
-  const htmlFile = path.join(ROOT, 'HTML', 'ConversationPit.html');
-  const html = fs.readFileSync(htmlFile, 'utf8');
-  const beginMark = '// __CONV_FALLBACK_BEGIN__';
-  const endMark = '// __CONV_FALLBACK_END__';
-  const bIdx = html.indexOf(beginMark);
-  const eIdx = html.indexOf(endMark);
-  if (bIdx < 0 || eIdx < 0) {
-    throw new Error('ConversationPit.html is missing its fallback markers');
-  }
-  const eol = html.includes('\r\n') ? '\r\n' : '\n';
-  const serialized = JSON.stringify(parsed).replace(/</g, '\\u003c');
-  const updated = html.slice(0, html.indexOf('\n', bIdx) + 1) +
-    'let conversations = ' + serialized + ';' + eol +
-    html.slice(eIdx);
-  const tmpHtml = htmlFile + '.tmp';
-  fs.writeFileSync(tmpHtml, updated, 'utf8');
-  fs.renameSync(tmpHtml, htmlFile);
 }
 
 const server = http.createServer((req, res) => {

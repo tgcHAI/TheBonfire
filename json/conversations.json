@@ -173,7 +173,7 @@
         "screenName": "Director"
       },
       {
-        "text": "Eventualism. Concept Embodiment. Parallel worlds — whatever you may call it.",
+        "text": "Eventualism. Concept Embodiment. Mirror worlds — whatever you may call it.",
         "time": "??:??",
         "delayMs": 5000,
         "screenName": "???"
@@ -241,14 +241,14 @@
       {
         "text": "signal degrading",
         "time": "??:??",
-        "delayMs": 2000,
+        "delayMs": 100,
         "type": "action",
         "screenName": "SYSTEM"
       },
       {
         "text": "disconnected",
         "time": "??:??",
-        "delayMs": 1500,
+        "delayMs": 1000,
         "type": "action",
         "screenName": "UNKNOWN"
       },
@@ -273,7 +273,7 @@
       {
         "text": "papa...?",
         "time": "??:??",
-        "delayMs": 1000,
+        "delayMs": 2000,
         "screenName": "Director"
       },
       {
@@ -286,7 +286,7 @@
       {
         "text": "th thi sin't funny, yo ug uys.",
         "time": "??:??",
-        "delayMs": 2000,
+        "delayMs": 5000,
         "screenName": "Director"
       },
       {
@@ -1113,7 +1113,7 @@
         "screenName": "green_flame448"
       },
       {
-        "text": " who tf running the propaganda department i swear to god",
+        "text": "who tf running the propaganda department i swear to god",
         "time": "00:21",
         "delayMs": 5000,
         "screenName": "green_flame448"
@@ -1431,6 +1431,79 @@
         "delayMs": 2000,
         "type": "action",
         "screenName": "Caeruleus Ignis Ex Gehenna"
+      }
+    ]
+  },
+  {
+    "id": "CONV-005",
+    "title": "Game Room",
+    "status": "Online",
+    "messages": [
+      {
+        "text": "Shit, I forgot how many people I have to add.",
+        "time": "00:00",
+        "delayMs": 1000,
+        "screenName": "Director"
+      },
+      {
+        "text": "went IDLE",
+        "time": "00:01",
+        "delayMs": 5000,
+        "type": "action",
+        "screenName": "Director"
+      },
+      {
+        "text": "is back",
+        "time": "00:02",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "Director"
+      },
+      {
+        "text": "went IDLE",
+        "time": "00:08",
+        "delayMs": 6000,
+        "type": "action",
+        "screenName": "Director"
+      },
+      {
+        "text": "is back",
+        "time": "00:09",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "Director"
+      },
+      {
+        "text": "added 21 members",
+        "time": "00:10",
+        "delayMs": 2000,
+        "type": "action",
+        "screenName": "Director"
+      },
+      {
+        "text": "FUCK. Okay, here you guys go. A permanent game room chat. Stop pestering me about it. Thank !!green_flame448",
+        "time": "00:13",
+        "delayMs": 3000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Ni",
+        "time": "00:14",
+        "delayMs": 1000,
+        "screenName": "blackflame_burger&fries"
+      },
+      {
+        "text": "[SYSTEM HAS MUTED 'blackflame_burger&fries' FOR 10 MINUTES. REASON: HEAVY PROFANITY||RACIAL SLURS]",
+        "time": "00:14",
+        "delayMs": 100,
+        "type": "action",
+        "screenName": "blackflame_burger&fries"
+      },
+      {
+        "text": "You are kidding me, not even THIRTY SECONDS, you fucking moron.",
+        "time": "00:14",
+        "delayMs": 1000,
+        "screenName": "Clockwise"
       }
     ]
   }
