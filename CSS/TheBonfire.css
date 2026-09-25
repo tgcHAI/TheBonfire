@@ -554,6 +554,8 @@ body::before {
 }
 .conv-msg-kind { width: 62px; }
 .conv-msg-name { width: 130px; }
+/* END rows have no screen name — the field hides when 'end' is selected */
+.conv-msg-row.is-end .conv-msg-name { display: none; }
 .conv-msg-time { width: 58px; }
 .conv-msg-delay { width: 76px; }
 .conv-msg-text { flex: 1 1 160px; min-width: 130px; }
@@ -748,10 +750,28 @@ body::before {
     margin: 10px 0;
 }
 
+/* END rows close the chapter: centred like an action but accented — the
+   next conversation opens automatically after the sign-off beat. */
+.chat-end {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ember-bright);
+    margin: 14px 0;
+}
+.chat-end::before,
+.chat-end::after {
+    content: '— ';
+    color: var(--text-faint);
+    font-weight: 400;
+}
+
 /* messages are pre-built but hidden until their timeline slot arrives */
 .chat-pending { display: none; }
 
-.chat-msg.in, .chat-action.in { animation: msg-in 0.28s ease-out both; }
+.chat-msg.in, .chat-action.in, .chat-end.in { animation: msg-in 0.28s ease-out both; }
 @keyframes msg-in {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }

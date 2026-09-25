@@ -70,7 +70,7 @@
           </div>
         </div>
         <div class="ed-field ed-body-field cnv-msg">
-          <label for="cd-msgList">Messages <span class="ed-hint">(chat = screen name + line; action = event line)</span></label>
+          <label for="cd-msgList">Messages <span class="ed-hint">(chat = screen name + line; action = event line; end = chapter close, opens the next)</span></label>
           <div class="conv-msg-list" id="cd-msgList">
             <!-- populated by JS -->
           </div>
@@ -134,6 +134,7 @@ let conversations = [];
   const SPEAKER_COLORS = 8;        // .spk-0 … .spk-7 in the stylesheet
   const DING_SRC = '../mats/sfx/message_out.mp3';
   const GONE_OFFLINE_SRC = '../mats/sfx/gone_offline.mp3';
+  const END_ADVANCE_DELAY_MS = 2000;  // beat after an END row before the next chapter opens
 
   let currentIndex = 0;
   let playing = false;
@@ -146,6 +147,7 @@ let conversations = [];
   let typingEl = null;
   let promptEl = null;
   let endShown = false;
+  let endedAtEnd = false;           // set when an END row stops playback
   let chatToken = 0;               // invalidated on switch so stale frames die
   let ding = null;                 // created on first Play (autoplay policy)
   let endedTone = null;            // 'sign off' tone, primed with the ding
@@ -235,6 +237,10 @@ let conversations = [];
       if (msg.type === 'action') {
         el.className = 'chat-action chat-pending';
         el.textContent = (msg.screenName ? msg.screenName + ' ' : '') + msg.text;
+      } else if (msg.type === 'end') {
+        // END closes the chapter; an optional custom caption defaults to the close marker
+        el.className = 'chat-end chat-pending';
+        el.textContent = msg.text || '— end of conversation —';
       } else {
         el.className = 'chat-msg chat-pending ' + (palette[msg.screenName] || 'spk-0');
         const row = document.createElement('div');
@@ -313,6 +319,7 @@ let conversations = [];
     playhead = 0;
     revealed = 0;
     endShown = false;
+    endedAtEnd = false;
     if (endedTone) { try { endedTone.pause(); endedTone.currentTime = 0; } catch (e) { /* not seekable yet */ } }
     msgNodes.forEach((el) => {
       el.classList.remove('in');
@@ -333,10 +340,12 @@ let conversations = [];
 
   function play() {
     if (playing) return;
+    chatToken++;                  // a fresh run cancels any pending auto-advance
     const conv = conversations[currentIndex];
     if (!conv) return;
-    // Already finished? Play starts it over rather than doing nothing.
-    if (revealed >= conv.messages.length && playhead >= totalMs) {
+    // Already finished (natural end or an END row)? Play starts it over
+    // rather than doing nothing.
+    if (endedAtEnd || (revealed >= conv.messages.length && playhead >= totalMs)) {
       resetPlayback();
     }
     primeDing();
@@ -362,6 +371,18 @@ let conversations = [];
       updateTyping();
       renderTransport();
 
+      // An END row closes the chapter: stop, sign off, then hand over to the
+      // next conversation (wrapping around the sidebar) after a short beat.
+      const lastShown = (conv.messages || [])[revealed - 1];
+      if (lastShown && lastShown.type === 'end') {
+        playing = false;
+        endedAtEnd = true;
+        renderTransport();
+        playGoneOffline();
+        advanceToNextChapter(token, currentIndex);
+        return;
+      }
+
       if (revealed >= timeline.length) {
         playing = false;
         renderTransport();
@@ -371,6 +392,23 @@ let conversations = [];
       }
       requestAnimationFrame(frame);
     }
+  }
+
+  // END rows hand off to the next playable conversation (the chapters loop
+  // around), starting it automatically after a short beat. The token guard
+  // cancels the hand-off if the reader switches conversations during the beat.
+  function advanceToNextChapter(token, from) {
+    setTimeout(() => {
+      if (token !== chatToken || !conversations.length) return;
+      let next = -1;
+      for (let step = 1; step <= conversations.length; step++) {
+        const idx = (from + step) % conversations.length;
+        if ((conversations[idx].messages || []).length) { next = idx; break; }
+      }
+      if (next === -1) next = from;   // nothing else playable — replay this one
+      openConversation(next);
+      play();
+    }, END_ADVANCE_DELAY_MS);
   }
 
   function pause() {
@@ -389,7 +427,8 @@ let conversations = [];
     if (promptEl) { promptEl.style.display = 'none'; }
     el.classList.remove('chat-pending');
     el.classList.add('in');
-    dingNow();
+    // END rows close the chapter silently — the sign-off tone speaks instead
+    if ((conversations[currentIndex].messages[i] || {}).type !== 'end') dingNow();
     const area = document.getElementById('chatArea');
     area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
   }
@@ -399,7 +438,7 @@ let conversations = [];
     const conv = conversations[currentIndex];
     const next = (conv.messages || [])[revealed];
     // Only meaningful while more words are still coming.
-    if (!playing || !next || next.type === 'action') {
+    if (!playing || !next || next.type === 'action' || next.type === 'end') {
       typingEl.classList.remove('on');
       return;
     }
@@ -508,8 +547,14 @@ let conversations = [];
     optChat.value = 'chat'; optChat.textContent = 'chat';
     const optAction = document.createElement('option');
     optAction.value = 'action'; optAction.textContent = 'action';
-    kind.appendChild(optChat); kind.appendChild(optAction);
-    kind.value = m.type === 'action' ? 'action' : 'chat';
+    const optEnd = document.createElement('option');
+    optEnd.value = 'end'; optEnd.textContent = 'end';
+    kind.appendChild(optChat); kind.appendChild(optAction); kind.appendChild(optEnd);
+    kind.value = m.type === 'action' ? 'action' : (m.type === 'end' ? 'end' : 'chat');
+    kind.addEventListener('change', () => {
+      row.classList.toggle('is-end', kind.value === 'end');
+      text.placeholder = kind.value === 'end' ? '— end of conversation —' : 'the line itself…';
+    });
 
     const name = document.createElement('input');
     name.type = 'text'; name.className = 'conv-msg-name';
@@ -527,7 +572,8 @@ let conversations = [];
 
     const text = document.createElement('input');
     text.type = 'text'; text.className = 'conv-msg-text';
-    text.placeholder = 'the line itself…'; text.value = m.text || '';
+    text.placeholder = m.type === 'end' ? '— end of conversation —' : 'the line itself…';
+    text.value = m.text || '';
 
     const actions = document.createElement('div');
     actions.className = 'conv-msg-actions';
@@ -537,6 +583,7 @@ let conversations = [];
 
     row.appendChild(kind); row.appendChild(name); row.appendChild(time);
     row.appendChild(delay); row.appendChild(text); row.appendChild(actions);
+    row.classList.toggle('is-end', kind.value === 'end');
     return row;
   }
 
@@ -566,7 +613,7 @@ function addMsgRow() {
       const kind = row.querySelector('.conv-msg-kind').value;
       const text = row.querySelector('.conv-msg-text').value.trim();
       const name = row.querySelector('.conv-msg-name').value.trim();
-      if (!text && !name) return null;  // unfilled row — drop it
+      if (!text && !name && kind !== 'end') return null;  // unfilled row — drop it
       const msg = { text: text };
       const time = row.querySelector('.conv-msg-time').value.trim();
       if (time) msg.time = time;
@@ -575,6 +622,9 @@ function addMsgRow() {
       if (kind === 'action') {
         msg.type = 'action';
         if (name) msg.screenName = name;  // renderer prefixes it when present
+      } else if (kind === 'end') {
+        // END rows carry no screenName; empty text gets the default caption
+        msg.type = 'end';
       } else {
         msg.screenName = name;
       }
@@ -595,8 +645,10 @@ function addMsgRow() {
     if (!conv.title) throw new Error('every conversation needs a title');
     if (!conv.messages.length) throw new Error('add at least one message');
     conv.messages.forEach((m) => {
-      if (!m.text) throw new Error('every message needs text');
-      if (m.type !== 'action' && !m.screenName) throw new Error('chat messages need a screenName');
+      if (m.type !== 'end' && !m.text) throw new Error('every message needs text');
+      if (m.type !== 'action' && m.type !== 'end' && !m.screenName) {
+        throw new Error('chat messages need a screenName');
+      }
       if (m.delayMs != null && (!(m.delayMs >= 0) || m.delayMs > 86400000)) {
         throw new Error('delayMs must be between 0 and 86400000');
       }
