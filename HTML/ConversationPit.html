@@ -245,11 +245,18 @@ let conversations = [];
         el.className = 'chat-action chat-pending';
         el.textContent = (msg.screenName ? msg.screenName + ' ' : '') + msg.text;
       } else if (msg.type === 'end') {
-        // END rows are pure cuts: they always announce their own room falling
-        // asleep, so the caption is fixed — stored text is never shown.
+        // END rows are pure cuts: the fixed sleep caption plus the sign-off
+        // tag. Stored text is never shown. Playback halts on this row.
         el.className = 'chat-end chat-pending';
         const room = (conversations[entry.convIdx] || {}).title || '';
-        el.textContent = "SYSTEM has set the room: '" + room + "' to sleep";
+        const cap = document.createElement('div');
+        cap.className = 'chat-end-cap';
+        cap.textContent = "SYSTEM has set the room: '" + room + "' to sleep";
+        const tag = document.createElement('div');
+        tag.className = 'chat-end-eoc';
+        tag.textContent = '— end of conversation —';
+        el.appendChild(cap);
+        el.appendChild(tag);
       } else {
         el.className = 'chat-msg chat-pending ' + (palette[msg.screenName] || 'spk-0');
         const row = document.createElement('div');
@@ -386,8 +393,18 @@ let conversations = [];
       playhead += dt;
 
       while (revealed < timeline.length && playhead >= timeline[revealed].at) {
-        revealMessage(timeline[revealed].i);
+        const i = timeline[revealed].i;
+        revealMessage(i);
         revealed++;
+        // A chapter's END row is a hard stop: the room sign-offs on the cut and
+        // waits for the reader — no spilling into the next conversation, and no
+        // auto-wrap at the end of the cycle. A later Play resumes from here.
+        if (stream[i].msg.type === 'end') {
+          playing = false;
+          renderTransport();
+          updateTyping();
+          return;
+        }
       }
       updateTyping();
       renderTransport();

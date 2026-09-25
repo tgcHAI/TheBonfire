@@ -755,8 +755,9 @@ body::before {
     margin: 10px 0;
 }
 
-/* END rows close the chapter: centred like an action but accented — the
-   next conversation opens automatically after the sign-off beat. */
+/* END rows close the chapter: the sleep caption (accented) over a quiet
+   sign-off tag. Playback halts on the cut — the reader moves on with Play
+   or Fast-forward rather than the stream auto-advancing. */
 .chat-end {
     text-align: center;
     font-size: 11px;
@@ -766,11 +767,19 @@ body::before {
     color: var(--ember-bright);
     margin: 14px 0;
 }
-.chat-end::before,
-.chat-end::after {
+.chat-end .chat-end-cap::before,
+.chat-end .chat-end-cap::after {
     content: '— ';
     color: var(--text-faint);
     font-weight: 400;
+}
+.chat-end .chat-end-eoc {
+    font-size: 11px;
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: 0.06em;
+    text-transform: none;
+    color: var(--text-faint);
 }
 
 /* messages are pre-built but hidden until their timeline slot arrives */
