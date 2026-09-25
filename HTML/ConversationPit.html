@@ -107,7 +107,7 @@
         <div class="chat-transport">
           <button class="chat-btn" id="playBtn" onclick="togglePlay()" aria-label="Play the stream">&#9654; Play</button>
           <button class="chat-btn" id="replayBtn" onclick="replayConversation()" aria-label="Replay the whole stream from the start">&#8635; Replay</button>
-          <button class="chat-btn" id="forwardBtn" onclick="forwardChapter()" aria-label="Skip to the next conversation">&#9193; Forward</button>
+          <button class="chat-btn" id="forwardBtn" onclick="forwardChapter()" aria-label="Fast-forward to the next END cut">&#9193; Forward</button>
           <span class="chat-progress" id="chatProgress">0 / 0</span>
         </div>
 
@@ -421,14 +421,38 @@ let conversations = [];
     renderTransport();
   }
 
-  // FORWARD skips to the start of the very next conversation and keeps playing,
-  // so every chapter — including any END cut inside it — is read in order at
-  // its own pace. Wrapping from the last chapter back to the first starts a
-  // fresh lap.
+  // FORWARD hunts only the next END cut in the flat stream (wrapping around the
+  // top for a fresh lap) and INSTANTLY loads everything from the cut's chapter
+  // opening — or the current reading position, whichever comes first — through
+  // the cut line itself, so the story leading into the break is never skipped.
+  // Playback then resumes on the first message of the new chapter.
   function forwardChapter() {
-    if (!conversations.length) return;
-    const next = (currentIndex + 1) % conversations.length;
-    openConversation(next);               // reset lap state and park at the chapter's first line
+    if (!stream.length) return;
+    let cut = -1;
+    for (let step = 1; step <= stream.length; step++) {
+      const i = (revealed + step) % stream.length;
+      if (stream[i].msg.type === 'end') { cut = i; break; }
+    }
+    if (cut === -1) return;               // no END cuts defined — nothing to fast-forward to
+    chatToken++;                          // drop any running frame loop / pending wrap
+    playing = false;
+    if (cut < revealed) resetPlayback();  // wrapped to an earlier cut: fresh lap first
+    // Bulk-reveal without per-message timing or dings — this is a seek, not a
+    // stream arrival — so the chapter break lands fully in context.
+    const from = Math.min(revealed, chapterStarts[stream[cut].convIdx] || 0);
+    for (let i = from; i <= cut; i++) {
+      const el = msgNodes[i];
+      if (el) { el.classList.remove('chat-pending'); el.classList.add('in'); }
+    }
+    if (promptEl && from <= cut) promptEl.style.display = 'none';
+    const area = document.getElementById('chatArea');
+    area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
+    revealed = cut + 1;                   // the new chapter's first line takes over
+    playhead = revealed < timeline.length ? timeline[revealed].at : totalMs;
+    currentIndex = revealed < stream.length ? stream[revealed].convIdx : 0;
+    renderSidebar();
+    renderTitlebar(conversations[currentIndex]);
+    renderTransport();
     play();
   }
 
