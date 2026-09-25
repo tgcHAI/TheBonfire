@@ -1841,6 +1841,9 @@
         "time": "00:18",
         "delayMs": 2000,
         "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "type": "end"
       }
     ]
   }
