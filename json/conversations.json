@@ -311,7 +311,7 @@
         "screenName": "SYSTEM"
       },
       {
-        "text": "invited Clockwise, MechaLord, Delmira, 500_hundred_enkephaline, green_flame448, Blackflame_burger&fries, Caeruleus Ignis Ex Gehenna, Lightwep_user, LarpitanClark, Foxtrot, Zips'n'zooms., johncontracts, Geramiah",
+        "text": "invited Clockwise, MechaLord, Delmira, 500_hundred_enkephaline, green_flame448, Blackflame_burger&fries, Caeruleus Ignis Ex Gehenna, Lightwep_user, a certain cabbage, Foxtrot, Zips'n'zooms., johncontracts, Geramiah",
         "time": "00:00",
         "delayMs": 1000,
         "type": "action",
@@ -480,7 +480,7 @@
         "screenName": "Lightwep_user"
       },
       {
-        "text": "I was literally in the mess hall with Foxtrot and Larpitan!",
+        "text": "I was literally in the mess hall with Foxtrot and Cabbage!",
         "time": "02:42",
         "delayMs": 5000,
         "screenName": "johncontracts"
@@ -495,7 +495,7 @@
         "text": "Yeah he didn't touch a keypad for the last hour.",
         "time": "02:52",
         "delayMs": 5000,
-        "screenName": "LarpitanClark"
+        "screenName": "a certain cabbage"
       },
       {
         "text": "Then who touched terminal 4B?",
@@ -586,7 +586,7 @@
         "text": "Yo, we're going to go down there and rip you in half you hemogobbler.",
         "time": "03:16",
         "delayMs": 500,
-        "screenName": "LarpitanClark"
+        "screenName": "a certain cabbage"
       },
       {
         "text": "We really do not like you, please go away.",
@@ -755,13 +755,13 @@
         "text": "He?",
         "time": "05:18",
         "delayMs": 3000,
-        "screenName": "LarpitanClark"
+        "screenName": "a certain cabbage"
       },
       {
         "text": "Who is he?",
         "time": "05:22",
         "delayMs": 4000,
-        "screenName": "LarpitanClark"
+        "screenName": "a certain cabbage"
       },
       {
         "text": "Voxus, huh...",
@@ -1058,7 +1058,7 @@
         "text": "MFer you legit just have to run your mouth",
         "time": "09:20",
         "delayMs": 8000,
-        "screenName": "LarpitanClark"
+        "screenName": "a certain cabbage"
       },
       {
         "text": "Just wipe yo shit off the logs m",
@@ -1487,7 +1487,7 @@
         "screenName": "Director"
       },
       {
-        "text": "Ni",
+        "text": "N",
         "time": "00:14",
         "delayMs": 1000,
         "screenName": "blackflame_burger&fries"
@@ -1500,11 +1500,303 @@
         "screenName": "blackflame_burger&fries"
       },
       {
-        "text": "You are kidding me, not even THIRTY SECONDS, you fucking moron.",
+        "text": "You are kidding me, not even FIVE SECONDS, and the shithead gets muted",
         "time": "00:14",
         "delayMs": 1000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "INSANE SPEEDRUN TECH LOOOOOOOOOOOOOOOOOOOOOOL",
+        "time": "00:16",
+        "delayMs": 2000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "ONE LETTER BRO IS ABSOLUTELY UNHINGED",
+        "time": "00:18",
+        "delayMs": 2000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "WE HAVE A GAME ROOM LESSS GOOOOOOO",
+        "time": "00:22",
+        "delayMs": 4000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "shoutout to director for coming through, i am officially hosting a JJS Tourney",
+        "time": "00:27",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "No char. pass characters. Fuck you.",
+        "time": "00:30",
+        "delayMs": 3000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "If anyone breaks terminal hardware during this 'tournament' it comes out of your paycheck.",
+        "time": "00:36",
+        "delayMs": 6000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Muting this channel now. Bye.",
+        "time": "00:40",
+        "delayMs": 4000,
+        "screenName": "Director"
+      },
+      {
+        "text": "Director left the conversation",
+        "time": "00:42",
+        "delayMs": 2000,
+        "type": "action",
+        "screenName": "Director"
+      },
+      {
+        "text": "alright she's gone, who wants to bet 500 ahn on me demolishing blues in a 1v1",
+        "time": "00:48",
+        "delayMs": 6000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "you main Ryu and spam 1, fuck off you nitwit",
+        "time": "00:53",
+        "delayMs": 5000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "It's called holding S and playing a Zoner as a Zoner LMAO",
+        "time": "00:58",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "Can propaganda join? Delmira and I have been setting up a LAN server for three weeks.",
+        "time": "01:04",
+        "delayMs": 6000,
+        "screenName": "Zips'n'zooms."
+      },
+      {
+        "text": "Only if Del promises not to route the game server through a third-party again.",
+        "time": "01:10",
+        "delayMs": 6000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "IT WAS ONE ACCIDENT MAN COME ON",
+        "time": "01:14",
+        "delayMs": 4000,
+        "screenName": "Delmira"
+      },
+      {
+        "text": "I STILL HAVE A REPRIMAND ON MY FILE",
+        "time": "01:17",
+        "delayMs": 3000,
+        "screenName": "Delmira"
+      },
+      {
+        "text": "blackflame_burger&fries has sent 50 messages in Timeout.",
+        "time": "01:22",
+        "delayMs": 5000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "look at him malding in mute state lmfaoooo",
+        "time": "01:26",
+        "delayMs": 4000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "bro is aggressively smashing his keyboard and can't even send a single word",
+        "time": "01:31",
+        "delayMs": 5000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "cope and seeth lol.",
+        "time": "01:35",
+        "delayMs": 4000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "anyway i put 50 ahn on green's Ryu. walking backwards is unironically peak meta.",
+        "time": "01:41",
+        "delayMs": 6000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "GOD. I hope The Head comes to your rooms and hits you all in the head with socks full of coins.",
+        "time": "01:45",
+        "delayMs": 4000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "If that's the case, I'm going Gojo and press 1,2,3 and 4 because skills",
+        "time": "01:50",
+        "delayMs": 5000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Oh shit. Yo, Clockwise's joining in.",
+        "time": "01:56",
+        "delayMs": 6000,
+        "screenName": "green_flame448"
+      },
+	  {
+        "text": "wait Clockwise actually plays JJS?",
+        "time": "02:01",
+        "delayMs": 5000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "old man's about to get combo'd into next cycle LMFAO",
+        "time": "02:06",
+        "delayMs": 5000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Bet.",
+        "time": "02:12",
+        "delayMs": 6000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "bracket is set boys, green vs blues, clockwise vs delmira, winner gets the pot",
+        "time": "02:18",
+        "delayMs": 6000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "match 1 starting... wait why is green already dying",
+        "time": "02:24",
+        "delayMs": 6000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "STRAY PURPLE'D BOZO AHAHAHAHAHAHAHAHAHA",
+        "time": "02:28",
+        "delayMs": 4000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "YOU FUCKING SHITHEAD",
+        "time": "02:33",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "Skill issue. Delmira, you're up next.",
+        "time": "02:38",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Wait why is Clockwise playing Yuji??",
+        "time": "02:44",
+        "delayMs": 6000,
+        "screenName": "Delmira"
+      },
+      {
+        "text": "WHAT THE FUCK ARE THESE M1 TRADES",
+        "time": "02:50",
+        "delayMs": 6000,
+        "screenName": "Delmira"
+      },
+      {
+        "text": "Delmira eliminated.",
+        "time": "02:54",
+        "delayMs": 4000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Finals: Blues vs Clockwise.",
+        "time": "02:58",
+        "delayMs": 4000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "DUDE",
+        "time": "03:02",
+        "delayMs": 4000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "WHAT THE FU CKI STHIS COMBO FROM THE ASSCRACKS OF NEST J. BRO FUUUUUUUUUUUUUUUUUUUUUUUUCK",
+        "time": "03:08",
+        "delayMs": 6000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Less talking, more loading into the lobby.",
+        "time": "03:13",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "NO WAY NO WAY NO WAY BLUES IS GETTING NO DIFF",
+        "time": "03:19",
+        "delayMs": 6000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "HOLY SHIT, GREEN GIANT",
+        "time": "03:24",
+        "delayMs": 5000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "HE'S GONE TODO, FUUUUUUUUUUUUUUUUUUUCK",
+        "time": "03:28",
+        "delayMs": 4000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "Shit, I guess I'm proven wrong, holy true combos",
+        "time": "03:34",
+        "delayMs": 6000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "GIVE ME MY MONEY RAAAAAAAAAAAAAAAAAAAAAAAGH",
+        "time": "03:38",
+        "delayMs": 4000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Ya'll think being this old means I can't give belt-to-ass treatment?",
+        "time": "03:43",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Never insult Unc.",
+        "time": "03:47",
+        "delayMs": 4000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "blackflame_burger&fries has been unmuted.",
+        "time": "03:50",
+        "delayMs": 3000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "I MISSED THE WHOLE FUCKING TOURNAMENT YOU GUYS ARE ALL DEAD MEAT",
+        "time": "03:55",
+        "delayMs": 5000,
+        "screenName": "blackflame_burger&fries"
+      },
+      {
+        "text": "Clockwise left the conversation",
+        "time": "03:57",
+        "delayMs": 2000,
+        "type": "action",
         "screenName": "Clockwise"
       }
     ]
   }
-]
+ ]
