@@ -1799,6 +1799,48 @@
       },
       {
         "type": "end"
+      },
+      {
+        "text": "Maaaaaan, today's such a slow day.",
+        "time": "00:00",
+        "delayMs": 1000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Honestly, you'd think for an Office that's located on somewhere on M. Corp's Backstreets, we'd get more requests",
+        "time": "00:05",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Kinda the reason bruv. Backstreet boots are all living on scraps'n'morsels. Fuck was the game plan to set up here anyway?",
+        "time": "00:09",
+        "delayMs": 9000,
+        "screenName": "blackflame_burger&fries"
+      },
+      {
+        "text": "Well, Hearthlight IS built on the remnants of Jx. Co's headquarters. Back then, it's MUUUUUCH larger.",
+        "time": "00:14",
+        "delayMs": 5000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "???",
+        "time": "00:14",
+        "delayMs": 1000,
+        "screenName": "blackflame_burger&fries"
+      },
+      {
+        "text": "wait a tick. you, Clockwise, Delmira and... who else? I think some of you guys were from the Recall system, yeah?",
+        "time": "00:16",
+        "delayMs": 2000,
+        "screenName": "blackflame_burger&fries"
+      },
+      {
+        "text": "half right. I don't even remember anymore who I am much anymore. I was a FORMER seatholder back in Jx. Co. days.",
+        "time": "00:18",
+        "delayMs": 2000,
+        "screenName": "500_hundred_enkephaline"
       }
     ]
   }
