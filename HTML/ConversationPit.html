@@ -70,7 +70,7 @@
           </div>
         </div>
         <div class="ed-field ed-body-field cnv-msg">
-          <label for="cd-msgList">Messages <span class="ed-hint">(chat = screen name + line; action = event line; end = chapter close, opens the next)</span></label>
+          <label for="cd-msgList">Messages <span class="ed-hint">(chat = screen name + line; action = event line; end = room-to-sleep marker; chapters stream as one)</span></label>
           <div class="conv-msg-list" id="cd-msgList">
             <!-- populated by JS -->
           </div>
@@ -104,8 +104,9 @@
         </div>
 
         <div class="chat-transport">
-          <button class="chat-btn" id="playBtn" onclick="togglePlay()" aria-label="Play the conversation">&#9654; Play</button>
-          <button class="chat-btn" id="replayBtn" onclick="replayConversation()" aria-label="Replay the conversation from the start">&#8635; Replay</button>
+          <button class="chat-btn" id="playBtn" onclick="togglePlay()" aria-label="Play the stream">&#9654; Play</button>
+          <button class="chat-btn" id="replayBtn" onclick="replayConversation()" aria-label="Replay the whole stream from the start">&#8635; Replay</button>
+          <button class="chat-btn" id="forwardBtn" onclick="forwardChapter()" aria-label="Skip to the next conversation">&#9193; Forward</button>
           <span class="chat-progress" id="chatProgress">0 / 0</span>
         </div>
 
@@ -134,7 +135,7 @@ let conversations = [];
   const SPEAKER_COLORS = 8;        // .spk-0 … .spk-7 in the stylesheet
   const DING_SRC = '../mats/sfx/message_out.mp3';
   const GONE_OFFLINE_SRC = '../mats/sfx/gone_offline.mp3';
-  const END_ADVANCE_DELAY_MS = 2000;  // beat after an END row before the next chapter opens
+  const WRAP_DELAY_MS = 2000;       // beat after the whole stream ends before it wraps around
 
   let currentIndex = 0;
   let playing = false;
@@ -146,8 +147,9 @@ let conversations = [];
   let msgNodes = [];               // DOM nodes, one per message, pre-built hidden
   let typingEl = null;
   let promptEl = null;
-  let endShown = false;
-  let endedAtEnd = false;           // set when an END row stops playback
+  let endedAtEnd = false;           // set when a full stream cycle reaches its end
+  let stream = [];                 // [{ convIdx, msg, at }] all chapters flattened
+  let chapterStarts = [];          // stream index at the start of each conversation
   let chatToken = 0;               // invalidated on switch so stale frames die
   let ding = null;                 // created on first Play (autoplay policy)
   let endedTone = null;            // 'sign off' tone, primed with the ding
@@ -210,37 +212,43 @@ let conversations = [];
   }
 
   // ── CHAT RENDERING ──.
-  function speakerPalette(conv) {
+  // ONE continuous stream: every conversation's messages are flattened in
+  // sidebar order and pre-built once, so playback flows across chapters and
+  // only the wrap-around ever rebuilds the area.
+  function speakerPalette() {
     const map = {};
     let n = 0;
-    (conv.messages || []).forEach((m) => {
+    conversations.forEach((conv) => (conv.messages || []).forEach((m) => {
       if (!m.screenName || map[m.screenName] !== undefined) return;
       map[m.screenName] = 'spk-' + (n % SPEAKER_COLORS);
       n++;
-    });
+    }));
     return map;
   }
 
-  function renderChat(conv) {
+  function renderStream() {
     const area = document.getElementById('chatArea');
     area.innerHTML = '';
     msgNodes = [];
-    const palette = speakerPalette(conv);
+    const palette = speakerPalette();
 
     promptEl = document.createElement('div');
     promptEl.className = 'chat-action';
     promptEl.textContent = '— press play to open the channel —';
     area.appendChild(promptEl);
 
-    conv.messages.forEach((msg, i) => {
+    stream.forEach((entry) => {
+      const msg = entry.msg;
       const el = document.createElement('div');
       if (msg.type === 'action') {
         el.className = 'chat-action chat-pending';
         el.textContent = (msg.screenName ? msg.screenName + ' ' : '') + msg.text;
       } else if (msg.type === 'end') {
-        // END closes the chapter; an optional custom caption defaults to the close marker
+        // END rows are pure chapter markers: they announce their own room
+        // falling asleep. A custom caption overrides the system line.
         el.className = 'chat-end chat-pending';
-        el.textContent = msg.text || '— end of conversation —';
+        const room = (conversations[entry.convIdx] || {}).title || '';
+        el.textContent = msg.text || ("SYSTEM has set the room: '" + room + "' to sleep");
       } else {
         el.className = 'chat-msg chat-pending ' + (palette[msg.screenName] || 'spk-0');
         const row = document.createElement('div');
@@ -280,36 +288,50 @@ let conversations = [];
 
   function renderTransport() {
     const btn = document.getElementById('playBtn');
-    const conv = conversations[currentIndex] || { messages: [] };
     btn.innerHTML = playing ? '&#10074;&#10074; Pause' : '&#9654; Play';
-    btn.setAttribute('aria-label', playing ? 'Pause the conversation' : 'Play the conversation');
-    document.getElementById('chatProgress').textContent = revealed + ' / ' + conv.messages.length;
+    btn.setAttribute('aria-label', playing ? 'Pause the stream' : 'Play the stream');
+    const total = stream.length;
+    document.getElementById('chatProgress').textContent = Math.min(revealed, total) + ' / ' + total;
   }
 
   // ── TIMELINE ──
-  // Reveal times accumulate each message's own delay, so the conversation reads
-  // at the pace the writer intended.
-  function buildTimeline(conv) {
+  // Reveal times accumulate each message's own delay, so the stream reads at
+  // the pace the writers intended. chapterStarts lets the transport and the
+  // FORWARD control hop straight to a chapter's first line.
+  function rebuildStream() {
+    stream = [];
+    chapterStarts = [];
     let t = 0;
-    const steps = [];
-    (conv.messages || []).forEach((msg, i) => {
-      const delay = Number(msg.delayMs) > 0 ? Number(msg.delayMs) : DEFAULT_DELAY_MS;
-      t += delay;
-      steps.push({ at: t, i: i });
+    conversations.forEach((conv, ci) => {
+      chapterStarts.push(stream.length);
+      (conv.messages || []).forEach((m) => {
+        const delay = Number(m.delayMs) > 0 ? Number(m.delayMs) : DEFAULT_DELAY_MS;
+        t += delay;
+        stream.push({ convIdx: ci, msg: m, at: t });
+      });
     });
     totalMs = t;
-    timeline = steps;
+    timeline = stream.map((e, i) => ({ at: e.at, i: i }));
   }
 
   function openConversation(i) {
-    chatToken++;                  // kill any in-flight frame loop
+    chatToken++;                  // kill any in-flight frame loop and pending wrap
     currentIndex = i;
-    const conv = conversations[i];
+    rebuildStream();
+    const conv = conversations[i] || { messages: [] };
     renderSidebar();
     renderTitlebar(conv);
-    buildTimeline(conv);
     resetPlayback();
-    renderChat(conv);
+    renderStream();
+    if (stream.length) {
+      // Park the stream at this chapter's first message so Play picks up here.
+      const start = Math.min(chapterStarts[i] || 0, stream.length);
+      revealed = start;
+      playhead = start < timeline.length ? timeline[start].at : totalMs;
+      // Deep chapters skip their predecessors, so the press-play prompt would
+      // be orphaned above their opening line — hide it.
+      if (start > 0 && promptEl) promptEl.style.display = 'none';
+    }
     renderTransport();
     if (isMobile()) setSidebar(false);
   }
@@ -318,7 +340,6 @@ let conversations = [];
     playing = false;
     playhead = 0;
     revealed = 0;
-    endShown = false;
     endedAtEnd = false;
     if (endedTone) { try { endedTone.pause(); endedTone.currentTime = 0; } catch (e) { /* not seekable yet */ } }
     msgNodes.forEach((el) => {
@@ -340,12 +361,11 @@ let conversations = [];
 
   function play() {
     if (playing) return;
-    chatToken++;                  // a fresh run cancels any pending auto-advance
-    const conv = conversations[currentIndex];
-    if (!conv) return;
-    // Already finished (natural end or an END row)? Play starts it over
-    // rather than doing nothing.
-    if (endedAtEnd || (revealed >= conv.messages.length && playhead >= totalMs)) {
+    chatToken++;                  // a fresh run cancels any pending wrap-around
+    if (!stream.length) return;
+    // Already finished the whole cycle? Play starts it over rather than doing
+    // nothing.
+    if (endedAtEnd || (revealed >= stream.length && playhead >= totalMs)) {
       resetPlayback();
     }
     primeDing();
@@ -358,7 +378,7 @@ let conversations = [];
 
     function frame(now) {
       if (!playing || token !== chatToken) return;
-      // rAF is suspended in background tabs; clamping dt means the conversation
+      // rAF is suspended in background tabs; clamping dt means the stream
       // waits for the reader instead of dumping a pile of messages at once.
       const dt = Math.min(now - lastFrame, 250);
       lastFrame = now;
@@ -371,49 +391,47 @@ let conversations = [];
       updateTyping();
       renderTransport();
 
-      // An END row closes the chapter: stop, sign off, then hand over to the
-      // next conversation (wrapping around the sidebar) after a short beat.
-      const lastShown = (conv.messages || [])[revealed - 1];
-      if (lastShown && lastShown.type === 'end') {
+      // The whole cycle (every chapter) has played through: sign off, then
+      // wrap around so the same conversations keep streaming.
+      if (revealed >= timeline.length) {
         playing = false;
         endedAtEnd = true;
         renderTransport();
         playGoneOffline();
-        advanceToNextChapter(token, currentIndex);
-        return;
-      }
-
-      if (revealed >= timeline.length) {
-        playing = false;
-        renderTransport();
-        playGoneOffline();
-        showEndMarker();
+        wrapStreamAfterBeat(token);
         return;
       }
       requestAnimationFrame(frame);
     }
   }
 
-  // END rows hand off to the next playable conversation (the chapters loop
-  // around), starting it automatically after a short beat. The token guard
-  // cancels the hand-off if the reader switches conversations during the beat.
-  function advanceToNextChapter(token, from) {
+  // The end-of-cycle beat before the stream restarts. A manual Play or sidebar
+  // pick during the beat bumps chatToken and cancels this wrap.
+  function wrapStreamAfterBeat(token) {
     setTimeout(() => {
-      if (token !== chatToken || !conversations.length) return;
-      let next = -1;
-      for (let step = 1; step <= conversations.length; step++) {
-        const idx = (from + step) % conversations.length;
-        if ((conversations[idx].messages || []).length) { next = idx; break; }
-      }
-      if (next === -1) next = from;   // nothing else playable — replay this one
-      openConversation(next);
+      if (token !== chatToken || !stream.length) return;
+      resetPlayback();
       play();
-    }, END_ADVANCE_DELAY_MS);
+    }, WRAP_DELAY_MS);
   }
 
   function pause() {
     playing = false;
     renderTransport();
+  }
+
+  // FORWARD skips the rest of the current chapter and starts the next
+  // conversation's stream (wrapping around the sidebar) straight away.
+  function forwardChapter() {
+    if (!conversations.length) return;
+    let next = -1;
+    for (let step = 1; step <= conversations.length; step++) {
+      const idx = (currentIndex + step) % conversations.length;
+      if ((conversations[idx].messages || []).length) { next = idx; break; }
+    }
+    if (next === -1) return;
+    openConversation(next);
+    play();
   }
 
   function replayConversation() {
@@ -427,33 +445,22 @@ let conversations = [];
     if (promptEl) { promptEl.style.display = 'none'; }
     el.classList.remove('chat-pending');
     el.classList.add('in');
-    // END rows close the chapter silently — the sign-off tone speaks instead
-    if ((conversations[currentIndex].messages[i] || {}).type !== 'end') dingNow();
+    // END rows are silent markers — the wrap tone speaks at cycle's end
+    if (stream[i] && stream[i].msg.type !== 'end') dingNow();
     const area = document.getElementById('chatArea');
     area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
   }
 
   function updateTyping() {
     if (!typingEl) return;
-    const conv = conversations[currentIndex];
-    const next = (conv.messages || [])[revealed];
+    const next = stream[revealed];
     // Only meaningful while more words are still coming.
-    if (!playing || !next || next.type === 'action' || next.type === 'end') {
+    if (!playing || !next || next.msg.type === 'action' || next.msg.type === 'end') {
       typingEl.classList.remove('on');
       return;
     }
-    typingEl.textContent = next.screenName + ' is typing\u2026';
+    typingEl.textContent = next.msg.screenName + ' is typing\u2026';
     typingEl.classList.add('on');
-  }
-
-  function showEndMarker() {
-    if (endShown) return;
-    endShown = true;
-    if (typingEl) typingEl.classList.remove('on');
-    const end = document.createElement('div');
-    end.className = 'chat-action';
-    end.textContent = '— end of conversation —';
-    document.getElementById('chatArea').appendChild(end);
   }
 
   // ── AUDIO ──
@@ -536,6 +543,13 @@ let conversations = [];
     messages.forEach((m) => list.appendChild(buildMsgRow(m)));
   }
 
+  // The editor preview for an END row mirrors the live caption: a SYSTEM
+  // line that announces the chapter's own room falling asleep.
+  function endCaptionHint() {
+    const room = (conversations[currentIndex] || {}).title || '';
+    return "SYSTEM has set the room: '" + room + "' to sleep";
+  }
+
   function buildMsgRow(m) {
     const row = document.createElement('div');
     row.className = 'conv-msg-row';
@@ -553,7 +567,7 @@ let conversations = [];
     kind.value = m.type === 'action' ? 'action' : (m.type === 'end' ? 'end' : 'chat');
     kind.addEventListener('change', () => {
       row.classList.toggle('is-end', kind.value === 'end');
-      text.placeholder = kind.value === 'end' ? '— end of conversation —' : 'the line itself…';
+      text.placeholder = kind.value === 'end' ? endCaptionHint() : 'the line itself…';
     });
 
     const name = document.createElement('input');
@@ -572,7 +586,7 @@ let conversations = [];
 
     const text = document.createElement('input');
     text.type = 'text'; text.className = 'conv-msg-text';
-    text.placeholder = m.type === 'end' ? '— end of conversation —' : 'the line itself…';
+    text.placeholder = m.type === 'end' ? endCaptionHint() : 'the line itself…';
     text.value = m.text || '';
 
     const actions = document.createElement('div');
@@ -721,6 +735,9 @@ function addMsgRow() {
       document.getElementById('chatStatusText').textContent = 'Offline';
       document.getElementById('chatArea').innerHTML = '';
       document.getElementById('chatProgress').textContent = '0 / 0';
+      stream = [];
+      timeline = [];
+      msgNodes = [];
     }
     let wrote = 'offline';
     try { wrote = await persistConversations(); }
