@@ -1645,7 +1645,7 @@
         "delayMs": 6000,
         "screenName": "green_flame448"
       },
-	  {
+      {
         "text": "wait Clockwise actually plays JJS?",
         "time": "02:01",
         "delayMs": 5000,
@@ -1796,7 +1796,10 @@
         "delayMs": 2000,
         "type": "action",
         "screenName": "Clockwise"
+      },
+      {
+        "type": "end"
       }
     ]
   }
- ]
+]
