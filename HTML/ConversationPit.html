@@ -126,19 +126,6 @@
 </div>
 
 <script>
-  // ─────────────────────────────────────────────────────────────────────────
-  // CONVERSATION PIT — realtime replay engine
-  //
-  // The channel is a read-only observer feed: the reader presses Play and the
-  // conversation unfolds message by message, with a typing indicator between
-  // lines and a soft ding on every arrival (AIM did the same). Timeline-driven,
-  // guarded by a render token so a mid-play switch never lets stale frames in.
-  // ─────────────────────────────────────────────────────────────────────────
-
-  // Built-in fallback so the page still works when opened straight from disk.
-  // Every editor Save rewrites the block between the fallback markers below to
-  // mirror ../json/conversations.json, so file:// opens match the served version.
-// __CONV_FALLBACK_BEGIN__
 let conversations = [{"id":"CONV-LOCKED","title":"Locked Terminal","status":"Offline","messages":[{"type":"action","text":"You have no access to this terminal. Refresh or enter your credentials right.","delayMs":1600}]}];
 // __CONV_FALLBACK_END__
 // ── STATE ──
@@ -218,9 +205,7 @@ let conversations = [{"id":"CONV-LOCKED","title":"Locked Terminal","status":"Off
     });
   }
 
-  // ── CHAT RENDERING ──
-  // Every speaker keeps one colour for the whole conversation, assigned by order
-  // of first appearance — the way AIM tinted screen names.
+  // ── CHAT RENDERING ──.
   function speakerPalette(conv) {
     const map = {};
     let n = 0;
