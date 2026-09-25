@@ -311,7 +311,7 @@
         "screenName": "SYSTEM"
       },
       {
-        "text": "invited Clockwise, MechaLord, Quackers, 500_hundred_enkephaline, green_flame448, Blackflame_burger&fries, Caeruleus Ignis Ex Gehenna, Lightwep_user, LarpitanClark, Foxtrot, Zips'n'zooms., johncontracts, Geramiah",
+        "text": "invited Clockwise, MechaLord, Delmira, 500_hundred_enkephaline, green_flame448, Blackflame_burger&fries, Caeruleus Ignis Ex Gehenna, Lightwep_user, LarpitanClark, Foxtrot, Zips'n'zooms., johncontracts, Geramiah",
         "time": "00:00",
         "delayMs": 1000,
         "type": "action",
@@ -357,7 +357,7 @@
         "text": "Wait, legacy protocols? Those were purged three cycles ago.",
         "time": "00:40",
         "delayMs": 6000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "Unless somebody kept an offline override key.",
@@ -375,16 +375,16 @@
         "text": "Excuse me?! We run ads, not encrypted server breaches! What the fuck do we have use for legacy systems?",
         "time": "01:00",
         "delayMs": 10000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "Why don't you check the spy who literally steals data for a living?",
         "time": "01:06",
         "delayMs": 6000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
-        "text": "Hey, Salaknib, did you know Quack was stealing muffins again from the cafeteria?",
+        "text": "Hey, Salaknib, did you know Del was stealing muffins again from the cafeteria?",
         "time": "01:12",
         "delayMs": 6000,
         "screenName": "500_hundred_enkephaline"
@@ -393,7 +393,7 @@
         "text": "HEY! NO! NO NO! YOU DON'T GET TO PULL THAT CA",
         "time": "01:18",
         "delayMs": 4000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "Quiet down.",
@@ -562,7 +562,7 @@
         "text": "Dude, read the room, leave.",
         "time": "03:14",
         "delayMs": 500,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "Choke and die, bloodfiend.",
@@ -803,19 +803,19 @@
         "text": "Look at the logs, someone had to execute the relay script from a local drive!",
         "time": "05:54",
         "delayMs": 6000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "I'm looking at the relay trace right now...",
         "time": "05:59",
         "delayMs": 5000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "It came from...",
         "time": "06:02",
         "delayMs": 3000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "Wait. It came from the Media & PR server?",
@@ -824,7 +824,7 @@
         "screenName": "500_hundred_enkephaline"
       },
       {
-        "text": "QUACKERS YOU REROUTED IT?!",
+        "text": "Delmira YOU REROUTED IT?!",
         "time": "06:11",
         "delayMs": 4000,
         "screenName": "green_flame448"
@@ -833,19 +833,19 @@
         "text": "HEY! NO NO NO NO NO NO! I DIDN'T DO SHIT!",
         "time": "06:14",
         "delayMs": 3000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "I WAS SCHEDULED TO BROADCAST THE QUARTERLY PROMO AT MIDNIGHT!",
         "time": "06:18",
         "delayMs": 4000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "The automated queue must have picked up the signal file because it was tagged urgent!",
         "time": "06:24",
         "delayMs": 6000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "Who placed the file in your upload folder?",
@@ -857,7 +857,7 @@
         "text": "I don't know! The file name was just hex code!",
         "time": "06:33",
         "delayMs": 4000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "You absolute idiot, you let an untracked payload execute on executive channels!",
@@ -875,13 +875,13 @@
         "text": "It wasn't a payload! It was a audio-text stream!",
         "time": "06:47",
         "delayMs": 4000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "It was decaying in real time!",
         "time": "06:51",
         "delayMs": 4000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "Decaying? Like what? weak signal?",
@@ -893,7 +893,7 @@
         "text": "Yes! Like... like someone typing from somewhere far away...",
         "time": "07:01",
         "delayMs": 5000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
         "text": "stop it.",
@@ -944,7 +944,7 @@
         "screenName": "Director"
       },
       {
-        "text": "Quacks, Mecha. Office. Now.",
+        "text": "Delmira, Mecha. Office. Now.",
         "time": "07:52",
         "delayMs": 5000,
         "screenName": "Director"
@@ -990,10 +990,10 @@
         "text": "YO HOLY SHIT LMAO. Alsopleasedontfiremeboss",
         "time": "08:21",
         "delayMs": 5000,
-        "screenName": "Quackers"
+        "screenName": "Delmira"
       },
       {
-        "text": "Just get up here Quackers.",
+        "text": "Just get up here Delmira.",
         "time": "08:26",
         "delayMs": 5000,
         "screenName": "MechaLord"
