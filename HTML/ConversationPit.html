@@ -70,11 +70,12 @@
           </div>
         </div>
         <div class="ed-field ed-body-field cnv-msg">
-          <label for="cd-msgList">Messages <span class="ed-hint">(chat = screen name + line; action = event line; end = room-to-sleep marker; chapters stream as one)</span></label>
+          <label for="cd-msgList">Messages <span class="ed-hint">(chat = screen name + line; action = event line; end = fixed SYSTEM caption, no name/time/delay)</span></label>
           <div class="conv-msg-list" id="cd-msgList">
             <!-- populated by JS -->
           </div>
           <button class="ed-btn ed-addmsg" onclick="addMsgRow()">+ Add message</button>
+          <button class="ed-btn ed-addmsg ed-addend" onclick="addEndRow()">+ Add end</button>
         </div>
       </div>
     </div>
@@ -106,7 +107,7 @@
         <div class="chat-transport">
           <button class="chat-btn" id="playBtn" onclick="togglePlay()" aria-label="Play the stream">&#9654; Play</button>
           <button class="chat-btn" id="replayBtn" onclick="replayConversation()" aria-label="Replay the whole stream from the start">&#8635; Replay</button>
-          <button class="chat-btn" id="forwardBtn" onclick="forwardChapter()" aria-label="Skip to the next conversation">&#9193; Forward</button>
+          <button class="chat-btn" id="forwardBtn" onclick="forwardChapter()" aria-label="Skip to the next END cut">&#9193; Forward</button>
           <span class="chat-progress" id="chatProgress">0 / 0</span>
         </div>
 
@@ -244,11 +245,11 @@ let conversations = [];
         el.className = 'chat-action chat-pending';
         el.textContent = (msg.screenName ? msg.screenName + ' ' : '') + msg.text;
       } else if (msg.type === 'end') {
-        // END rows are pure chapter markers: they announce their own room
-        // falling asleep. A custom caption overrides the system line.
+        // END rows are pure cuts: they always announce their own room falling
+        // asleep, so the caption is fixed — stored text is never shown.
         el.className = 'chat-end chat-pending';
         const room = (conversations[entry.convIdx] || {}).title || '';
-        el.textContent = msg.text || ("SYSTEM has set the room: '" + room + "' to sleep");
+        el.textContent = "SYSTEM has set the room: '" + room + "' to sleep";
       } else {
         el.className = 'chat-msg chat-pending ' + (palette[msg.screenName] || 'spk-0');
         const row = document.createElement('div');
@@ -296,8 +297,8 @@ let conversations = [];
 
   // ── TIMELINE ──
   // Reveal times accumulate each message's own delay, so the stream reads at
-  // the pace the writers intended. chapterStarts lets the transport and the
-  // FORWARD control hop straight to a chapter's first line.
+  // the pace the writers intended. chapterStarts lets a sidebar pick park the
+  // stream at that chapter's first line.
   function rebuildStream() {
     stream = [];
     chapterStarts = [];
@@ -420,17 +421,27 @@ let conversations = [];
     renderTransport();
   }
 
-  // FORWARD skips the rest of the current chapter and starts the next
-  // conversation's stream (wrapping around the sidebar) straight away.
+  // FORWARD reads ahead for the next END cut in the flat stream — not the next
+  // conversation — and loads the reading position onto that marker (wrapping
+  // around the top when the current lap has no more cuts), then keeps playing.
   function forwardChapter() {
-    if (!conversations.length) return;
+    if (!stream.length) return;
     let next = -1;
-    for (let step = 1; step <= conversations.length; step++) {
-      const idx = (currentIndex + step) % conversations.length;
-      if ((conversations[idx].messages || []).length) { next = idx; break; }
+    for (let step = 0; step < stream.length; step++) {
+      const i = (revealed + step) % stream.length;
+      if (stream[i].msg.type === 'end') { next = i; break; }
     }
-    if (next === -1) return;
-    openConversation(next);
+    if (next === -1) return;              // no END cuts defined — nothing to skip to
+    chatToken++;                          // drop any running frame loop / pending wrap
+    playing = false;
+    // Wrapping to an earlier cut means a fresh lap: restart, then park on it.
+    if (next < revealed) resetPlayback();
+    revealed = next;
+    playhead = timeline[next] ? timeline[next].at : totalMs;
+    currentIndex = stream[next].convIdx;  // the cut's chapter becomes active
+    renderSidebar();
+    renderTitlebar(conversations[currentIndex]);
+    renderTransport();
     play();
   }
 
@@ -565,10 +576,25 @@ let conversations = [];
     optEnd.value = 'end'; optEnd.textContent = 'end';
     kind.appendChild(optChat); kind.appendChild(optAction); kind.appendChild(optEnd);
     kind.value = m.type === 'action' ? 'action' : (m.type === 'end' ? 'end' : 'chat');
-    kind.addEventListener('change', () => {
-      row.classList.toggle('is-end', kind.value === 'end');
-      text.placeholder = kind.value === 'end' ? endCaptionHint() : 'the line itself…';
-    });
+    // END rows are pure cuts: they only carry a kind. Name/time/delay go inert
+    // and the caption input becomes a fixed read-only preview of the SYSTEM line.
+    const applyEndState = (isEnd) => {
+      row.classList.toggle('is-end', isEnd);
+      name.disabled = isEnd;
+      time.disabled = isEnd;
+      delay.disabled = isEnd;
+      if (isEnd) {
+        if (text.dataset.user === undefined) text.dataset.user = text.value;
+        text.value = endCaptionHint();
+      } else if (text.dataset.user !== undefined) {
+        text.value = text.dataset.user;
+        delete text.dataset.user;
+      }
+      text.disabled = isEnd;
+      text.placeholder = isEnd ? endCaptionHint() : 'the line itself…';
+    };
+
+    kind.addEventListener('change', () => applyEndState(kind.value === 'end'));
 
     const name = document.createElement('input');
     name.type = 'text'; name.className = 'conv-msg-name';
@@ -597,7 +623,7 @@ let conversations = [];
 
     row.appendChild(kind); row.appendChild(name); row.appendChild(time);
     row.appendChild(delay); row.appendChild(text); row.appendChild(actions);
-    row.classList.toggle('is-end', kind.value === 'end');
+    applyEndState(kind.value === 'end');
     return row;
   }
 
@@ -622,12 +648,21 @@ function addMsgRow() {
     document.getElementById('cd-msgList').appendChild(buildMsgRow({ type: 'chat' }));
   }
 
+  function addEndRow() {
+    document.getElementById('cd-msgList').appendChild(buildMsgRow({ type: 'end' }));
+  }
+
   function messagesFromEditor() {
     return Array.from(document.querySelectorAll('#cd-msgList .conv-msg-row')).map((row) => {
       const kind = row.querySelector('.conv-msg-kind').value;
-      const text = row.querySelector('.conv-msg-text').value.trim();
       const name = row.querySelector('.conv-msg-name').value.trim();
-      if (!text && !name && kind !== 'end') return null;  // unfilled row — drop it
+      if (kind === 'end') {
+        // END rows are pure cuts: the SYSTEM caption is always derived from the
+        // title, so a saved end carries just a kind — no text, name, time or delay.
+        return { type: 'end' };
+      }
+      const text = row.querySelector('.conv-msg-text').value.trim();
+      if (!text && !name) return null;  // unfilled row — drop it
       const msg = { text: text };
       const time = row.querySelector('.conv-msg-time').value.trim();
       if (time) msg.time = time;
@@ -636,9 +671,6 @@ function addMsgRow() {
       if (kind === 'action') {
         msg.type = 'action';
         if (name) msg.screenName = name;  // renderer prefixes it when present
-      } else if (kind === 'end') {
-        // END rows carry no screenName; empty text gets the default caption
-        msg.type = 'end';
       } else {
         msg.screenName = name;
       }

@@ -554,14 +554,19 @@ body::before {
 }
 .conv-msg-kind { width: 62px; }
 .conv-msg-name { width: 130px; }
-/* END rows have no screen name — the field hides when 'end' is selected */
-.conv-msg-row.is-end .conv-msg-name { display: none; }
+/* END rows are pure cuts: name, time and delay columns go away entirely */
+.conv-msg-row.is-end .conv-msg-name,
+.conv-msg-row.is-end .conv-msg-time,
+.conv-msg-row.is-end .conv-msg-delay { display: none; }
 .conv-msg-time { width: 58px; }
 .conv-msg-delay { width: 76px; }
+/* the caption preview reads like the SYSTEM line it will become */
+.conv-msg-row.is-end .conv-msg-text { opacity: .7; font-style: italic; }
 .conv-msg-text { flex: 1 1 160px; min-width: 130px; }
 .conv-msg-actions { display: flex; gap: 3px; }
 .conv-row-btn { padding: 1px 7px; min-width: 20px; }
 .ed-addmsg { margin-top: 6px; }
+.ed-addmsg + .ed-addmsg { margin-left: 6px; }
 
 /* account for editor panel pushing layout */
 .body {
