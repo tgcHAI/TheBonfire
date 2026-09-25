@@ -974,6 +974,13 @@
         "screenName": "Caeruleus Ignis Ex Gehenna"
       },
       {
+        "text": "Of course you're going to shower you stinky f",
+        "time": "08:11",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
         "text": "[SYSTEM HAS REMOVED 'Blackflame_burger&fries'] Reason: Heavy slurs.",
         "time": "08:16",
         "delayMs": 5000,
