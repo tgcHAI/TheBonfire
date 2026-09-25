@@ -1074,5 +1074,364 @@
         "screenName": "SYSTEM"
       }
     ]
+  },
+  {
+    "id": "CONV-004",
+    "title": "Ember Lords — [OFF-RECORD]",
+    "status": "Online",
+    "messages": [
+      {
+        "text": "Clockwise created the group",
+        "time": "00:00",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "Clockwise invited green_flame448, Blackflame_burger&fries, Caeruleus Ignis Ex Gehenna",
+        "time": "00:00",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "God that meeting was long. Alright you unfettered lobotomites. What's up?",
+        "time": "00:05",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "My back is killing me, who left the director's AC on 16 degrees. fucking freezing.",
+        "time": "00:10",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "we literally just got yelled at for 45 minutes because Delmira accidentally uploaded a cursed MP3 and you care about the AC?",
+        "time": "00:16",
+        "delayMs": 6000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": " who tf running the propaganda department i swear to god",
+        "time": "00:21",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "bro tf is Prop. Dept. doing?",
+        "time": "00:26",
+        "delayMs": 5000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "i shouldve skinned hi",
+        "time": "00:30",
+        "delayMs": 4000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "Blackflame_burger&fries was muted for 30 seconds by SYSTEM [Automated Hate Speech / Violence Filter]",
+        "time": "00:31",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "LMAOOOOOOOOOO",
+        "time": "00:34",
+        "delayMs": 3000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "skill issue honestly. imagine getting silenced by an automated script. couldn't be me, a refined sniper.",
+        "time": "00:40",
+        "delayMs": 6000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Blues please. You use 'profoundly unhinged' as a personality trait.",
+        "time": "00:46",
+        "delayMs": 6000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "i'm literally eating lukewarm tactical rations and watching you two argue like a pair of divorced blorbos",
+        "time": "00:52",
+        "delayMs": 6000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "DO NOT USE THE WORD BLORBO IN MY PRESENCE",
+        "time": "00:56",
+        "delayMs": 4000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "I will literally snipe your ration bowl from 800 yards away green I am NOT joking",
+        "time": "01:02",
+        "delayMs": 6000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Blackflame_burger&fries has been unmuted.",
+        "time": "01:03",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "system filter is a soft ass bitch just like you blues u absolute clown main",
+        "time": "01:08",
+        "delayMs": 5000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "1v1 me in the training grounds u wannabe aesthetics fraud",
+        "time": "01:13",
+        "delayMs": 5000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "oh honey. sweetie. my darling edgelord.",
+        "time": "01:18",
+        "delayMs": 5000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "You go melee because you can't aim for piss, Burgs.",
+        "time": "01:24",
+        "delayMs": 6000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "go post another edgy sigma edit on your private feed",
+        "time": "01:29",
+        "delayMs": 5000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "SHUT, LITTLE FA",
+        "time": "01:32",
+        "delayMs": 3000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "Blackflame_burger&fries was muted for 60 seconds by SYSTEM [Automated Hate Speech / Severe Toxicity Filter]",
+        "time": "01:33",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "KLAJSDFKLJASDFKLJ HE TRIED IT",
+        "time": "01:37",
+        "delayMs": 4000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "GET FILTERED AGAN LOLOLOLOLOL",
+        "time": "01:41",
+        "delayMs": 4000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Guys please stop typing so fast my terminal is lagging.",
+        "time": "01:47",
+        "delayMs": 6000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Also who keeps going into my room and setting the AC to 16 degrees. Which one of you fucks stole its remote.",
+        "time": "01:53",
+        "delayMs": 6000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "probably Geramiah.",
+        "time": "01:57",
+        "delayMs": 4000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "don't say his name, you'll summon the bloodsucker and then we all have to spam 'fuck off' for another two minutes",
+        "time": "02:03",
+        "delayMs": 6000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "Honestly that synchronized 'fuck off' for that leech was absolute peak team synergy.",
+        "time": "02:09",
+        "delayMs": 6000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "I almost cried. THE one time the whole of this office banded to do one thing and it's to tell a minority to fuck off.",
+        "time": "02:13",
+        "delayMs": 4000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "It was unprofessional is what it was. Director almost popped a vein.",
+        "time": "02:19",
+        "delayMs": 6000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Speaking of Director... what was that whole 'Voxus' thing?",
+        "time": "02:25",
+        "delayMs": 6000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "She looked like she saw a ghost when Delmira mentioned the transmission.",
+        "time": "02:30",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "Blackflame_burger&fries has been unmuted.",
+        "time": "02:33",
+        "delayMs": 3000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "VOXUS IS DEAD ASF BRO. 5 MANG CRIT SLAM LMFAOOOOOOOOOOO",
+        "time": "02:38",
+        "delayMs": 5000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "BLUE, YOU SUCK ASS BTW, GG NO RE",
+        "time": "02:43",
+        "delayMs": 5000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "oh you want to get destroyed? again? on main?",
+        "time": "02:48",
+        "delayMs": 5000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "i will literally clip you, turn it into a gif, and post it.",
+        "time": "02:54",
+        "delayMs": 6000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "I WOULD LIKE TO REMIND BOTH OF YOU THAT WE ARE THE ELITE WARFARE UNIT OF THE HEARTHLIGHT",
+        "time": "03:00",
+        "delayMs": 6000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "ACT LIKE IT.",
+        "time": "03:03",
+        "delayMs": 3000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "okay grandpa calm down before your blood pressure hits three digits",
+        "time": "03:08",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "I am 34 years old green.",
+        "time": "03:12",
+        "delayMs": 4000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "that's basically ancient in elite unit years. go take your metamucil.",
+        "time": "03:17",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "bruh clockwise is fossil tier fr :lmao: :lmao: :lmao:",
+        "time": "03:21",
+        "delayMs": 4000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "anyway im going to play R6, this group chat is full of weak mindset beta ni",
+        "time": "03:26",
+        "delayMs": 5000,
+        "screenName": "Blackflame_burger&fries"
+      },
+      {
+        "text": "Blackflame_burger&fries was muted for 120 seconds by SYSTEM [Automated Hate Speech / Blacklisted Slur Filter]",
+        "time": "03:27",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "YOOOOOOOO THREE TIMES IN TEN MINUTES RECORD SPEED!!!!!",
+        "time": "03:31",
+        "delayMs": 400,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "I can hear him on his room crashing out lmao",
+        "time": "03:35",
+        "delayMs": 4000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "I am going to delete this group chat.",
+        "time": "03:40",
+        "delayMs": 5000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Clockwise left the conversation",
+        "time": "03:42",
+        "delayMs": 2000,
+        "type": "action",
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "and then there were three.",
+        "time": "03:47",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "well, two and a muted dipshit raging behind his screen.",
+        "time": "03:52",
+        "delayMs": 5000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "wanna go watch Delmira get publicly reprimanded in the main lobby?",
+        "time": "03:57",
+        "delayMs": 5000,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "I'm already in here.",
+        "time": "04:01",
+        "delayMs": 4000,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "green_flame448 left the conversation",
+        "time": "04:03",
+        "delayMs": 2000,
+        "type": "action",
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "Caeruleus Ignis Ex Gehenna left the conversation",
+        "time": "04:05",
+        "delayMs": 2000,
+        "type": "action",
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      }
+    ]
   }
 ]
