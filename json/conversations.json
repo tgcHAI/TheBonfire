@@ -311,14 +311,14 @@
         "screenName": "SYSTEM"
       },
       {
-        "text": "Director invited Clockwise, MechaLord, Quackers, 500_hundred_enkephaline, green_flame448, Blackflame_burger&fries, Caeruleus Ignis Ex Gehenna, Lightwep_user, LarpitanClark, Foxtrot, Zips'n'zooms., johncontracts, Geramiah",
+        "text": "invited Clockwise, MechaLord, Quackers, 500_hundred_enkephaline, green_flame448, Blackflame_burger&fries, Caeruleus Ignis Ex Gehenna, Lightwep_user, LarpitanClark, Foxtrot, Zips'n'zooms., johncontracts, Geramiah",
         "time": "00:00",
         "delayMs": 1000,
         "type": "action",
         "screenName": "SYSTEM"
       },
       {
-        "text": "I am only going to ask this once.",
+        "text": "Alright.",
         "time": "00:05",
         "delayMs": 5000,
         "screenName": "Director"
@@ -372,9 +372,9 @@
         "screenName": "500_hundred_enkephaline"
       },
       {
-        "text": "Excuse me?! We run ads, not encrypted server breaches!",
+        "text": "Excuse me?! We run ads, not encrypted server breaches! What the fuck do we have use for legacy systems?",
         "time": "01:00",
-        "delayMs": 7000,
+        "delayMs": 10000,
         "screenName": "Quackers"
       },
       {
@@ -384,15 +384,21 @@
         "screenName": "Quackers"
       },
       {
-        "text": "Hey! My ops are clean and approved directly by the Director!",
+        "text": "Hey, Salaknib, did you know Quack was stealing muffins again from the cafeteria?",
         "time": "01:12",
         "delayMs": 6000,
         "screenName": "500_hundred_enkephaline"
       },
       {
-        "text": "Both of you quiet down.",
+        "text": "HEY! NO! NO NO! YOU DON'T GET TO PULL THAT CA",
         "time": "01:18",
-        "delayMs": 6000,
+        "delayMs": 4000,
+        "screenName": "Quackers"
+      },
+      {
+        "text": "Quiet down.",
+        "time": "01:18",
+        "delayMs": 100,
         "screenName": "Clockwise"
       },
       {
@@ -402,7 +408,7 @@
         "screenName": "Clockwise"
       },
       {
-        "text": "Don't call me that.",
+        "text": "Man, c'mon. I asked you guys not  to call me that.",
         "time": "01:29",
         "delayMs": 4000,
         "screenName": "Caeruleus Ignis Ex Gehenna"
@@ -414,13 +420,13 @@
         "screenName": "Caeruleus Ignis Ex Gehenna"
       },
       {
-        "text": "Which means it came from inside.",
+        "text": "Inside is most plausible.",
         "time": "01:42",
         "delayMs": 6000,
         "screenName": "green_flame448"
       },
       {
-        "text": "One of us broadcasted a fake script right to her terminal.",
+        "text": "Broadcasted a fake script right to her terminal.",
         "time": "01:48",
         "delayMs": 6000,
         "screenName": "green_flame448"
@@ -429,12 +435,6 @@
         "text": "It wasn't a fake script.",
         "time": "01:53",
         "delayMs": 5000,
-        "screenName": "Director"
-      },
-      {
-        "text": "It was...",
-        "time": "01:57",
-        "delayMs": 4000,
         "screenName": "Director"
       },
       {
@@ -504,7 +504,7 @@
         "screenName": "500_hundred_enkephaline"
       },
       {
-        "text": "Terminal 4B is in the lower sub-levels...",
+        "text": "Terminal 4B's on lower sub-levels...",
         "time": "03:02",
         "delayMs": 5000,
         "screenName": "Clockwise"
@@ -517,79 +517,79 @@
         "screenName": "Geramiah"
       },
       {
-        "text": "Pardon the interruption, I saw an emergency broadcast active on—",
+        "text": "Pardon the interruption, I saw an emergency broadcast active",
         "time": "03:11",
         "delayMs": 4000,
         "screenName": "Geramiah"
       },
       {
-        "text": "Fuck off.",
+        "text": "Get out.",
         "time": "03:11",
         "delayMs": 500,
         "screenName": "Director"
       },
       {
-        "text": "Fuck off.",
+        "text": "You bloodsucking shithead, GTFO",
         "time": "03:12",
         "delayMs": 500,
         "screenName": "Clockwise"
       },
       {
-        "text": "Fuck off.",
+        "text": "GET OUT, YOU SMELL LIKE ASS",
         "time": "03:12",
         "delayMs": 500,
         "screenName": "MechaLord"
       },
       {
-        "text": "Fuck off.",
+        "text": "Mate, no one likes you.",
         "time": "03:13",
         "delayMs": 500,
         "screenName": "green_flame448"
       },
       {
-        "text": "Fuck off leech.",
+        "text": "[SYSTEM HAS MUTED 'Blackflame_burger&fries' for 10 seconds.] Reason: heavy slurs.",
         "time": "03:13",
         "delayMs": 500,
         "screenName": "Blackflame_burger&fries"
       },
       {
-        "text": "Fuck off.",
+        "text": "OH MY GOD, GET THIS PARASITE OUT HERE.",
         "time": "03:14",
         "delayMs": 500,
         "screenName": "Caeruleus Ignis Ex Gehenna"
       },
       {
-        "text": "Fuck off.",
+        "text": "Dude, read the room, leave.",
         "time": "03:14",
         "delayMs": 500,
         "screenName": "Quackers"
       },
       {
-        "text": "Fuck off bloodsucker.",
+        "text": "Choke and die, bloodfiend.",
         "time": "03:15",
         "delayMs": 500,
         "screenName": "500_hundred_enkephaline"
       },
       {
-        "text": "Fuck off.",
+        "text": "Go away please.",
         "time": "03:15",
         "delayMs": 500,
         "screenName": "Zips'n'zooms."
       },
       {
-        "text": "Fuck off.",
+        "text": "GO KILL YOURSELF NOOOOOOW.",
         "time": "03:16",
         "delayMs": 500,
         "screenName": "Lightwep_user"
       },
       {
-        "text": "Fuck off.",
+        "text": "Yo, we're going to go down there and rip you in half you hemogobbler.",
         "time": "03:16",
         "delayMs": 500,
         "screenName": "LarpitanClark"
       },
       {
-        "text": "Fuck off.",
+        "text": "We really do not like you, please go away.",
         "time": "03:17",
         "delayMs": 500,
         "screenName": "Foxtrot"
@@ -601,7 +601,7 @@
         "screenName": "johncontracts"
       },
       {
-        "text": "...I know when I am not wanted.",
+        "text": "...okay.",
         "time": "03:22",
         "delayMs": 5000,
         "screenName": "Geramiah"
@@ -638,31 +638,31 @@
         "screenName": "green_flame448"
       },
       {
-        "text": "Did that leech hack the Director's terminal?!",
+        "text": "Fucking wot? m8, we just told the shitheel to go back to his shithole. Oi, bossman !!Director.",
         "time": "03:46",
         "delayMs": 4000,
         "screenName": "Blackflame_burger&fries"
       },
       {
-        "text": "Let me bring the interrogation kit right now I'll tear his—",
+        "text": "Am going to skin the fuck alive, let me get perms to head do",
         "time": "03:50",
         "delayMs": 4000,
         "screenName": "Blackflame_burger&fries"
       },
       {
-        "text": "NO! It wasn't him!",
+        "text": "NO!",
         "time": "03:54",
-        "delayMs": 4000,
+        "delayMs": 10,
         "screenName": "Director"
       },
       {
-        "text": "He doesn't have the codes. He doesn't know the name Voxus.",
+        "text": "It wasn't Gearvox, he doesn't have the codes. He doesn't know the name Voxus.",
         "time": "04:00",
         "delayMs": 6000,
         "screenName": "Director"
       },
       {
-        "text": "Director... you sound shaken.",
+        "text": "You sound shaken, ma'am.",
         "time": "04:05",
         "delayMs": 5000,
         "screenName": "Clockwise"
@@ -674,7 +674,7 @@
         "screenName": "Clockwise"
       },
       {
-        "text": "That is none of your concern!",
+        "text": "None that you all should be concerned with.",
         "time": "04:14",
         "delayMs": 4000,
         "screenName": "Director"
@@ -686,81 +686,69 @@
         "screenName": "Caeruleus Ignis Ex Gehenna"
       },
       {
-        "text": "Hey! My shields didn't fail!",
+        "text": "Fuck dude, my shit's impenetrable. Only thing that can be done is if it's on the inside.",
         "time": "04:24",
         "delayMs": 4000,
         "screenName": "MechaLord"
       },
       {
-        "text": "The signal didn't hit the outer wall, it spawned INSIDE the mainframe!",
+        "text": "And take a WILD FUCKING GUESS WHERE THE SIGNAL CAME FROM.",
         "time": "04:29",
         "delayMs": 5000,
         "screenName": "MechaLord"
       },
       {
-        "text": "Like a phantom packet!",
+        "text": "INSIDE. THE. NETWORK.",
         "time": "04:33",
         "delayMs": 4000,
         "screenName": "MechaLord"
       },
       {
-        "text": "Phantom packet? You mean someone hardwired a transponder inside the facility?",
+        "text": "This is too technical for my stuff. All I am getting is that we got hijacked-ish, Miss Salaknib got a transmission from somwhere thinking it's a prank. Not funny guys.",
         "time": "04:39",
-        "delayMs": 6000,
+        "delayMs": 10000,
         "screenName": "Zips'n'zooms."
       },
       {
-        "text": "That's impossible, I check every wire coming through Sector 2!",
+        "text": "Is it possible? I mean, we paid top ahn to get a security network THIS tight.",
         "time": "04:44",
         "delayMs": 5000,
         "screenName": "Zips'n'zooms."
       },
       {
-        "text": "Unless you missed one.",
+        "text": "Unless someone missed one.",
         "time": "04:48",
         "delayMs": 4000,
         "screenName": "Lightwep_user"
       },
       {
-        "text": "I DON'T MISS WIRES YOU LIGHTWEIGHT FRAUD",
+        "text": "ARE YOU BLAMING ME?!",
         "time": "04:51",
         "delayMs": 3000,
         "screenName": "Zips'n'zooms."
       },
       {
-        "text": "Calm down!",
+        "text": "Chill!",
         "time": "04:54",
         "delayMs": 3000,
         "screenName": "Foxtrot"
       },
       {
-        "text": "We are turning on each other over a glitch!",
+        "text": "What the fuck, we're tearing into each other over a bug! A glitch!",
         "time": "04:58",
         "delayMs": 4000,
         "screenName": "Foxtrot"
       },
       {
-        "text": "IT WAS NOT A GLITCH!",
+        "text": "No, Fox. Not a glitch.",
         "time": "05:02",
         "delayMs": 4000,
         "screenName": "Director"
       },
       {
-        "text": "It knew my name.",
+        "text": "He knew my name.",
         "time": "05:06",
         "delayMs": 4000,
-        "screenName": "Director"
-      },
-      {
-        "text": "It knew...",
-        "time": "05:10",
-        "delayMs": 4000,
-        "screenName": "Director"
-      },
-      {
-        "text": "It knew things only HE would know.",
-        "time": "05:15",
-        "delayMs": 5000,
         "screenName": "Director"
       },
       {
@@ -776,39 +764,39 @@
         "screenName": "LarpitanClark"
       },
       {
-        "text": "Is this about the old founder?",
+        "text": "Voxus, huh...",
         "time": "05:27",
         "delayMs": 5000,
         "screenName": "500_hundred_enkephaline"
       },
       {
-        "text": "The one who vanished during the dimensional jump testing?",
+        "text": "Wasn't he and a few others the ones that jumped into a tear in space during the Fall of Jx. Co?",
         "time": "05:33",
         "delayMs": 6000,
         "screenName": "500_hundred_enkephaline"
       },
       {
-        "text": "Shut your mouth!",
+        "text": "Don't...just say his name like that Ivy.",
         "time": "05:36",
         "delayMs": 3000,
         "screenName": "Director"
       },
       {
-        "text": "Do not speak his name in this chat!",
+        "text": "It already hurts getting reminded.",
         "time": "05:40",
         "delayMs": 4000,
         "screenName": "Director"
       },
       {
-        "text": "Director, if Voxus is somehow broadcasting from—",
+        "text": "Director, if Voxus is somehow broadcasting f",
         "time": "05:45",
         "delayMs": 5000,
         "screenName": "Clockwise"
       },
       {
-        "text": "I SAID SHUT UP!",
+        "text": "Don't even entertain it.",
         "time": "05:48",
-        "delayMs": 3000,
+        "delayMs": 1000,
         "screenName": "Director"
       },
       {
@@ -842,7 +830,7 @@
         "screenName": "green_flame448"
       },
       {
-        "text": "WHAT?! NO! NO I DIDN'T!",
+        "text": "HEY! NO NO NO NO NO NO! I DIDN'T DO SHIT!",
         "time": "06:14",
         "delayMs": 3000,
         "screenName": "Quackers"
@@ -896,7 +884,7 @@
         "screenName": "Quackers"
       },
       {
-        "text": "Decaying? Like temporal degradation?",
+        "text": "Decaying? Like what? weak signal?",
         "time": "06:56",
         "delayMs": 5000,
         "screenName": "Caeruleus Ignis Ex Gehenna"
@@ -908,15 +896,9 @@
         "screenName": "Quackers"
       },
       {
-        "text": "Or somewhere when...",
-        "time": "07:04",
-        "delayMs": 3000,
-        "screenName": "Quackers"
-      },
-      {
-        "text": "Enough.",
+        "text": "stop it.",
         "time": "07:10",
-        "delayMs": 6000,
+        "delayMs": 2000,
         "screenName": "Director"
       },
       {
@@ -938,7 +920,7 @@
         "screenName": "MechaLord"
       },
       {
-        "text": "No. Blast doors won't keep out...",
+        "text": "No, you're blocking nothing out.",
         "time": "07:31",
         "delayMs": 5000,
         "screenName": "Director"
@@ -956,7 +938,7 @@
         "screenName": "Director"
       },
       {
-        "text": "Alright. Everyone, shut up, we're checking into this later, you guys go back to work.",
+        "text": "Alright. Ee're checking into this later, you guys go back to work.",
         "time": "07:47",
         "delayMs": 7000,
         "screenName": "Director"
@@ -968,37 +950,37 @@
         "screenName": "Director"
       },
       {
-        "text": "You too Ember Lords.",
+        "text": "You too Ember Lords. Haul ass here. Personal meeting.",
         "time": "07:56",
         "delayMs": 4000,
         "screenName": "Director"
       },
       {
-        "text": "Understood.",
+        "text": "Yes, miss.",
         "time": "08:01",
         "delayMs": 5000,
         "screenName": "Clockwise"
       },
       {
-        "text": "Moving to executive suite.",
+        "text": "Heard. let me just finish eating my cup noodles.",
         "time": "08:06",
         "delayMs": 5000,
         "screenName": "green_flame448"
       },
       {
-        "text": "On my way, Ma'am.",
+        "text": "Can I take a shower at least?",
         "time": "08:11",
         "delayMs": 5000,
         "screenName": "Caeruleus Ignis Ex Gehenna"
       },
       {
-        "text": "Bringing my kit just in case.",
+        "text": "[SYSTEM HAS REMOVED 'Blackflame_burger&fries'] Reason: Heavy slurs.",
         "time": "08:16",
         "delayMs": 5000,
         "screenName": "Blackflame_burger&fries"
       },
       {
-        "text": "I'm coming, please don't fire me Director I swear I didn't mean to—",
+        "text": "YO HOLY SHIT LMAO. Alsopleasedontfiremeboss",
         "time": "08:21",
         "delayMs": 5000,
         "screenName": "Quackers"
@@ -1010,37 +992,44 @@
         "screenName": "MechaLord"
       },
       {
-        "text": "The rest of you, scrub the logs from your local stations.",
+        "text": "The rest of you, scrub the logs from your terminals",
         "time": "08:32",
         "delayMs": 6000,
         "screenName": "Director"
       },
       {
-        "text": "If I see a single word of this transmission leaked to the lower staff...",
+        "text": "it's already a pain in the ass to have to make sure this conversation function on your pads work.",
         "time": "08:38",
         "delayMs": 6000,
         "screenName": "Director"
       },
       {
-        "text": "I will personally execute you.",
+        "text": "Make it easy for me, and just...scrub it. Rumors around us are bad enough as is.",
         "time": "08:43",
         "delayMs": 5000,
         "screenName": "Director"
       },
       {
-        "text": "Understood, Ma'am.",
+        "text": "Yeahppers.",
         "time": "08:48",
         "delayMs": 5000,
         "screenName": "500_hundred_enkephaline"
       },
       {
-        "text": "Log wiped on my end.",
+        "text": "How do I wi",
         "time": "08:53",
         "delayMs": 5000,
         "screenName": "johncontracts"
       },
       {
-        "text": "Wiping now.",
+        "text": "has left the server.",
+        "time": "08:53",
+        "delayMs": 10,
+        "type": "action",
+        "screenName": "johncontracts"
+      },
+      {
+        "text": "I'm going to help them out. Hold on let me wipe mine first.",
         "time": "08:58",
         "delayMs": 5000,
         "screenName": "Zips'n'zooms."
@@ -1053,27 +1042,27 @@
         "screenName": "Director"
       },
       {
-        "text": "Man... what the hell was that about?",
+        "text": "Shit show after shit show.",
         "time": "09:12",
         "delayMs": 7000,
         "screenName": "Foxtrot"
       },
       {
-        "text": "Don't ask questions if you value your neck. Just wipe your screen.",
+        "text": "MFer you legit just have to run your mouth",
         "time": "09:20",
         "delayMs": 8000,
         "screenName": "LarpitanClark"
       },
       {
-        "text": "Yeah... whatever you say.",
+        "text": "Just wipe yo shit off the logs m",
         "time": "09:28",
         "delayMs": 8000,
         "screenName": "Foxtrot"
       },
       {
-        "text": "Director ended the session",
+        "text": "ended the session",
         "time": "10:00",
-        "delayMs": 32000,
+        "delayMs": 10,
         "type": "action",
         "screenName": "SYSTEM"
       }
