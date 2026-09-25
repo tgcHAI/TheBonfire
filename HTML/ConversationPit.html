@@ -107,7 +107,7 @@
         <div class="chat-transport">
           <button class="chat-btn" id="playBtn" onclick="togglePlay()" aria-label="Play the stream">&#9654; Play</button>
           <button class="chat-btn" id="replayBtn" onclick="replayConversation()" aria-label="Replay the whole stream from the start">&#8635; Replay</button>
-          <button class="chat-btn" id="forwardBtn" onclick="forwardChapter()" aria-label="Skip to the next END cut">&#9193; Forward</button>
+          <button class="chat-btn" id="forwardBtn" onclick="forwardChapter()" aria-label="Skip to the next conversation">&#9193; Forward</button>
           <span class="chat-progress" id="chatProgress">0 / 0</span>
         </div>
 
@@ -421,27 +421,14 @@ let conversations = [];
     renderTransport();
   }
 
-  // FORWARD reads ahead for the next END cut in the flat stream — not the next
-  // conversation — and loads the reading position onto that marker (wrapping
-  // around the top when the current lap has no more cuts), then keeps playing.
+  // FORWARD skips to the start of the very next conversation and keeps playing,
+  // so every chapter — including any END cut inside it — is read in order at
+  // its own pace. Wrapping from the last chapter back to the first starts a
+  // fresh lap.
   function forwardChapter() {
-    if (!stream.length) return;
-    let next = -1;
-    for (let step = 0; step < stream.length; step++) {
-      const i = (revealed + step) % stream.length;
-      if (stream[i].msg.type === 'end') { next = i; break; }
-    }
-    if (next === -1) return;              // no END cuts defined — nothing to skip to
-    chatToken++;                          // drop any running frame loop / pending wrap
-    playing = false;
-    // Wrapping to an earlier cut means a fresh lap: restart, then park on it.
-    if (next < revealed) resetPlayback();
-    revealed = next;
-    playhead = timeline[next] ? timeline[next].at : totalMs;
-    currentIndex = stream[next].convIdx;  // the cut's chapter becomes active
-    renderSidebar();
-    renderTitlebar(conversations[currentIndex]);
-    renderTransport();
+    if (!conversations.length) return;
+    const next = (currentIndex + 1) % conversations.length;
+    openConversation(next);               // reset lap state and park at the chapter's first line
     play();
   }
 
