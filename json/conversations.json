@@ -1791,56 +1791,569 @@
         "screenName": "blackflame_burger&fries"
       },
       {
-        "text": "Clockwise left the conversation",
-        "time": "03:57",
-        "delayMs": 2000,
-        "type": "action",
-        "screenName": "Clockwise"
-      },
-      {
         "type": "end"
       },
       {
         "text": "Maaaaaan, today's such a slow day.",
-        "time": "00:00",
+        "time": "02:00",
         "delayMs": 1000,
         "screenName": "Clockwise"
       },
       {
         "text": "Honestly, you'd think for an Office that's located on somewhere on M. Corp's Backstreets, we'd get more requests",
-        "time": "00:05",
+        "time": "02:05",
         "delayMs": 5000,
         "screenName": "Clockwise"
       },
       {
         "text": "Kinda the reason bruv. Backstreet boots are all living on scraps'n'morsels. Fuck was the game plan to set up here anyway?",
-        "time": "00:09",
+        "time": "02:09",
         "delayMs": 9000,
         "screenName": "blackflame_burger&fries"
       },
       {
         "text": "Well, Hearthlight IS built on the remnants of Jx. Co's headquarters. Back then, it's MUUUUUCH larger.",
-        "time": "00:14",
+        "time": "02:14",
         "delayMs": 5000,
         "screenName": "500_hundred_enkephaline"
       },
       {
         "text": "???",
-        "time": "00:14",
+        "time": "02:14",
         "delayMs": 1000,
         "screenName": "blackflame_burger&fries"
       },
       {
         "text": "wait a tick. you, Clockwise, Delmira and... who else? I think some of you guys were from the Recall system, yeah?",
-        "time": "00:16",
+        "time": "02:16",
         "delayMs": 2000,
         "screenName": "blackflame_burger&fries"
       },
       {
         "text": "half right. I don't even remember anymore who I am much anymore. I was a FORMER seatholder back in Jx. Co. days.",
-        "time": "00:18",
+        "time": "02:18",
         "delayMs": 2000,
         "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "As for me, just a security member. I think I have a high clearance? But that's really not important now. The skills former me",
+        "time": "02:22",
+        "delayMs": 4000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Yo guys, what's up?",
+        "time": "02:22",
+        "delayMs": 100,
+        "screenName": "Delmira"
+      },
+      {
+        "text": "Delmira jumpscare",
+        "time": "02:23",
+        "delayMs": 40,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "Delmira jumpscare",
+        "time": "02:23",
+        "delayMs": 40,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Delmira jumpscare",
+        "time": "02:24",
+        "delayMs": 40,
+        "screenName": "blackflame_burger&fries"
+      },
+      {
+        "text": "Delmira jumpscare",
+        "time": "02:24",
+        "delayMs": 40,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Delmira jumpscare",
+        "time": "02:25",
+        "delayMs": 40,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "What",
+        "time": "02:25",
+        "delayMs": 400,
+        "screenName": "Zips'n'zooms."
+      },
+      {
+        "text": "Delmira jumpscare",
+        "time": "02:26",
+        "delayMs": 40,
+        "screenName": "MechaLord"
+      },
+      {
+        "text": "I'M GETTING FUCKING JUMPED OUT H",
+        "time": "02:26",
+        "delayMs": 400,
+        "screenName": "Lightwep_user"
+      },
+      {
+        "text": "Delmira jumpscare",
+        "time": "02:27",
+        "delayMs": 400,
+        "screenName": "a certain cabbage"
+      },
+      {
+        "text": "Delmira jumpscare",
+        "time": "02:27",
+        "delayMs": 400,
+        "screenName": "Foxtrot"
+      },
+      {
+        "text": "Oh shit we have a game room, hi ya'll",
+        "time": "02:28",
+        "delayMs": 400,
+        "screenName": "johncontracts"
+      },
+      {
+        "text": "Oh shit since when did we have a full on messaging system",
+        "time": "02:28",
+        "delayMs": 400,
+        "screenName": "Ezzy_pzzy"
+      },
+      {
+        "text": "I'm backreading stop fucking chatting",
+        "time": "02:28",
+        "delayMs": 400,
+        "screenName": "RandomSoldato"
+      },
+      {
+        "text": "Hey gangalang",
+        "time": "02:29",
+        "delayMs": 400,
+        "screenName": "Terminus"
+      },
+      {
+        "text": "oh wow, we have a chat now? Did we miss somethings?",
+        "time": "02:29",
+        "delayMs": 400,
+        "screenName": "Bladeworks"
+      },
+      {
+        "text": "is that rat bastard geramiah in here?",
+        "time": "02:30",
+        "delayMs": 400,
+        "screenName": "HeishouRat"
+      },
+      {
+        "text": "Dude, why am I here",
+        "time": "02:32",
+        "delayMs": 400,
+        "screenName": "Lunarite"
+      },
+      {
+        "text": "left the conversation",
+        "time": "02:32",
+        "delayMs": 400,
+        "type": "action",
+        "screenName": "Lunarite"
+      },
+      {
+        "text": "HOLY SHIT WHOA OKAY",
+        "time": "02:37",
+        "delayMs": 5000,
+        "screenName": "Delmira"
+      },
+      {
+        "text": "Just jumped someone lmaooooooooooooooooo",
+        "time": "02:38",
+        "delayMs": 1000,
+        "screenName": "FriendlyFirelmao"
+      },
+      {
+        "text": "WHY ARE MY NOTIFS EXPLODING STOP SPAMMING YOU MONKEYS",
+        "time": "02:38",
+        "delayMs": 100,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "WHO CARES ABOUT DELMIRA WE HAVE 21 PEOPLE IN ONE CHAT",
+        "time": "02:39",
+        "delayMs": 150,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "stop moving the chat scroll I'm trying to read the top message",
+        "time": "02:39",
+        "delayMs": 80,
+        "screenName": "RandomSoldato"
+      },
+      {
+        "text": "too bad skill issue bozo",
+        "time": "02:39",
+        "delayMs": 50,
+        "screenName": "blackflame_burger&fries"
+      },
+      {
+        "text": "Who added cabbage? Who is cabbage???",
+        "time": "02:40",
+        "delayMs": 200,
+        "screenName": "Zips'n'zooms."
+      },
+      {
+        "text": "I am cabbage.",
+        "time": "02:40",
+        "delayMs": 50,
+        "screenName": "a certain cabbage"
+      },
+      {
+        "text": "understandable carry on",
+        "time": "02:40",
+        "delayMs": 100,
+        "screenName": "Zips'n'zooms."
+      },
+      {
+        "text": "Clockwise finished his sentence at 00:22 and got completely buried lmao",
+        "time": "02:41",
+        "delayMs": 300,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "what was bro even saying about his former skills before Delmira spawned in",
+        "time": "02:41",
+        "delayMs": 150,
+        "screenName": "Foxtrot"
+      },
+      {
+        "text": "I WAS TRYING TO SAY THAT MY FORMER SKILLS DON'T MATTER BUT YOU ALL HAVE BRAIN ROT",
+        "time": "02:42",
+        "delayMs": 300,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "L + ratio + boomer rage",
+        "time": "02:42",
+        "delayMs": 100,
+        "screenName": "blackflame_burger&fries"
+      },
+      {
+        "text": "blackflame_burger&fries was muted for 30 seconds by SYSTEM [Spam / Abuse Detection]",
+        "time": "02:42",
+        "delayMs": 50,
+        "type": "action",
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "AGAIN???? HE GOT MUTED AGAIN???",
+        "time": "02:43",
+        "delayMs": 200,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "THIS CHAT IS A BLESSING FROM THE HEAD THEMSELVES",
+        "time": "02:43",
+        "delayMs": 100,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "so uh... are we doing contracts or playing games?",
+        "time": "02:44",
+        "delayMs": 400,
+        "screenName": "johncontracts"
+      },
+      {
+        "text": "who does contracts on a slow day go back to sleep john",
+        "time": "02:44",
+        "delayMs": 150,
+        "screenName": "Ezzy_pzzy"
+      },
+      {
+        "text": "someone pin the JJS tournament rules before the room explodes again",
+        "time": "02:45",
+        "delayMs": 300,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "NO CHAR PASS CHARACTERS OR I AM NUKING THE SERVER",
+        "time": "02:45",
+        "delayMs": 100,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "already picking Gojo cope harder green",
+        "time": "02:46",
+        "delayMs": 200,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "I will literally choke you with my bare hands Blues",
+        "time": "02:46",
+        "delayMs": 150,
+        "screenName": "green_flame448"
+      },
+      {
+        "text": "Is Geramiah in here? I swear I smelled blood near Sector 4",
+        "time": "02:47",
+        "delayMs": 400,
+        "screenName": "HeishouRat"
+      },
+      {
+        "text": "he got booted in CONV-03 keep up rat",
+        "time": "02:47",
+        "delayMs": 150,
+        "screenName": "Terminus"
+      },
+      {
+        "text": "good. if he comes back tell him to fuck off again",
+        "time": "02:48",
+        "delayMs": 200,
+        "screenName": "HeishouRat"
+      },
+      {
+        "text": "Hey wait guys look at my text formatting!",
+        "time": "02:48",
+        "delayMs": 100,
+        "screenName": "Bladeworks"
+      },
+      {
+        "text": "Godddamn it, fuck you FFL",
+        "time": "02:48",
+        "delayMs": 50,
+        "screenName": "Lightwep_user"
+      },
+      {
+        "text": "womp womp",
+        "time": "02:49",
+        "delayMs": 40,
+        "screenName": "FriendlyFirelmao"
+      },
+      {
+        "text": "shit, no replying, emoticons or anything yes huh?",
+        "time": "02:49",
+        "delayMs": 40,
+        "screenName": "a certain cabbage"
+      },
+      {
+        "text": "MY MUTE IS OVER YOU ALL ARE DEAD MEAT",
+        "time": "02:50",
+        "delayMs": 300,
+        "screenName": "blackflame_burger&fries"
+      },
+      {
+        "text": "Pipe down",
+        "time": "02:50",
+        "delayMs": 100,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "shut the fuck up blackflame",
+        "time": "02:50",
+        "delayMs": 100,
+        "screenName": "EVERYONE"
+      },
+      {
+        "text": "Dude, cry about it",
+        "time": "02:50",
+        "delayMs": 10,
+        "screenName": "MechaLord"
+      },
+      {
+        "text": "Speedrun another mute lmfao",
+        "time": "02:50",
+        "delayMs": 150,
+        "screenName": "green_flame448,"
+      },
+      {
+        "text": "Blud's going to get muted to new year loooool",
+        "time": "02:50",
+        "delayMs": 600,
+        "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "text": "Blackflame, pipe down gang",
+        "time": "02:50",
+        "delayMs": 805,
+        "screenName": "Delmira"
+      },
+      {
+        "text": "I can hear someone pop open a bag of chips",
+        "time": "02:50",
+        "delayMs": 304,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "syabu blackflame",
+        "time": "02:50",
+        "delayMs": 453,
+        "screenName": "Lightwep_user"
+      },
+      {
+        "text": "OH FUCK SOMEONE'S RUNNING DOWN THE HA",
+        "time": "02:50",
+        "delayMs": 901,
+        "screenName": "a certain cabbage"
+      },
+      {
+        "text": "THE DIRECTOR'S PISSED DUDE, SHE LEFT CHAT BUT CAN STILL GET PINGS LMAOOOOOOOOOOO",
+        "time": "02:50",
+        "delayMs": 677,
+        "screenName": "Foxtrot"
+      },
+      {
+        "text": "Guys can you help me get some supplies in? It's getting dark and it's nearly night",
+        "time": "02:50",
+        "delayMs": 676,
+        "screenName": "Zips'n'zooms"
+      },
+      {
+        "text": "Blackflames shut your bitchass up",
+        "time": "02:50",
+        "delayMs": 843,
+        "screenName": "johncontracts"
+      },
+      {
+        "text": "I have Clockwise's AC remote and I'm going to set his room temp to 16 again",
+        "time": "02:50",
+        "delayMs": 832,
+        "screenName": "Ezzy_pzzy"
+      },
+      {
+        "text": "HOLY SHIT LIGHTWEP'S ON AFULL SPRINT TOWARDS M",
+        "time": "02:50",
+        "delayMs": 144,
+        "screenName": "FriendlyFirelmao"
+      },
+      {
+        "text": "I'll go help you Zips. Hold on.",
+        "time": "02:50",
+        "delayMs": 753,
+        "screenName": "HeishouRat"
+      },
+      {
+        "text": "WHO'S THE FATASS EATING CHIPS, I CAN SMELL THEM YOU GLUTTONOUS FUCK",
+        "time": "02:50",
+        "delayMs": 236,
+        "screenName": "Terminus"
+      },
+      {
+        "text": "Oh wow, so lively",
+        "time": "02:50",
+        "delayMs": 563,
+        "screenName": "Bladeworks"
+      },
+      {
+        "text": "Thanks Heishou",
+        "time": "02:50",
+        "delayMs": 654,
+        "screenName": "Zips'n'zooms"
+      },
+      {
+        "text": "NO LET ME EAT MY CHIPS NO NO GET THE FUCK AWAY FROM ME",
+        "time": "02:50",
+        "delayMs": 457,
+        "screenName": "RandomSoldato"
+      },
+      {
+        "text": "js fr said 'shut the fuck up' in unison like Burger is Geramiah",
+        "time": "02:51",
+        "delayMs": 300,
+        "screenName": "Delmira"
+      },
+      {
+        "text": "peak teamwork. Hearthlight Office is truly united.",
+        "time": "02:52",
+        "delayMs": 400,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "WHOEVER HAS MY AC REMOTE I WILL FOUND YOU AND I WILL DROWN YOU IN THE SEWER",
+        "time": "02:53",
+        "delayMs": 600,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "EZZY RUN BRO HE'S COMING FOR YOU RUUUUUN",
+        "time": "02:54",
+        "delayMs": 300,
+        "screenName": "Delmira"
+      },
+      {
+        "text": "joined the room",
+        "time": "02:55",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "Director"
+      },
+      {
+        "text": "left the room",
+        "time": "02:55",
+        "delayMs": 1000,
+        "type": "action",
+        "screenName": "Director"
+      },
+      {
+        "text": "????????",
+        "time": "02:52",
+        "delayMs": 500,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Did she just join and leave???? What????",
+        "time": "02:52",
+        "delayMs": 500,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "Me and Heishou are getting milktea",
+        "time": "02:53",
+        "delayMs": 2000,
+        "screenName": "Zips'n'zooms"
+      },
+      {
+        "text": "Yeah, also a perfect time for me to settle some milktea debts. !!Ivy, !!Clockwise, !!green_flame448 and",
+        "time": "02:54",
+        "delayMs": 2000,
+        "screenName": "HeishouRat"
+      },
+      {
+        "text": "!!Bladeworks. I think. Yeah.",
+        "time": "02:55",
+        "delayMs": 1000,
+        "screenName": "HeishouRat"
+      },
+      {
+        "text": "You guys going to vouch your milktea vouches?",
+        "time": "02:57",
+        "delayMs": 2000,
+        "screenName": "HeishouRat"
+      },
+      {
+        "text": "Get me some shawarma instead, but yeah, punch my vouch in.",
+        "time": "02:58",
+        "delayMs": 1000,
+        "screenName": "Bladeworks"
+      },
+      {
+        "text": "Get me Sans Rival milktea.",
+        "time": "03:00",
+        "delayMs": 2000,
+        "screenName": "500_hundred_enkephaline"
+      },
+      {
+        "text": "Also get me shawarma instead, thanks",
+        "time": "03:03",
+        "delayMs": 2000,
+        "screenName": "Clockwise"
+      },
+      {
+        "text": "Lightwep and FFL are duking it in the training grounds atm",
+        "time": "03:07",
+        "delayMs": 4000,
+        "screenName": "Foxtrot"
+      },
+      {
+        "text": "I guess everyone's going to watch the fight seeing the room get quiet lmao.",
+        "time": "03:10",
+        "delayMs": 3000,
+        "screenName": "Ezzy_pzzy"
       },
       {
         "type": "end"
