@@ -1850,7 +1850,7 @@
       {
         "text": "Delmira jumpscare",
         "time": "02:23",
-        "delayMs": 40,
+        "delayMs": 4000,
         "screenName": "500_hundred_enkephaline"
       },
       {
@@ -2029,7 +2029,7 @@
         "screenName": "Clockwise"
       },
       {
-        "text": "L + ratio + boomer rage",
+        "text": "L + ratio + malding",
         "time": "02:42",
         "delayMs": 100,
         "screenName": "blackflame_burger&fries"
