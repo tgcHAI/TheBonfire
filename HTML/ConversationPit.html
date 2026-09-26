@@ -136,8 +136,6 @@ let conversations = [];
   const SPEAKER_COLORS = 8;        // .spk-0 … .spk-7 in the stylesheet
   const DING_SRC = '../mats/sfx/message_out.mp3';
   const GONE_OFFLINE_SRC = '../mats/sfx/gone_offline.mp3';
-  const WRAP_DELAY_MS = 2000;       // beat after the whole stream ends before it wraps around
-
   let currentIndex = 0;
   let playing = false;
   let playhead = 0;                // ms elapsed in the conversation timeline
@@ -369,12 +367,14 @@ let conversations = [];
 
   function play() {
     if (playing) return;
-    chatToken++;                  // a fresh run cancels any pending wrap-around
+    chatToken++;                  // a fresh run supersedes any stale frame loop
     if (!stream.length) return;
-    // Already finished the whole cycle? Play starts it over rather than doing
-    // nothing.
+    // The whole cycle is spent: stay parked on the sign-off. Play never walks
+    // back into the first conversation — restart happens from the sidebar only.
     if (endedAtEnd || (revealed >= stream.length && playhead >= totalMs)) {
-      resetPlayback();
+      renderTransport();
+      updateTyping();
+      return;
     }
     primeDing();
     primeOfflineTone();
@@ -409,28 +409,17 @@ let conversations = [];
       updateTyping();
       renderTransport();
 
-      // The whole cycle (every chapter) has played through: sign off, then
-      // wrap around so the same conversations keep streaming.
+      // The whole cycle (every chapter) has played through: stop on the last
+      // line — no wrapping back into the first conversation.
       if (revealed >= timeline.length) {
         playing = false;
         endedAtEnd = true;
         renderTransport();
         playGoneOffline();
-        wrapStreamAfterBeat(token);
         return;
       }
       requestAnimationFrame(frame);
     }
-  }
-
-  // The end-of-cycle beat before the stream restarts. A manual Play or sidebar
-  // pick during the beat bumps chatToken and cancels this wrap.
-  function wrapStreamAfterBeat(token) {
-    setTimeout(() => {
-      if (token !== chatToken || !stream.length) return;
-      resetPlayback();
-      play();
-    }, WRAP_DELAY_MS);
   }
 
   function pause() {
