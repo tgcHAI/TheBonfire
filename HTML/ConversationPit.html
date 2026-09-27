@@ -107,7 +107,7 @@
         <div class="chat-transport">
           <button class="chat-btn" id="playBtn" onclick="togglePlay()" aria-label="Play the stream">&#9654; Play</button>
           <button class="chat-btn" id="replayBtn" onclick="replayConversation()" aria-label="Replay the whole stream from the start">&#8635; Replay</button>
-          <button class="chat-btn" id="forwardBtn" onclick="forwardChapter()" aria-label="Fast-forward to the next END cut">&#9193; Forward</button>
+          <select class="chat-btn" id="endJumpBtn" onchange="endJumpChange()" aria-label="Jump to an END cut in this conversation" title="Jump to an END cut in this conversation"></select>
           <span class="chat-progress" id="chatProgress">0 / 0</span>
         </div>
 
@@ -243,18 +243,11 @@ let conversations = [];
         el.className = 'chat-action chat-pending';
         el.textContent = (msg.screenName ? msg.screenName + ' ' : '') + msg.text;
       } else if (msg.type === 'end') {
-        // END rows are pure cuts: the fixed sleep caption plus the sign-off
-        // tag. Stored text is never shown. Playback halts on this row.
-        el.className = 'chat-end chat-pending';
-        const room = (conversations[entry.convIdx] || {}).title || '';
-        const cap = document.createElement('div');
-        cap.className = 'chat-end-cap';
-        cap.textContent = "SYSTEM has set the room: '" + room + "' to sleep";
-        const tag = document.createElement('div');
-        tag.className = 'chat-end-eoc';
-        tag.textContent = '— end of conversation —';
-        el.appendChild(cap);
-        el.appendChild(tag);
+        // END rows are hidden system markers: they keep their timeline slot so
+        // playback still halts and the dropdown can offer them, but no node is
+        // ever placed on the board — a null keeps msgNodes aligned with stream.
+        msgNodes.push(null);
+        return;
       } else {
         el.className = 'chat-msg chat-pending ' + (palette[msg.screenName] || 'spk-0');
         const row = document.createElement('div');
@@ -349,14 +342,14 @@ let conversations = [];
     endedAtEnd = false;
     if (endedTone) { try { endedTone.pause(); endedTone.currentTime = 0; } catch (e) { /* not seekable yet */ } }
     msgNodes.forEach((el) => {
-      el.classList.remove('in');
-      el.classList.add('chat-pending');
+      if (el) { el.classList.remove('in'); el.classList.add('chat-pending'); }
     });
     if (typingEl) typingEl.classList.remove('on');
     if (promptEl) promptEl.style.display = '';
     const area = document.getElementById('chatArea');
     if (area) area.scrollTop = 0;
     renderTransport();
+    renderEndMenu();          // the dropdown mirrors every reset of the playhead
   }
 
   // ── PLAYBACK ──
@@ -427,22 +420,52 @@ let conversations = [];
     renderTransport();
   }
 
-  // FORWARD works only inside the chapter the reader is currently in: it finds
-  // that conversation's own next END cut and INSTANTLY loads everything from the
-  // chapter opening through the cut line, then parks on the sign-off. It never
-  // jumps to another conversation — a later Play enters the next chapter.
-  function forwardChapter() {
-    if (!stream.length) return;
-    const myConv = stream[revealed] ? stream[revealed].convIdx : currentIndex;
-    let cut = -1;
-    for (let i = revealed; i < stream.length && stream[i].convIdx === myConv; i++) {
-      if (stream[i].msg.type === 'end') { cut = i; break; }
+  // The END dropdown is the chapter's cut map: one option per 'end' row in the
+  // current conversation. Because END rows render nothing on the board, this
+  // menu is their only visible surface. Cuts stay jumpable wherever the reader
+  // is; the option at/behind the playhead is marked current.
+  function renderEndMenu() {
+    const sel = document.getElementById('endJumpBtn');
+    if (!sel) return;
+    const cuts = [];
+    for (let i = 0; i < stream.length; i++) {
+      if (stream[i].convIdx === currentIndex && stream[i].msg.type === 'end') cuts.push(i);
     }
-    if (cut === -1) return;               // this chapter has no END cut ahead — nothing to seek
+    sel.innerHTML = '';
+    if (!cuts.length) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.disabled = true;
+      opt.textContent = 'No ends';
+      sel.appendChild(opt);
+      sel.disabled = true;
+      return;
+    }
+    let active = -1;
+    for (const cut of cuts) { if (cut < revealed) active = cut; }
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.disabled = true;
+    placeholder.textContent = 'Ends…';
+    sel.appendChild(placeholder);
+    cuts.forEach((cut, ord) => {
+      const opt = document.createElement('option');
+      opt.value = String(cut);
+      opt.textContent = 'End ' + (ord + 1);
+      if (cut === active) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.disabled = false;
+  }
+
+  // Seeking a cut loads the chapter from its opening through that cut in one
+  // silent pass, then parks the playhead on the cut so Play resumes past it.
+  // Cuts leave no marker on the board — the pause is the signal.
+  function seekToEnd(cut) {
+    if (!stream.length || cut < 0 || cut >= stream.length) return;
+    const myConv = stream[cut].convIdx;
     chatToken++;                          // drop any running frame loop / pending wrap
     playing = false;
-    // Bulk-reveal from the chapter opening through the cut, silent — a seek
-    // lands the whole chapter in context instead of dripping it out.
     const from = Math.min(revealed, chapterStarts[myConv] || 0);
     for (let i = from; i <= cut; i++) {
       const el = msgNodes[i];
@@ -451,13 +474,22 @@ let conversations = [];
     if (promptEl && from <= cut) promptEl.style.display = 'none';
     const area = document.getElementById('chatArea');
     area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
-    // Park on the sign-off line so the chapter stays put; the next conversation
-    // begins only when the reader presses Play. The playhead rests at the cut's
-    // own slot, so the next line still waits out its natural delay on Play.
+    // Park on the cut so the chapter stays put; the next segment begins only
+    // when the reader presses Play. The playhead rests at the cut's own slot,
+    // so the next line still waits out its natural delay on Play.
     revealed = cut + 1;
     playhead = timeline[cut].at;
     renderTransport();
     updateTyping();
+    renderEndMenu();
+  }
+
+  function endJumpChange() {
+    const sel = document.getElementById('endJumpBtn');
+    const picked = sel && sel.value;
+    if (picked === '' || picked === null || picked === undefined) return;
+    const cut = Number(picked);
+    if (Number.isInteger(cut) && cut >= 0) seekToEnd(cut);
   }
 
   function replayConversation() {

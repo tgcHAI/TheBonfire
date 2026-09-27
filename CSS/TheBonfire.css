@@ -700,6 +700,15 @@ body::before {
     border-color: var(--ember);
     text-shadow: 0 0 8px rgba(196,127,23,0.5);
 }
+select.chat-btn {
+    color: var(--text-dim);
+    background: var(--panel);
+    cursor: pointer;
+}
+select.chat-btn option {
+    background: var(--panel);
+    color: var(--text-dim);
+}
 
 .chat-progress {
     margin-left: auto;
@@ -755,37 +764,13 @@ body::before {
     margin: 10px 0;
 }
 
-/* END rows close the chapter: the sleep caption (accented) over a quiet
-   sign-off tag. Playback halts on the cut — the reader moves on with Play
-   or Fast-forward rather than the stream auto-advancing. */
-.chat-end {
-    text-align: center;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ember-bright);
-    margin: 14px 0;
-}
-.chat-end .chat-end-cap::before,
-.chat-end .chat-end-cap::after {
-    content: '— ';
-    color: var(--text-faint);
-    font-weight: 400;
-}
-.chat-end .chat-end-eoc {
-    font-size: 11px;
-    font-weight: 400;
-    font-style: italic;
-    letter-spacing: 0.06em;
-    text-transform: none;
-    color: var(--text-faint);
-}
+/* END rows are hidden system markers — they own no board styling. They live on
+   the timeline (playback halts on them) and surface only in the END dropdown. */
 
 /* messages are pre-built but hidden until their timeline slot arrives */
 .chat-pending { display: none; }
 
-.chat-msg.in, .chat-action.in, .chat-end.in { animation: msg-in 0.28s ease-out both; }
+.chat-msg.in, .chat-action.in { animation: msg-in 0.28s ease-out both; }
 @keyframes msg-in {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }
