@@ -560,6 +560,9 @@ body::before {
 .conv-msg-row.is-end .conv-msg-delay { display: none; }
 .conv-msg-time { width: 58px; }
 .conv-msg-delay { width: 76px; }
+/* the chapter label exists only on END rows: it names the cut in the dropdown */
+.conv-msg-label { width: 190px; }
+.conv-msg-row:not(.is-end) .conv-msg-label { display: none; }
 /* the caption preview reads like the SYSTEM line it will become */
 .conv-msg-row.is-end .conv-msg-text { opacity: .7; font-style: italic; }
 .conv-msg-text { flex: 1 1 160px; min-width: 130px; }

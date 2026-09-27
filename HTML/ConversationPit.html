@@ -451,7 +451,7 @@ let conversations = [];
     cuts.forEach((cut, ord) => {
       const opt = document.createElement('option');
       opt.value = String(cut);
-      opt.textContent = 'End ' + (ord + 1);
+      opt.textContent = stream[cut].msg.label || 'End ' + (ord + 1);
       if (cut === active) opt.selected = true;
       sel.appendChild(opt);
     });
@@ -623,13 +623,15 @@ let conversations = [];
     optEnd.value = 'end'; optEnd.textContent = 'end';
     kind.appendChild(optChat); kind.appendChild(optAction); kind.appendChild(optEnd);
     kind.value = m.type === 'action' ? 'action' : (m.type === 'end' ? 'end' : 'chat');
-    // END rows are pure cuts: they only carry a kind. Name/time/delay go inert
-    // and the caption input becomes a fixed read-only preview of the SYSTEM line.
+    // END rows are pure cuts: they carry only a kind plus (optionally) a chapter
+    // label that names the cut in the END dropdown. Name/time/delay go inert and
+    // the caption input becomes a fixed read-only preview of the SYSTEM line.
     const applyEndState = (isEnd) => {
       row.classList.toggle('is-end', isEnd);
       name.disabled = isEnd;
       time.disabled = isEnd;
       delay.disabled = isEnd;
+      label.disabled = !isEnd;
       if (isEnd) {
         if (text.dataset.user === undefined) text.dataset.user = text.value;
         text.value = endCaptionHint();
@@ -657,6 +659,12 @@ let conversations = [];
     delay.title = 'Delay before this line (ms)';
     delay.value = m.delayMs != null ? m.delayMs : '';
 
+    const label = document.createElement('input');
+    label.type = 'text'; label.className = 'conv-msg-label';
+    label.placeholder = 'chapter title';
+    label.title = 'Names this END cut in the dropdown; blank falls back to an ordinal';
+    label.value = m.label || '';
+
     const text = document.createElement('input');
     text.type = 'text'; text.className = 'conv-msg-text';
     text.placeholder = m.type === 'end' ? endCaptionHint() : 'the line itself…';
@@ -669,7 +677,8 @@ let conversations = [];
     actions.appendChild(rowBtn('×', 'Remove message', () => row.remove()));
 
     row.appendChild(kind); row.appendChild(name); row.appendChild(time);
-    row.appendChild(delay); row.appendChild(text); row.appendChild(actions);
+    row.appendChild(delay); row.appendChild(label); row.appendChild(text);
+    row.appendChild(actions);
     applyEndState(kind.value === 'end');
     return row;
   }
@@ -705,8 +714,10 @@ function addMsgRow() {
       const name = row.querySelector('.conv-msg-name').value.trim();
       if (kind === 'end') {
         // END rows are pure cuts: the SYSTEM caption is always derived from the
-        // title, so a saved end carries just a kind — no text, name, time or delay.
-        return { type: 'end' };
+        // title, so a saved end carries just a kind plus an optional chapter
+        // label that names this cut in the END dropdown.
+        const chapterLabel = row.querySelector('.conv-msg-label').value.trim();
+        return chapterLabel ? { type: 'end', label: chapterLabel } : { type: 'end' };
       }
       const text = row.querySelector('.conv-msg-text').value.trim();
       if (!text && !name) return null;  // unfilled row — drop it
