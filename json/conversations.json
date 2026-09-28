@@ -1094,7 +1094,7 @@
   },
   {
     "id": "CONV-004",
-    "title": "Ember Lords — [OFF-RECORD]",
+    "title": "Ember Lords",
     "status": "Offline",
     "messages": [
       {
@@ -3066,7 +3066,18 @@
       },
       {
         "type": "divider",
-        "label": "Hearthlight Shenanigans"
+        "label": "Hearthlight Shenanigans",
+        "text": "The Intercom incident"
+      }
+    ]
+  },
+  {
+    "id": "CONV-006",
+    "title": "Sometihng",
+    "status": "Online",
+    "messages": [
+      {
+        "type": "divider"
       }
     ]
   }
