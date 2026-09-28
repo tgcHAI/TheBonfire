@@ -5,6 +5,10 @@
     "status": "Offline",
     "messages": [
       {
+        "type": "divider",
+        "label": "Conversation Pit Testing."
+      },
+      {
         "text": "joined in",
         "time": "00:00",
         "delayMs": 1000,
@@ -77,6 +81,11 @@
         "time": "00:07",
         "delayMs": 3000,
         "screenName": "Geramiah"
+      },
+      {
+        "type": "divider",
+        "label": "End",
+        "text": "SYSTEM has archived the CONV"
       }
     ]
   },
@@ -85,6 +94,10 @@
     "title": "Transmission — Origin Unknown",
     "status": "Online",
     "messages": [
+      {
+        "type": "divider",
+        "label": "Transmission — Origin Unknown"
+      },
       {
         "text": "signal detected — origin unverified",
         "time": "??:??",
@@ -303,6 +316,10 @@
     "title": "Emergency Sector Assembly — Breach Investigation",
     "status": "Online",
     "messages": [
+      {
+        "type": "divider",
+        "label": "Emergency Sector Assembly — Breach Investigation"
+      },
       {
         "text": "Director created the group",
         "time": "00:00",
@@ -1078,8 +1095,13 @@
   {
     "id": "CONV-004",
     "title": "Ember Lords — [OFF-RECORD]",
-    "status": "Online",
+    "status": "Offline",
     "messages": [
+      {
+        "type": "divider",
+        "label": "Chewed-out for nothing.",
+        "text": "SYSTEM has made a room"
+      },
       {
         "text": "Clockwise created the group",
         "time": "00:00",
@@ -1431,6 +1453,11 @@
         "delayMs": 2000,
         "type": "action",
         "screenName": "Caeruleus Ignis Ex Gehenna"
+      },
+      {
+        "type": "divider",
+        "label": "End",
+        "text": "SYSTEM has archived the room."
       }
     ]
   },
@@ -1439,6 +1466,11 @@
     "title": "Game Room",
     "status": "Online",
     "messages": [
+      {
+        "type": "divider",
+        "label": "Oh hey, a Game Room!",
+        "text": "SYSTEM has made new room"
+      },
       {
         "text": "Shit, I forgot how many people I have to add.",
         "time": "00:00",
@@ -1791,7 +1823,7 @@
         "screenName": "blackflame_burger&fries"
       },
       {
-        "type": "end",
+        "type": "divider",
         "label": "Slow Day At Work"
       },
       {
@@ -3021,7 +3053,7 @@
         "screenName": "RandomSoldato"
       },
       {
-        "text": "IWhat the fuck, Butter???? When were you here?",
+        "text": "What the fuck, Butter???? When were you here?",
         "time": "0:13",
         "delayMs": 2000,
         "screenName": "500_hundred_enkephaline"
@@ -3033,7 +3065,7 @@
         "screenName": "ButtaDawgWidDaButta"
       },
       {
-        "type": "end",
+        "type": "divider",
         "label": "Hearthlight Shenanigans"
       }
     ]

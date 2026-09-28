@@ -93,11 +93,14 @@ function saveConversations(text) {
     if (!conv.id || !conv.title || !Array.isArray(conv.messages)) {
       throw new Error('Every conversation needs id, title and a messages array');
     }
+    if (!conv.messages.length || conv.messages[0].type !== 'divider') {
+      throw new Error('Every conversation must open with a divider');
+    }
     for (const msg of conv.messages) {
-      if (!msg || typeof msg !== 'object' || (msg.type !== 'end' && (typeof msg.text !== 'string' || !msg.text))) {
+      if (!msg || typeof msg !== 'object' || (msg.type !== 'divider' && (typeof msg.text !== 'string' || !msg.text))) {
         throw new Error('Every message needs a text field');
       }
-      if (msg.type !== 'action' && msg.type !== 'end' && !(typeof msg.screenName === 'string' && msg.screenName)) {
+      if (msg.type !== 'action' && msg.type !== 'divider' && !(typeof msg.screenName === 'string' && msg.screenName)) {
         throw new Error('Chat messages need a screenName');
       }
       if (msg.delayMs !== undefined && !(Number(msg.delayMs) >= 0)) {

@@ -70,12 +70,12 @@
           </div>
         </div>
         <div class="ed-field ed-body-field cnv-msg">
-          <label for="cd-msgList">Messages <span class="ed-hint">(chat = screen name + line; action = event line; end = fixed SYSTEM caption, no name/time/delay)</span></label>
+          <label for="cd-msgList">Messages <span class="ed-hint">(chat = screen name + line; action = event line; divider = bold chapter card with a dropdown name, no name/time/delay)</span></label>
           <div class="conv-msg-list" id="cd-msgList">
             <!-- populated by JS -->
           </div>
           <button class="ed-btn ed-addmsg" onclick="addMsgRow()">+ Add message</button>
-          <button class="ed-btn ed-addmsg ed-addend" onclick="addEndRow()">+ Add end</button>
+          <button class="ed-btn ed-addmsg ed-addend" onclick="addDividerRow()">+ Add divider</button>
         </div>
       </div>
     </div>
@@ -107,7 +107,7 @@
         <div class="chat-transport">
           <button class="chat-btn" id="playBtn" onclick="togglePlay()" aria-label="Play the stream">&#9654; Play</button>
           <button class="chat-btn" id="replayBtn" onclick="replayConversation()" aria-label="Replay the whole stream from the start">&#8635; Replay</button>
-          <select class="chat-btn" id="endJumpBtn" onchange="endJumpChange()" aria-label="Jump to an END cut in this conversation" title="Jump to an END cut in this conversation"></select>
+          <select class="chat-btn" id="dividerJumpBtn" onchange="dividerJumpChange()" aria-label="Fast-forward to a divider in this conversation" title="Fast-forward to a divider in this conversation"></select>
           <span class="chat-progress" id="chatProgress">0 / 0</span>
         </div>
 
@@ -134,7 +134,11 @@ let conversations = [];
 // ── STATE ──
   const DEFAULT_DELAY_MS = 1600;   // gap before a message that doesn't set its own
   const SPEAKER_COLORS = 8;        // .spk-0 … .spk-7 in the stylesheet
+  const FF_MS = 2000;              // a divider fast-forward always sweeps for exactly this long
   const DING_SRC = '../mats/sfx/message_out.mp3';
+  // Ease-out (deceleration) curve: rows pour in fast at first, then trickle as
+  // the sweep closes on the picked divider over the fixed FF_MS window.
+  function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
   const GONE_OFFLINE_SRC = '../mats/sfx/gone_offline.mp3';
   let currentIndex = 0;
   let playing = false;
@@ -242,12 +246,19 @@ let conversations = [];
       if (msg.type === 'action') {
         el.className = 'chat-action chat-pending';
         el.textContent = (msg.screenName ? msg.screenName + ' ' : '') + msg.text;
-      } else if (msg.type === 'end') {
-        // END rows are hidden system markers: they keep their timeline slot so
-        // playback still halts and the dropdown can offer them, but no node is
-        // ever placed on the board — a null keeps msgNodes aligned with stream.
-        msgNodes.push(null);
-        return;
+      } else if (msg.type === 'divider') {
+        // A divider is a chapter card that opens with its caption on the board:
+        // the author's own bold line, or the derived room line when no text is
+        // set. Natural playback halts here; the dropdown fast-forwards the
+        // board from the conversation's top card onto a picked divider.
+        el.className = 'chat-divider chat-pending';
+        const room = (conversations[entry.convIdx] || {}).title || '';
+        const cap = document.createElement('div');
+        cap.className = 'chat-divider-cap';
+        cap.textContent = String(msg.text || '').trim()
+          ? msg.text
+          : "SYSTEM has set the room: '" + room + "' to sleep";
+        el.appendChild(cap);
       } else {
         el.className = 'chat-msg chat-pending ' + (palette[msg.screenName] || 'spk-0');
         const row = document.createElement('div');
@@ -349,7 +360,7 @@ let conversations = [];
     const area = document.getElementById('chatArea');
     if (area) area.scrollTop = 0;
     renderTransport();
-    renderEndMenu();          // the dropdown mirrors every reset of the playhead
+    renderDividerMenu();      // the dropdown mirrors every reset of the playhead
   }
 
   // ── PLAYBACK ──
@@ -389,13 +400,16 @@ let conversations = [];
         const i = timeline[revealed].i;
         revealMessage(i);
         revealed++;
-        // A chapter's END row is a hard stop: the room sign-offs on the cut and
-        // waits for the reader — no spilling into the next conversation, and no
-        // auto-wrap at the end of the cycle. A later Play resumes from here.
-        if (stream[i].msg.type === 'end') {
+        // A divider is a hard stop in natural playback: the chapter's card
+        // signs the room off on the cut and waits for the reader — no spilling
+        // into the next conversation, and no auto-wrap at the end of the cycle.
+        // The dropdown's fast-forward sweep is the only path that lands past a
+        // card (see fastForwardTo).
+        if (stream[i].msg.type === 'divider') {
           playing = false;
           renderTransport();
           updateTyping();
+          renderDividerMenu();  // the dropdown marks the divider the run parked on
           return;
         }
       }
@@ -420,23 +434,24 @@ let conversations = [];
     renderTransport();
   }
 
-  // The END dropdown is the chapter's cut map: one option per 'end' row in the
-  // current conversation. Because END rows render nothing on the board, this
-  // menu is their only visible surface. Cuts stay jumpable wherever the reader
-  // is; the option at/behind the playhead is marked current.
-  function renderEndMenu() {
-    const sel = document.getElementById('endJumpBtn');
+  // The divider dropdown is the conversation's chapter map: one option per
+  // 'divider' row in the current conversation, the top card first. Picking a
+  // divider fast-forwards the board from the top card through that divider in
+  // one muted sweep (see fastForwardTo). The option at/behind the playhead is
+  // marked current; dividers stay jumpable wherever the reader is.
+  function renderDividerMenu() {
+    const sel = document.getElementById('dividerJumpBtn');
     if (!sel) return;
     const cuts = [];
     for (let i = 0; i < stream.length; i++) {
-      if (stream[i].convIdx === currentIndex && stream[i].msg.type === 'end') cuts.push(i);
+      if (stream[i].convIdx === currentIndex && stream[i].msg.type === 'divider') cuts.push(i);
     }
     sel.innerHTML = '';
     if (!cuts.length) {
       const opt = document.createElement('option');
       opt.value = '';
       opt.disabled = true;
-      opt.textContent = 'No ends';
+      opt.textContent = 'No dividers';
       sel.appendChild(opt);
       sel.disabled = true;
       return;
@@ -446,50 +461,83 @@ let conversations = [];
     const placeholder = document.createElement('option');
     placeholder.value = '';
     placeholder.disabled = true;
-    placeholder.textContent = 'Ends…';
+    placeholder.textContent = 'Chapters…';
     sel.appendChild(placeholder);
     cuts.forEach((cut, ord) => {
       const opt = document.createElement('option');
       opt.value = String(cut);
-      opt.textContent = stream[cut].msg.label || 'End ' + (ord + 1);
+      opt.textContent = stream[cut].msg.label || stream[cut].msg.text || 'Divider ' + (ord + 1);
       if (cut === active) opt.selected = true;
       sel.appendChild(opt);
     });
     sel.disabled = false;
   }
 
-  // Seeking a cut loads the chapter from its opening through that cut in one
-  // silent pass, then parks the playhead on the cut so Play resumes past it.
-  // Cuts leave no marker on the board — the pause is the signal.
-  function seekToEnd(cut) {
+  // Picking a divider fast-forwards the board from the conversation's opening
+  // divider to the picked one: every row is hidden (unloading whatever was on
+  // screen), then a self-contained sweep unveils rows from the top card through
+  // the picked divider with an ease-out (decelerating) cadence that lasts
+  // exactly FF_MS. The sweep never dings, so the rush of incoming lines stays
+  // quiet, and earlier cards of a multi-divider room pass through. It ends
+  // parked on the picked divider; Play continues past it into the chapter.
+  //
+  // The sweep owns its own rAF loop and token because it must not run through
+  // the natural-pace frame()/play() system: it claims a fresh chatToken so the
+  // token drop in play()/renderStream() kills it, and it responds to chips
+  // (Replay/sidebar/picking again) just like any other run.
+  function fastForwardTo(cut) {
     if (!stream.length || cut < 0 || cut >= stream.length) return;
     const myConv = stream[cut].convIdx;
-    chatToken++;                          // drop any running frame loop / pending wrap
+    if (myConv !== currentIndex) return;  // the dropdown only offers this chapter
+    const start = chapterStarts[myConv] || 0;
+    if (cut < start) return;
+    const token = ++chatToken;            // drop any running frame loop / sweep
     playing = false;
-    const from = Math.min(revealed, chapterStarts[myConv] || 0);
-    for (let i = from; i <= cut; i++) {
-      const el = msgNodes[i];
-      if (el) { el.classList.remove('chat-pending'); el.classList.add('in'); }
-    }
-    if (promptEl && from <= cut) promptEl.style.display = 'none';
+    endedAtEnd = false;                   // the sweep is a fresh run
+    msgNodes.forEach((el) => {
+      if (el) { el.classList.remove('in'); el.classList.add('chat-pending'); }
+    });
+    if (promptEl) promptEl.style.display = 'none';
+    const span = cut - start + 1;         // rows to unveil, picked divider last
     const area = document.getElementById('chatArea');
-    area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
-    // Park on the cut so the chapter stays put; the next segment begins only
-    // when the reader presses Play. The playhead rests at the cut's own slot,
-    // so the next line still waits out its natural delay on Play.
-    revealed = cut + 1;
-    playhead = timeline[cut].at;
+    const t0 = performance.now();
+    revealed = start;
+    playhead = start < timeline.length ? timeline[start].at : totalMs;
     renderTransport();
-    updateTyping();
-    renderEndMenu();
+    updateTyping();                       // clears any visible typing chips
+    renderDividerMenu();
+    requestAnimationFrame(sweep);
+
+    function sweep(now) {
+      if (chatToken !== token) return;    // Play/sidebar/another pick killed it
+      const t = Math.min(now - t0, FF_MS);
+      const target = start + Math.floor(easeOutCubic(t / FF_MS) * span);
+      while (revealed <= target && revealed <= cut) {
+        revealMessage(revealed, true);    // silent — the sweep never dings
+        revealed++;
+      }
+      if (revealed > start) playhead = timeline[revealed - 1].at;
+      if (t >= FF_MS) {
+        // Park exactly on the picked divider so the next Play reads past it.
+        revealed = cut + 1;
+        playhead = timeline[cut].at;
+        area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
+        renderTransport();
+        renderDividerMenu();
+        updateTyping();
+        return;
+      }
+      area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
+      requestAnimationFrame(sweep);
+    }
   }
 
-  function endJumpChange() {
-    const sel = document.getElementById('endJumpBtn');
+  function dividerJumpChange() {
+    const sel = document.getElementById('dividerJumpBtn');
     const picked = sel && sel.value;
     if (picked === '' || picked === null || picked === undefined) return;
     const cut = Number(picked);
-    if (Number.isInteger(cut) && cut >= 0) seekToEnd(cut);
+    if (Number.isInteger(cut) && cut >= 0) fastForwardTo(cut);
   }
 
   function replayConversation() {
@@ -497,14 +545,15 @@ let conversations = [];
     play();
   }
 
-  function revealMessage(i) {
+  function revealMessage(i, silent) {
     const el = msgNodes[i];
     if (!el) return;
     if (promptEl) { promptEl.style.display = 'none'; }
     el.classList.remove('chat-pending');
     el.classList.add('in');
-    // END rows are silent markers — the wrap tone speaks at cycle's end
-    if (stream[i] && stream[i].msg.type !== 'end') dingNow();
+    // Dividers are silent cards; the fast-forward sweep passes silent so its
+    // rush of loading rows never rattles a ding per frame.
+    if (!silent && stream[i] && stream[i].msg.type !== 'divider') dingNow();
     const area = document.getElementById('chatArea');
     area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
   }
@@ -513,7 +562,7 @@ let conversations = [];
     if (!typingEl) return;
     const next = stream[revealed];
     // Only meaningful while more words are still coming.
-    if (!playing || !next || next.msg.type === 'action' || next.msg.type === 'end') {
+    if (!playing || !next || next.msg.type === 'action' || next.msg.type === 'divider') {
       typingEl.classList.remove('on');
       return;
     }
@@ -601,9 +650,9 @@ let conversations = [];
     messages.forEach((m) => list.appendChild(buildMsgRow(m)));
   }
 
-  // The editor preview for an END row mirrors the live caption: a SYSTEM
-  // line that announces the chapter's own room falling asleep.
-  function endCaptionHint() {
+  // The editor hint for a divider row mirrors the rendered card: a SYSTEM
+  // line that announces the chapter's own room, shown when no text is set.
+  function dividerHint() {
     const room = (conversations[currentIndex] || {}).title || '';
     return "SYSTEM has set the room: '" + room + "' to sleep";
   }
@@ -619,31 +668,24 @@ let conversations = [];
     optChat.value = 'chat'; optChat.textContent = 'chat';
     const optAction = document.createElement('option');
     optAction.value = 'action'; optAction.textContent = 'action';
-    const optEnd = document.createElement('option');
-    optEnd.value = 'end'; optEnd.textContent = 'end';
-    kind.appendChild(optChat); kind.appendChild(optAction); kind.appendChild(optEnd);
-    kind.value = m.type === 'action' ? 'action' : (m.type === 'end' ? 'end' : 'chat');
-    // END rows are pure cuts: they carry only a kind plus (optionally) a chapter
-    // label that names the cut in the END dropdown. Name/time/delay go inert and
-    // the caption input becomes a fixed read-only preview of the SYSTEM line.
-    const applyEndState = (isEnd) => {
-      row.classList.toggle('is-end', isEnd);
-      name.disabled = isEnd;
-      time.disabled = isEnd;
-      delay.disabled = isEnd;
-      label.disabled = !isEnd;
-      if (isEnd) {
-        if (text.dataset.user === undefined) text.dataset.user = text.value;
-        text.value = endCaptionHint();
-      } else if (text.dataset.user !== undefined) {
-        text.value = text.dataset.user;
-        delete text.dataset.user;
-      }
-      text.disabled = isEnd;
-      text.placeholder = isEnd ? endCaptionHint() : 'the line itself…';
+    const optDivider = document.createElement('option');
+    optDivider.value = 'divider'; optDivider.textContent = 'divider';
+    kind.appendChild(optChat); kind.appendChild(optAction); kind.appendChild(optDivider);
+    kind.value = m.type === 'action' ? 'action' : (m.type === 'divider' ? 'divider' : 'chat');
+    // Divider rows act like action tags with a bold card: they carry a label
+    // that names the divider in the fast-forward dropdown plus an authorable
+    // line that renders bold on the board. Name/time/delay go inert.
+    const applyDividerState = (isDivider) => {
+      row.classList.toggle('is-divider', isDivider);
+      name.disabled = isDivider;
+      time.disabled = isDivider;
+      delay.disabled = isDivider;
+      label.disabled = !isDivider;
+      text.disabled = false;      // the card's own bold line stays authorable
+      text.placeholder = isDivider ? dividerHint() : 'the line itself…';
     };
 
-    kind.addEventListener('change', () => applyEndState(kind.value === 'end'));
+    kind.addEventListener('change', () => applyDividerState(kind.value === 'divider'));
 
     const name = document.createElement('input');
     name.type = 'text'; name.className = 'conv-msg-name';
@@ -662,12 +704,12 @@ let conversations = [];
     const label = document.createElement('input');
     label.type = 'text'; label.className = 'conv-msg-label';
     label.placeholder = 'chapter title';
-    label.title = 'Names this END cut in the dropdown; blank falls back to an ordinal';
+    label.title = 'Names this divider in the fast-forward dropdown; blank falls back to the card line or an ordinal';
     label.value = m.label || '';
 
     const text = document.createElement('input');
     text.type = 'text'; text.className = 'conv-msg-text';
-    text.placeholder = m.type === 'end' ? endCaptionHint() : 'the line itself…';
+    text.placeholder = m.type === 'divider' ? dividerHint() : 'the line itself…';
     text.value = m.text || '';
 
     const actions = document.createElement('div');
@@ -679,7 +721,7 @@ let conversations = [];
     row.appendChild(kind); row.appendChild(name); row.appendChild(time);
     row.appendChild(delay); row.appendChild(label); row.appendChild(text);
     row.appendChild(actions);
-    applyEndState(kind.value === 'end');
+    applyDividerState(kind.value === 'divider');
     return row;
   }
 
@@ -704,20 +746,24 @@ function addMsgRow() {
     document.getElementById('cd-msgList').appendChild(buildMsgRow({ type: 'chat' }));
   }
 
-  function addEndRow() {
-    document.getElementById('cd-msgList').appendChild(buildMsgRow({ type: 'end' }));
+  function addDividerRow() {
+    document.getElementById('cd-msgList').appendChild(buildMsgRow({ type: 'divider' }));
   }
 
   function messagesFromEditor() {
     return Array.from(document.querySelectorAll('#cd-msgList .conv-msg-row')).map((row) => {
       const kind = row.querySelector('.conv-msg-kind').value;
       const name = row.querySelector('.conv-msg-name').value.trim();
-      if (kind === 'end') {
-        // END rows are pure cuts: the SYSTEM caption is always derived from the
-        // title, so a saved end carries just a kind plus an optional chapter
-        // label that names this cut in the END dropdown.
+      if (kind === 'divider') {
+        // A saved divider carries its type plus optional label (dropdown name)
+        // and text (the bold line); a blank text falls back to the derived
+        // room caption on the board.
+        const msg = { type: 'divider' };
         const chapterLabel = row.querySelector('.conv-msg-label').value.trim();
-        return chapterLabel ? { type: 'end', label: chapterLabel } : { type: 'end' };
+        const display = row.querySelector('.conv-msg-text').value.trim();
+        if (chapterLabel) msg.label = chapterLabel;
+        if (display) msg.text = display;
+        return msg;
       }
       const text = row.querySelector('.conv-msg-text').value.trim();
       if (!text && !name) return null;  // unfilled row — drop it
@@ -748,9 +794,12 @@ function addMsgRow() {
   function validateConversation(conv) {
     if (!conv.title) throw new Error('every conversation needs a title');
     if (!conv.messages.length) throw new Error('add at least one message');
+    if (!conv.messages[0] || conv.messages[0].type !== 'divider') {
+      throw new Error('every conversation opens with a divider — move a divider row to the top');
+    }
     conv.messages.forEach((m) => {
-      if (m.type !== 'end' && !m.text) throw new Error('every message needs text');
-      if (m.type !== 'action' && m.type !== 'end' && !m.screenName) {
+      if (m.type !== 'divider' && !m.text) throw new Error('every message needs text');
+      if (m.type !== 'action' && m.type !== 'divider' && !m.screenName) {
         throw new Error('chat messages need a screenName');
       }
       if (m.delayMs != null && (!(m.delayMs >= 0) || m.delayMs > 86400000)) {

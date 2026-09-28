@@ -554,17 +554,17 @@ body::before {
 }
 .conv-msg-kind { width: 62px; }
 .conv-msg-name { width: 130px; }
-/* END rows are pure cuts: name, time and delay columns go away entirely */
-.conv-msg-row.is-end .conv-msg-name,
-.conv-msg-row.is-end .conv-msg-time,
-.conv-msg-row.is-end .conv-msg-delay { display: none; }
+/* Divider rows are pure cards: name, time and delay columns go away entirely */
+.conv-msg-row.is-divider .conv-msg-name,
+.conv-msg-row.is-divider .conv-msg-time,
+.conv-msg-row.is-divider .conv-msg-delay { display: none; }
 .conv-msg-time { width: 58px; }
 .conv-msg-delay { width: 76px; }
-/* the chapter label exists only on END rows: it names the cut in the dropdown */
+/* the chapter label exists only on divider rows: it names the card in the dropdown */
 .conv-msg-label { width: 190px; }
-.conv-msg-row:not(.is-end) .conv-msg-label { display: none; }
-/* the caption preview reads like the SYSTEM line it will become */
-.conv-msg-row.is-end .conv-msg-text { opacity: .7; font-style: italic; }
+.conv-msg-row:not(.is-divider) .conv-msg-label { display: none; }
+/* a divider's card line stays authorable and reads like the bold board caption */
+.conv-msg-row.is-divider .conv-msg-text { font-weight: 700; }
 .conv-msg-text { flex: 1 1 160px; min-width: 130px; }
 .conv-msg-actions { display: flex; gap: 3px; }
 .conv-row-btn { padding: 1px 7px; min-width: 20px; }
@@ -767,13 +767,29 @@ select.chat-btn option {
     margin: 10px 0;
 }
 
-/* END rows are hidden system markers — they own no board styling. They live on
-   the timeline (playback halts on them) and surface only in the END dropdown. */
+/* Dividers are chapter cards: a bold centred line, accented like a title.
+   Natural playback halts on the cut; the reader moves on with Play or the
+   fast-forward dropdown. */
+.chat-divider {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ember-bright);
+    margin: 14px 0;
+}
+.chat-divider .chat-divider-cap::before,
+.chat-divider .chat-divider-cap::after {
+    content: '— ';
+    color: var(--text-faint);
+    font-weight: 400;
+}
 
 /* messages are pre-built but hidden until their timeline slot arrives */
 .chat-pending { display: none; }
 
-.chat-msg.in, .chat-action.in { animation: msg-in 0.28s ease-out both; }
+.chat-msg.in, .chat-action.in, .chat-divider.in { animation: msg-in 0.28s ease-out both; }
 @keyframes msg-in {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }
