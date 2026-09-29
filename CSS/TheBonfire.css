@@ -1029,3 +1029,126 @@ body { -webkit-tap-highlight-color: transparent; }
     .main { padding: 10px 14px; }
 }
 
+/* ── RESTRICTED-ARCHIVE GATE ── */
+/* The topbar logo doubles as the gate trigger; keep the icon feel but make it
+   clearly interactive and keyboard-focusable. */
+.topbar-logo {
+    cursor: pointer;
+}
+.topbar-logo:focus-visible {
+    outline: 2px solid var(--ember);
+    outline-offset: 2px;
+}
+
+.gate-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.65);
+}
+.gate-overlay[hidden] {
+    display: none;
+}
+
+.gate-panel {
+    width: min(320px, calc(100vw - 40px));
+    background: var(--panel);
+    border: 1px solid var(--border);
+    box-shadow: 0 0 24px rgba(196, 127, 23, 0.25);
+    padding: 22px;
+}
+.gate-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.gate-lock {
+    font-size: 22px;
+    color: var(--ember);
+}
+.gate-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--ember);
+}
+.gate-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+}
+.gate-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    outline: none;
+}
+.gate-input:focus {
+    border-color: var(--ember);
+    box-shadow: 0 0 0 1px var(--ember);
+}
+.gate-error {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #e05b4a;
+}
+.gate-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+.gate-btn {
+    flex: 1;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    background: transparent;
+    border: 1px solid var(--border);
+    cursor: pointer;
+}
+.gate-btn:hover {
+    color: var(--ember);
+    border-color: var(--ember);
+}
+.gate-btn-primary {
+    color: var(--bg);
+    background: var(--ember);
+    border-color: var(--ember);
+}
+.gate-btn-primary:hover {
+    color: var(--bg);
+    background: var(--ember-bright);
+}
+.gate-open {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--text-dim);
+}
+.gate-open .gate-btn {
+    flex: 0 0 auto;
+}
+
+.gate-shake {
+    animation: gate-shake 0.4s;
+}
+@keyframes gate-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+}

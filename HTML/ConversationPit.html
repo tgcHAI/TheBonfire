@@ -7,6 +7,7 @@
 <title>Conversation Pit — Eternal Hearthlight Office</title>
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../CSS/TheBonfire.css">
+  <script src="../js/gate.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -193,13 +194,14 @@ let conversations = [];
       // simply starts empty until it is served and the JSON can be fetched
     }
     renderSidebar();
-    if (conversations.length) openConversation(0);
+    if (conversations.length) openConversation(firstVisibleIndex());
   }
 
   function renderSidebar() {
     const nav = document.getElementById('sidebar');
     nav.innerHTML = '<div class="sidebar-label">Conversations</div>';
     conversations.forEach((c, i) => {
+      if (c.restricted && !Gate.isUnlocked()) return; // gated — hidden while locked
       const a = document.createElement('a');
       a.className = 'nav-item' + (i === currentIndex ? ' active' : '');
       if (i === currentIndex) a.setAttribute('aria-current', 'true');
@@ -314,6 +316,7 @@ let conversations = [];
     let t = 0;
     conversations.forEach((conv, ci) => {
       chapterStarts.push(stream.length);
+      if (conv.restricted && !Gate.isUnlocked()) return; // gated chapter — not in the stream
       (conv.messages || []).forEach((m) => {
         const delay = Number(m.delayMs) > 0 ? Number(m.delayMs) : DEFAULT_DELAY_MS;
         t += delay;
@@ -324,8 +327,39 @@ let conversations = [];
     timeline = stream.map((e, i) => ({ at: e.at, i: i }));
   }
 
+  // Index of the first conversation that is accessible while the archive is
+  // locked (restricted conversations are hidden until the gate is opened).
+  function firstVisibleIndex() {
+    return conversations.findIndex(c => !c.restricted || Gate.isUnlocked());
+  }
+
+  // Empty state used when every conversation is restricted and the gate is
+  // locked — nothing can be shown or played.
+  function renderEmptyArchive() {
+    chatToken++;                  // kill any in-flight frame loop and pending wrap
+    playing = false;
+    currentIndex = -1;
+    renderSidebar();
+    document.getElementById('chatTitle').textContent = 'Conversation Pit';
+    document.getElementById('chatStatusText').textContent = 'Locked';
+    document.getElementById('chatStatusDot').classList.add('off');
+    document.getElementById('chatArea').innerHTML = '';
+    stream = [];
+    timeline = [];
+    msgNodes = [];
+    renderTransport();
+    if (isMobile()) setSidebar(false);
+  }
+
   function openConversation(i) {
     chatToken++;                  // kill any in-flight frame loop and pending wrap
+    // A gated conversation is not accessible while the archive is locked —
+    // step to the first visible one, or show an empty state when all are gated.
+    if (i < 0 || (conversations[i] && conversations[i].restricted && !Gate.isUnlocked())) {
+      const fv = firstVisibleIndex();
+      if (fv >= 0) i = fv;
+      else { renderEmptyArchive(); return; }
+    }
     currentIndex = i;
     rebuildStream();
     const conv = conversations[i] || { messages: [] };
@@ -894,6 +928,17 @@ function addMsgRow() {
     URL.revokeObjectURL(a.href);
     flashBtn('ed-export', 'Exported!');
   }
+
+  // Re-render when the gate opens or locks so restricted conversations appear
+  // in the sidebar and stream (or disappear again on a re-lock). If the current
+  // conversation became gated, step to the first still-visible one.
+  window.addEventListener('eho:gatechange', () => {
+    let i = currentIndex;
+    if (i < 0 || (conversations[i] && conversations[i].restricted && !Gate.isUnlocked())) {
+      i = firstVisibleIndex();
+    }
+    openConversation(i);
+  });
 
 </script>
 </body>

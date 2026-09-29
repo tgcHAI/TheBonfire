@@ -7,6 +7,7 @@
 <title>Bonfire.bat — Eternal Hearthlight Office</title>
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../CSS/TheBonfire.css">
+  <script src="../js/gate.js"></script>
 </head>
 <body>
 
@@ -139,7 +140,10 @@
       // starts empty until it is served and the JSON can be fetched
     }
     renderSidebar();
-    renderEntry(0);
+    // Restricted entries are hidden while the archive is locked, so land on
+    // the first one that is actually accessible.
+    const firstVisible = entries.findIndex(e => !e.restricted || Gate.isUnlocked());
+    renderEntry(firstVisible < 0 ? 0 : firstVisible);
   }
 
   // ── SIDEBAR ──
@@ -147,6 +151,7 @@
     const nav = document.getElementById('sidebar');
     nav.innerHTML = '<div class="sidebar-label">Entries</div>';
     entries.forEach((e, i) => {
+      if (e.restricted && !Gate.isUnlocked()) return; // gated — hidden while locked
       const a = document.createElement('a');
       const active = i === currentIndex;
       a.className = 'nav-item' + (active ? ' active' : '');
@@ -166,6 +171,7 @@
     if (!entries.length) return;
     currentIndex = index;
     const e = entries[index];
+    if (!e || (e.restricted && !Gate.isUnlocked())) return; // not accessible while gated
 
     // header
     document.getElementById('entryHeader').innerHTML = `
@@ -487,6 +493,18 @@
 
   // sidebar clicks reload the editor fields when the editor panel is open
   // (see switchEntry) — keeps editingIndex aligned with the shown entry
+
+  // Re-render when the gate opens or locks so restricted entries appear or
+  // disappear without a reload. If a re-lock leaves the current entry gated,
+  // step back to the first still-visible one.
+  window.addEventListener('eho:gatechange', () => {
+    renderSidebar();
+    if (entries[currentIndex] && entries[currentIndex].restricted && !Gate.isUnlocked()) {
+      const fv = entries.findIndex(e => !e.restricted || Gate.isUnlocked());
+      currentIndex = fv < 0 ? 0 : fv;
+    }
+    renderEntry(currentIndex);
+  });
 
   loadEntries();
 </script>
