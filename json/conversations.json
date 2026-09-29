@@ -3312,9 +3312,10 @@
         "screenName": "Blackflame_burger&fries"
       },
       {
-        "text": "*Intercom plays: 'Nyan Cat 10 Hour Loop'*",
+        "text": "Intercom: 'Ева - Винтаж'",
         "time": "14:15",
         "delayMs": 1200,
+        "type": "action",
         "screenName": "SYSTEM"
       },
       {
@@ -3348,7 +3349,7 @@
         "screenName": "MechaLord"
       },
       {
-        "text": "Order update: 10 large pizzas and 16 large sodas are on their way. Please keep the peace, everyone.",
+        "text": "Order update: they do not have milk tea, so it's now 10 large pizzas and 16 large sodas. Please keep the peace, everyone.",
         "time": "14:16",
         "delayMs": 1600,
         "screenName": "Khorne"
@@ -3360,7 +3361,7 @@
         "screenName": "Delmira"
       },
       {
-        "text": "Fr, Khorne carrying the morale of Hearthlight Office on his back.",
+        "text": "Fr, Khorne solo carry the morale of Hearthlight Office.",
         "time": "14:17",
         "delayMs": 1100,
         "screenName": "johncontracts"
@@ -3384,9 +3385,10 @@
         "screenName": "500_hundred_enkephaline"
       },
       {
-        "text": "SYSTEM notification: Audio Output updated — Khorne's device connected.",
+        "text": "notification: Audio Output updated — T.Corp Walkman device connected.",
         "time": "14:18",
         "delayMs": 1200,
+        "type": "action",
         "screenName": "SYSTEM"
       },
       {
@@ -3516,9 +3518,10 @@
         "screenName": "FriendlyFirelmao"
       },
       {
-        "text": "SYSTEM notification: Audio Output redirected to [Main Intercom] — Source: Green_laptop_lolololol.",
+        "text": "notification: Audio Output redirected to [Main Intercom] — Source: Green_laptop_lolololol.",
         "time": "14:26",
         "delayMs": 1200,
+        "type": "action",
         "screenName": "SYSTEM"
       },
       {
@@ -3685,13 +3688,14 @@
         "screenName": "a certain cabbage"
       },
       {
-        "text": "SYSTEM notification: Audio Output on Main Intercom disconnected by user !!Da_Ourple.",
+        "text": "notification: Audio Output on Main Intercom disconnected by user !!Da_Ourple.",
         "time": "14:35",
         "delayMs": 1200,
+        "type": "action",
         "screenName": "SYSTEM"
       },
       {
-        "text": "Pizza time. We never talk about this again. Or else.",
+        "text": "We never talk about this again.",
         "time": "14:35",
         "delayMs": 1500,
         "screenName": "Da_Ourple"
