@@ -3073,12 +3073,27 @@
     ]
   },
   {
-    "id": "CONV-006",
-    "title": "Sometihng",
+    "id": "CONV-06",
+    "title": "Geramiah's message room",
     "status": "Online",
+    "restricted": true,
     "messages": [
       {
-        "type": "divider"
+        "type": "divider",
+        "label": "oh shit oh fuck",
+        "text": "SYSTEM has made room CONV-06 [Directives message board]"
+      },
+      {
+        "text": "Hello user !!Geramiah, and welcome to the Hearthlight Office directives board! This was made to best streamline your work and for you to call in supplies! This is a automated message and I will not be responding!",
+        "time": "00:00",
+        "delayMs": 5000,
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "...okay.",
+        "time": "00:06",
+        "delayMs": 1000,
+        "screenName": "Geramiah"
       }
     ]
   }
