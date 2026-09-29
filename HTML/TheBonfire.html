@@ -113,6 +113,7 @@
         <div class="entry-box" id="entryBox">
           <!-- populated by JS -->
         </div>
+        <button type="button" class="entry-skip-btn" id="skipBtn" onclick="skipEntryDecode()" aria-label="Skip: unscramble this entry now">Skip &#10095;</button>
       </div>
     </main>
 
@@ -129,6 +130,13 @@
   let entries = [];
   let currentIndex = 0;
   let editingIndex = -1;
+
+  // ── READER CONTROLS: skip-decode + idle auto-scroll ──
+  let activeDecode = null;          // live scramble: { token, nodes, finish }
+  let lastScrollActivity = 0;       // performance.now() of the reader's own scroll input
+  const IDLE_AUTOSCROLL_MS = 10000; // auto-scroll resumes after this much stillness
+  const IDLE_FOLLOW_GAP = 240;      // px the decode must outrun the view before a nudge
+  const SCROLL_KEYS = new Set(['PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', ' ']);
 
   // ── LOAD ──
   async function loadEntries() {
@@ -232,6 +240,9 @@
     // Large top padding keeps the first line below the box top at
     // scrollTop = 0 (wheel-picker feel) — no extra calculation needed.
     box.scrollTop = 0;
+    // A fresh render restarts the idle window, so auto-scroll only follows the
+    // decode once the reader has held still for a full IDLE_AUTOSCROLL_MS.
+    lastScrollActivity = 0;
     animateEntryText(box);
   }
 
@@ -252,7 +263,7 @@
       const el = walker.currentNode;
       if (el.nodeValue.trim()) nodes.push({ el: el, final: el.nodeValue });
     }
-    if (!nodes.length) { box.removeAttribute('aria-busy'); return; }
+    if (!nodes.length) { clearDecodeState(box); box.removeAttribute('aria-busy'); return; }
 
     // Whitespace stays whitespace; decoded chars lock in place.
     const scramble = (final, count) => {
@@ -280,7 +291,17 @@
     const token = ++entryRenderToken;
     const start = performance.now() + 90; // brief all-gibberish beat before resolving
     let complete = false;
-    const finish = () => { if (!complete) { complete = true; box.removeAttribute('aria-busy'); } };
+    // Register this run as the skippable decode; finish() is the single exit
+    // shared by natural completion and the Skip button.
+    activeDecode = { token: token, nodes: nodes, box: box, finish: null };
+    const finish = () => {
+      if (complete) return;
+      complete = true;
+      clearDecodeState(box);
+      box.removeAttribute('aria-busy');
+    };
+    activeDecode.finish = finish;
+    box.parentElement.classList.add('is-decoding');
 
     const msPerChar = SCRAMBLE_DURATION / totalChars;
 
@@ -292,6 +313,13 @@
 
     const tick = (now) => {
       if (complete || entryRenderToken !== token) { clearInterval(fallbackTimer); return; }
+      // Idle auto-scroll: while decoding, chase the reveal front once the
+      // reader has held still for IDLE_AUTOSCROLL_MS. Programmatic scrollTo()
+      // raises untrusted scroll events, so following never reregisters itself.
+      if (now - lastScrollActivity >= IDLE_AUTOSCROLL_MS &&
+          box.scrollTop + box.clientHeight < box.scrollHeight - IDLE_FOLLOW_GAP) {
+        box.scrollTo({ top: box.scrollHeight }); // CSS scroll-behavior animates it
+      }
       // Per-char timeline: the wave locks char p at revealAt; until then the
       // column shows a scramble glyph that advances once per second.
       let pending = 0;
@@ -321,6 +349,38 @@
       tick(performance.now());
     }, 300);
     requestAnimationFrame(tick);
+  }
+
+  // Skip: unscramble the entry now. Every masked column locks its final glyph
+  // in place and the running decode is closed through the normal finish path,
+  // so the Skip button never desyncs the render token or the aria-busy state.
+  function skipEntryDecode() {
+    const d = activeDecode;
+    if (!d) return;
+    for (const t of d.nodes) t.el.nodeValue = t.final;
+    d.finish();
+  }
+
+  // Drops the active-decode registration and the Skip affordance without
+  // touching rendered text; used by finish(), empty entries, and when the
+  // archive is emptied underneath a running decode.
+  function clearDecodeState(box) {
+    activeDecode = null;
+    box.parentElement.classList.remove('is-decoding');
+  }
+
+  // Reader input on the entry box pauses the idle auto-scroll. Trusted scroll
+  // events (scrollbar drags, wheel, touch) count as activity; the decode's own
+  // programmatic scrollTo() raises untrusted events and is ignored here, so
+  // auto-following never counts as its own activity.
+  function trackEntryScrollActivity() {
+    const box = document.getElementById('entryBox');
+    if (!box) return;
+    const poke = () => { lastScrollActivity = performance.now(); };
+    box.addEventListener('wheel', poke, { passive: true });
+    box.addEventListener('touchmove', poke, { passive: true });
+    box.addEventListener('keydown', ev => { if (SCROLL_KEYS.has(ev.key)) poke(); });
+    box.addEventListener('scroll', ev => { if (ev.isTrusted) poke(); });
   }
 
   function switchEntry(index) {
@@ -467,6 +527,7 @@
       document.getElementById('entryHeader').innerHTML = '';
       const emptyBox = document.getElementById('entryBox');
       emptyBox.innerHTML = '';
+      clearDecodeState(emptyBox);
       emptyBox.removeAttribute('aria-busy');
     }
     await persistEntries().then(w => flashBtn('ed-delete', w === 'written' ? 'Deleted' : 'Deleted (browser only)'));
@@ -506,6 +567,7 @@
     renderEntry(currentIndex);
   });
 
+  trackEntryScrollActivity();
   loadEntries();
 </script>
 

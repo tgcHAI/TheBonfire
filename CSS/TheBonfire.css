@@ -332,6 +332,43 @@ body::before {
 .entry-box::-webkit-scrollbar-track { background: transparent; }
 .entry-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+/* Skip button floats over the entry box's bottom-right corner while a decode
+   is running; hidden at rest so it never competes with the entry text. */
+.entry-skip-btn {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    z-index: 2;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--ember);
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.5);
+    transition: color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.entry-box-wrap.is-decoding .entry-skip-btn {
+    display: inline-flex;
+    animation: skipPulse 2.4s ease-in-out infinite;
+}
+.entry-skip-btn:hover {
+    color: var(--ember-bright);
+    border-color: var(--ember);
+    box-shadow: 0 0 14px rgba(196,127,23,0.35);
+}
+@keyframes skipPulse {
+    0% { opacity: 0.85; }
+    50% { opacity: 1; }
+    100% { opacity: 0.85; }
+}
+
 .entry-content {
     font-size: 13px;
     line-height: 1.85;

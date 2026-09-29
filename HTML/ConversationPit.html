@@ -70,6 +70,14 @@
             <span class="ed-hint">Use the arrows on each line</span>
           </div>
         </div>
+        <div class="ed-row">
+          <div class="ed-field ed-field-check">
+            <label>
+              <input type="checkbox" id="cd-restricted">
+              Restricted
+            </label>
+          </div>
+        </div>
         <div class="ed-field ed-body-field cnv-msg">
           <label for="cd-msgList">Messages <span class="ed-hint">(chat = screen name + line; action = event line; divider = bold chapter card with a dropdown name, no name/time/delay)</span></label>
           <div class="conv-msg-list" id="cd-msgList">
@@ -94,6 +102,7 @@
       <div class="chat-window">
         <div class="chat-titlebar">
           <span class="chat-title" id="chatTitle">Conversation Pit</span>
+          <span class="restricted-badge" id="chatOflog" hidden>[OFF-LOG]</span>
           <span class="chat-status">
             <span class="chat-status-dot" id="chatStatusDot"></span>
             <span id="chatStatusText">Offline</span>
@@ -211,6 +220,12 @@ let conversations = [];
       id.textContent = c.id;
       a.appendChild(id);
       a.appendChild(document.createTextNode(c.title));
+      if (c.restricted) {
+        const tag = document.createElement('span');
+        tag.className = 'restricted-badge';
+        tag.textContent = '[OFF-LOG]';
+        a.appendChild(tag);
+      }
       a.onclick = (ev) => { ev.preventDefault(); openConversation(i); };
       nav.appendChild(a);
     });
@@ -293,6 +308,9 @@ let conversations = [];
 
   function renderTitlebar(conv) {
     document.getElementById('chatTitle').textContent = conv.title;
+    // An OFF-LOG conversation keeps its channel on the record but earns the
+    // bracketed tag in the titlebar (and the sidebar), like the lock badge.
+    document.getElementById('chatOflog').hidden = !conv.restricted;
     document.getElementById('chatStatusText').textContent = conv.status || 'Offline';
     const online = (conv.status || '').toLowerCase() !== 'offline';
     document.getElementById('chatStatusDot').classList.toggle('off', !online);
@@ -675,6 +693,7 @@ let conversations = [];
     document.getElementById('cd-id').value = c.id || '';
     document.getElementById('cd-title').value = c.title || '';
     document.getElementById('cd-status').value = (c.status || 'Offline') === 'Offline' ? 'Offline' : 'Online';
+    document.getElementById('cd-restricted').checked = c.restricted || false;
     renderMsgEditor(c.messages || []);
   }
 
@@ -821,6 +840,7 @@ function addMsgRow() {
       id: document.getElementById('cd-id').value.trim(),
       title: document.getElementById('cd-title').value.trim(),
       status: document.getElementById('cd-status').value,
+      restricted: document.getElementById('cd-restricted').checked,
       messages: messagesFromEditor()
     };
   }
@@ -886,6 +906,7 @@ function addMsgRow() {
       id: 'CONV-' + String(conversations.length + 1).padStart(3, '0'),
       title: 'New Conversation',
       status: 'Online',
+      restricted: false,
       messages: []
     };
     conversations.push(blank);
