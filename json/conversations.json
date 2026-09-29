@@ -3114,7 +3114,7 @@
         "screenName": "Ezzy_pzzy"
       },
       {
-        "text": "Yo... Blackflame... Mermaid Girl??? on your recently played???",
+        "text": "Mermaid Girl??? on your recently played???",
         "time": "14:03",
         "delayMs": 1300,
         "screenName": "MechaLord"
@@ -3126,7 +3126,7 @@
         "screenName": "Blackflame_burger&fries"
       },
       {
-        "text": "DISCONNECT IT OR I AM PLAYING IT OVER THE INTERCOM FOR A LAUGH.",
+        "text": "Imma do a funny rq",
         "time": "14:04",
         "delayMs": 1000,
         "screenName": "FriendlyFirelmao"
@@ -3138,9 +3138,10 @@
         "screenName": "Blackflame_burger&fries"
       },
       {
-        "text": "SYSTEM notification: Audio Output redirected to [Main Office Intercom System - All Floors].",
+        "text": "notification: Audio Output redirected from [Break room] to [Floor 1 - 5].",
         "time": "14:05",
         "delayMs": 1200,
+        "type": "action",
         "screenName": "SYSTEM"
       },
       {
