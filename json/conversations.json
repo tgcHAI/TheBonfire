@@ -3073,358 +3073,368 @@
     ]
   },
   {
-  "id": "CONV-06",
-  "title": "Geramiah's message room",
-  "status": "Online",
-  "restricted": true,
-  "messages": [
-    {
-      "type": "divider",
-      "label": "oh shit oh fuck",
-      "text": "SYSTEM has made room CONV-06 [Directives message board]"
-    },
-    {
-      "text": "Hello user !!Geramiah, and welcome to the Hearthlight Office directives board! This was made to best streamline your work and for you to call in supplies! This is an automated message and I will not be responding!",
-      "time": "00:00",
-      "delayMs": 5000,
-      "screenName": "SYSTEM"
-    },
-    {
-      "text": "...okay.",
-      "time": "00:06",
-      "delayMs": 1000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "SYSTEM notification: Hands-free Voice-to-Text transcription is currently ACTIVE for user !!Geramiah. Audio will be logged automatically.",
-      "time": "00:06",
-      "delayMs": 1500,
-      "screenName": "SYSTEM"
-    },
-    {
-      "text": "SYSTEM notification: You currently have [27 directives]. Proceed with doing them or be flagged as disposable.",
-      "time": "00:07",
-      "delayMs": 2000,
-      "screenName": "SYSTEM"
-    },
-    {
-      "text": "Wait, twenty seven?! What the- what's DOWN here?!",
-      "time": "00:08",
-      "delayMs": 4000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Is anyone seeing this? Can someone at least send down a carton of milk? My stomach is twisting into fucking knots.",
-      "time": "00:09",
-      "delayMs": 3000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Hello? Heishou? Clockwise? Anyone??",
-      "time": "00:10",
-      "delayMs": 2500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "SYSTEM notification: Directive 01/27 — Inspect containment seal on Sub-Level B4 Sluice Gate.",
-      "time": "00:11",
-      "delayMs": 1500,
-      "screenName": "SYSTEM"
-    },
-    {
-      "text": "It's pitch black down here. My emergency flashlight is flickering and the battery indicator is bleeding static.",
-      "time": "00:12",
-      "delayMs": 3500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Why does the air smell like burnt flesh and rubber- What the fuck is that.",
-      "time": "00:14",
-      "delayMs": 4500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "It looks like a mass of woven limbs and weeping brass horns hanging from the rusty pipes. It's breathing. Why is it fucking breathing?!",
-      "time": "00:15",
-      "delayMs": 3000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "SOMEONE RESPOND! IT'S GOT ME ON THE ARM!",
-      "time": "00:16",
-      "delayMs": 2000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Get the FUCK OFF me! *heavy chain rattling and sound of bone crunching*- the heavy anchor chains around my knuckles shattered my wrist- FUUUUUUCK...",
-      "time": "00:17",
-      "delayMs": 1800,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "OH GOD IT REACHED OUT— MY ARM! MY FUCKING LEFT FOREARM IS GONE!",
-      "time": "00:18",
-      "delayMs": 2500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "IT PULLED MY WRIST RIGHT THROUGH THE HEAVY CHAINS! IT'S CRUNCHING ON MY BONES LIKE TWIGS!",
-      "time": "00:19",
-      "delayMs": 2000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "FUCK THIS I'M RUNNING.",
-      "time": "00:20",
-      "delayMs": 2200,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Wait...",
-      "time": "00:22",
-      "delayMs": 4000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Clotting at the stump. Regen mishap... Balls, I need something to lop off the arm or something.",
-      "time": "00:23",
-      "delayMs": 5000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "God, regeneration hurts so much worse than being torn apart. Fucking neural inhibitors for the adrenaline fried-",
-      "time": "00:25",
-      "delayMs": 4000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "I feel so sick. I need blood. Or milk. Just a drop of milk please... the dry heaving won't stop, but there's nothing in my stomach to throw up except bile.",
-      "time": "00:27",
-      "delayMs": 5000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "SYSTEM notification: Directive 01/27 incomplete. Time elapsed: 17 minutes. Directive 02/27 added: Neutralize sludge entity in Maintenance Shaft C.",
-      "time": "00:28",
-      "delayMs": 1500,
-      "screenName": "SYSTEM"
-    },
-    {
-      "text": "SYSTEM notification: You currently have [28 directives]. Proceed with doing them or be flagged as disposable.",
-      "time": "00:28",
-      "delayMs": 500,
-      "screenName": "SYSTEM"
-    },
-    {
-      "text": "IT ADDED ANOTHER ONE?! ARE YOU SERIOUS?! I AM REGROWING MY LEFT HAND FROM A BLOOD STUMP RIGHT NOW AND YOU'RE ADDING DIRECTIVES?!",
-      "time": "00:29",
-      "delayMs": 3000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Anyone seeing these? It's so lonely here.",
-      "time": "00:31",
-      "delayMs": 4500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Is anyone up there listening? I can hear faint chatter through the ventilation grates... are you guys playing cards up there while I'm being eaten alive?!",
-      "time": "00:32",
-      "delayMs": 3500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Please... just send down a crate of expired ration milk. I don't care if it's sour. I just need something to settle the thirst before I chew off my own lips again.",
-      "time": "00:33",
-      "delayMs": 4000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "-Chains around my remaining right fist and caved that brass thing's face in until it collapsed. It folded into an egg of sorts. What the fuck?",
-      "time": "00:36",
-      "delayMs": 5000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Now the walls are humming- This is not stone. Fuck no.",
-      "time": "00:38",
-      "delayMs": 3500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Am I losing my mind? Did Jx. Co build this place just to bury me under four hundred feet of concrete? No...Voxus won't build the headquarters above something like this- why is this here to begin with?",
-      "time": "00:40",
-      "delayMs": 4000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Found a half-crushed carton of strawberry milk near the Sub-Level emergency locker of... what floor is this?. It's three months past expiration.",
-      "time": "00:43",
-      "delayMs": 4500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Choked it down. Tastes like chalk and copper, nausea is easing up... I'm so hungry.",
-      "time": "00:45",
-      "delayMs": 4000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "It grew back wrong. I really need fresh milk or something.",
-      "time": "00:47",
-      "delayMs": 3500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Look at this shit. Fresh blood spraying everywhere on the concrete and I can't even punch properly. *wet bone cracking sound*",
-      "time": "00:47",
-      "delayMs": 2500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Gotta break the fresh bone structure so it reforms rig",
-      "time": "00:48",
-      "delayMs": 2000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "AAGH! FUCK! DAMN IT!",
-      "time": "00:49",
-      "delayMs": 900,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Fucking...sensory overriders...",
-      "time": "00:50",
-      "delayMs": 3000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "SYSTEM notification: Directive 02/27 updated — Entity has multiplied. Containment breach imminent in lower corridors.",
-      "time": "00:52",
-      "delayMs": 1500,
-      "screenName": "SYSTEM"
-    },
-    {
-      "text": "SYSTEM notification: You currently have [28 directives]. Proceed with doing them or be flagged as disposable.",
-      "time": "00:52",
-      "delayMs": 500,
-      "screenName": "SYSTEM"
-    },
-    {
-      "text": "...okay.",
-      "time": "00:53",
-      "delayMs": 2500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Something is skittering through the puddles toward my boots. It looks like a ribbon made of teeth and wet velvet.",
-      "time": "00:55",
-      "delayMs": 3500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "It sounds like it's crying- THAT'S A MASSIVE FUCKER, SHIT.",
-      "time": "00:56",
-      "delayMs": 2500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Flashlight died. Batteries are dead, gave it to that thing. I hope it chokes on it an die.",
-      "time": "00:57",
-      "delayMs": 2000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Pitch black now..",
-      "time": "00:58",
-      "delayMs": 1500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Everything feels wet now. I don't like that.",
-      "time": "00:59",
-      "delayMs": 3000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "I can feel them finding a hole to get through my suit.",
-      "time": "00:59",
-      "delayMs": 2000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "OH FUCK IT'S CRAWLING UP MY LEGS! MY KNEECAPS!",
-      "time": "01:00",
-      "delayMs": 1800,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "- I can't feel my waist, OH SHIT THE WAITBAND- I CAN'T MOVE MY LEGS, FUCK- COME ON! I'M GOING TO GET OUT",
-      "time": "01:00",
-      "delayMs": 1600,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Director! ANYONE! HELP!",
-      "time": "01:01",
-      "delayMs": 2000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Balls... I'm out of breath...",
-      "time": "01:02",
-      "delayMs": 2200,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Welp. I guess I'm on my own until I get this done.",
-      "time": "01:03",
-      "delayMs": 3000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "I'll just... smash through it with my fists until it eats me again...",
-      "time": "01:04",
-      "delayMs": 4000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "That's how it works, right? As long as a finger or something survives, I come back.",
-      "time": "01:05",
-      "delayMs": 3500,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Over and over. Dying twice a day down in the sub-levels.",
-      "time": "01:06",
-      "delayMs": 3000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "Fuck being immortal.",
-      "time": "01:07",
-      "delayMs": 4000,
-      "screenName": "Geramiah"
-    },
-    {
-      "text": "SYSTEM notification: Directive 03/28 added — Purge biological residue from Sector 4 filtration unit.",
-      "time": "01:09",
-      "delayMs": 1500,
-      "screenName": "SYSTEM"
-    },
-    {
-      "text": "SYSTEM notification: You currently have [29 directives]. Proceed with doing them or be flagged as disposable.",
-      "time": "01:09",
-      "delayMs": 500,
-      "screenName": "SYSTEM"
-    },
-    {
-      "text": "...twenty nine. Great. See you guys next week. I hope you guys are alright.",
-      "time": "01:10",
-      "delayMs": 3000,
-      "screenName": "Geramiah"
-    }
-  ]
-}
+    "id": "CONV-06",
+    "title": "Geramiah's message room",
+    "status": "Online",
+    "restricted": true,
+    "messages": [
+      {
+        "type": "divider",
+        "label": "oh shit oh fuck",
+        "text": "SYSTEM has made room CONV-06 [Directives message board]"
+      },
+      {
+        "text": "Hello user !!Geramiah, and welcome to the Hearthlight Office directives board! This was made to best streamline your work and for you to call in supplies! This is an automated message and I will not be responding!",
+        "time": "00:00",
+        "delayMs": 5000,
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "...okay.",
+        "time": "00:06",
+        "delayMs": 1000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "SYSTEM notification: Hands-free Voice-to-Text transcription is currently ACTIVE for user !!Geramiah. Audio will be logged automatically.",
+        "time": "00:06",
+        "delayMs": 1500,
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "SYSTEM notification: You currently have [27 directives]. Proceed with doing them or be flagged as disposable.",
+        "time": "00:07",
+        "delayMs": 2000,
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "Wait, twenty seven?! What the- what's DOWN here?!",
+        "time": "00:08",
+        "delayMs": 4000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Is anyone seeing this? Can someone at least send down a carton of milk? My stomach is twisting into fucking knots.",
+        "time": "00:09",
+        "delayMs": 3000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Hello? Heishou? Clockwise? Anyone??",
+        "time": "00:10",
+        "delayMs": 2500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "SYSTEM notification: Directive 01/27 — Inspect containment seal on Sub-Level B4 Sluice Gate.",
+        "time": "00:11",
+        "delayMs": 1500,
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "It's pitch black down here. My emergency flashlight is flickering and the battery indicator is bleeding static.",
+        "time": "00:12",
+        "delayMs": 3500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Why does the air smell like burnt flesh and rubber- What the fuck is that.",
+        "time": "00:14",
+        "delayMs": 4500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "It looks like a mass of woven limbs and weeping brass horns hanging from the rusty pipes. It's breathing. Why is it fucking breathing?!",
+        "time": "00:15",
+        "delayMs": 3000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "SOMEONE RESPOND! IT'S GOT ME ON THE ARM!",
+        "time": "00:16",
+        "delayMs": 2000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Get the FUCK OFF me! *heavy chain rattling and sound of bone crunching*- the heavy anchor chains around my knuckles shattered my wrist- FUUUUUUCK...",
+        "time": "00:17",
+        "delayMs": 1800,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "OH GOD IT REACHED OUT— MY ARM! MY FUCKING LEFT FOREARM IS GONE!",
+        "time": "00:18",
+        "delayMs": 2500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "IT PULLED MY WRIST RIGHT THROUGH THE HEAVY CHAINS! IT'S CRUNCHING ON MY BONES LIKE TWIGS!",
+        "time": "00:19",
+        "delayMs": 2000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "FUCK THIS I'M RUNNING.",
+        "time": "00:20",
+        "delayMs": 2200,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Wait...",
+        "time": "00:22",
+        "delayMs": 4000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Clotting at the stump. Regen mishap... Balls, I need something to lop off the arm or something.",
+        "time": "00:23",
+        "delayMs": 5000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "God, regeneration hurts so much worse than being torn apart. Fucking neural inhibitors for the adrenaline fried-",
+        "time": "00:25",
+        "delayMs": 4000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "I feel so sick. I need blood. Or milk. Just a drop of milk please... the dry heaving won't stop, but there's nothing in my stomach to throw up except bile.",
+        "time": "00:27",
+        "delayMs": 5000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "SYSTEM notification: Directive 01/27 incomplete. Time elapsed: 17 minutes. Directive 02/27 added: Neutralize sludge entity in Maintenance Shaft C.",
+        "time": "00:28",
+        "delayMs": 1500,
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "SYSTEM notification: You currently have [28 directives]. Proceed with doing them or be flagged as disposable.",
+        "time": "00:28",
+        "delayMs": 500,
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "IT ADDED ANOTHER ONE?! ARE YOU SERIOUS?! I AM REGROWING MY LEFT HAND FROM A BLOOD STUMP RIGHT NOW AND YOU'RE ADDING DIRECTIVES?!",
+        "time": "00:29",
+        "delayMs": 3000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Anyone seeing these? It's so lonely here.",
+        "time": "00:31",
+        "delayMs": 4500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Is anyone up there listening? I can hear faint chatter through the ventilation grates... are you guys playing cards up there while I'm being eaten alive?!",
+        "time": "00:32",
+        "delayMs": 3500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Please... just send down a crate of expired ration milk. I don't care if it's sour. I just need something to settle the thirst before I chew off my own lips again.",
+        "time": "00:33",
+        "delayMs": 4000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "-Chains around my remaining right fist and caved that brass thing's face in until it collapsed. It folded into an egg of sorts. What the fuck?",
+        "time": "00:36",
+        "delayMs": 5000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Now the walls are humming- This is not stone. Fuck no.",
+        "time": "00:38",
+        "delayMs": 3500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Am I losing my mind? Did Jx. Co build this place just to bury me under four hundred feet of concrete? No...Voxus won't build the headquarters above something like this- why is this here to begin with?",
+        "time": "00:40",
+        "delayMs": 4000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Found a half-crushed carton of strawberry milk near the Sub-Level emergency locker of... what floor is this?. It's three months past expiration.",
+        "time": "00:43",
+        "delayMs": 4500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Choked it down. Tastes like chalk and copper, nausea is easing up... I'm so hungry.",
+        "time": "00:45",
+        "delayMs": 4000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "It grew back wrong. I really need fresh milk or something.",
+        "time": "00:47",
+        "delayMs": 3500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Look at this shit. Fresh blood spraying everywhere on the concrete and I can't even punch properly. *wet bone cracking sound*",
+        "time": "00:47",
+        "delayMs": 2500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Gotta break the fresh bone structure so it reforms rig",
+        "time": "00:48",
+        "delayMs": 2000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "AAGH! FUCK! DAMN IT!",
+        "time": "00:49",
+        "delayMs": 900,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Fucking...sensory overriders...",
+        "time": "00:50",
+        "delayMs": 3000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "SYSTEM notification: Directive 02/27 updated — Entity has multiplied. Containment breach imminent in lower corridors.",
+        "time": "00:52",
+        "delayMs": 1500,
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "SYSTEM notification: You currently have [28 directives]. Proceed with doing them or be flagged as disposable.",
+        "time": "00:52",
+        "delayMs": 500,
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "...okay.",
+        "time": "00:53",
+        "delayMs": 2500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Something is skittering through the puddles toward my boots. It looks like a ribbon made of teeth and wet velvet.",
+        "time": "00:55",
+        "delayMs": 3500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "It sounds like it's crying- THAT'S A MASSIVE FUCKER, SHIT.",
+        "time": "00:56",
+        "delayMs": 2500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Flashlight died. Batteries are dead, gave it to that thing. I hope it chokes on it an die.",
+        "time": "00:57",
+        "delayMs": 2000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Pitch black now..",
+        "time": "00:58",
+        "delayMs": 1500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Everything feels wet now. I don't like that.",
+        "time": "00:59",
+        "delayMs": 3000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "I can feel them finding a hole to get through my suit.",
+        "time": "00:59",
+        "delayMs": 2000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "OH FUCK IT'S CRAWLING UP MY LEGS! MY KNEECAPS!",
+        "time": "01:00",
+        "delayMs": 1800,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "- I can't feel my waist, OH SHIT THE WAITBAND- I CAN'T MOVE MY LEGS, FUCK- COME ON! I'M GOING TO GET OUT",
+        "time": "01:00",
+        "delayMs": 1600,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Director! ANYONE! HELP!",
+        "time": "01:01",
+        "delayMs": 2000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Balls... I'm out of breath...",
+        "time": "01:02",
+        "delayMs": 2200,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Welp. I guess I'm on my own until I get this done.",
+        "time": "01:03",
+        "delayMs": 3000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "I'll just... smash through it with my fists until it eats me again...",
+        "time": "01:04",
+        "delayMs": 4000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "That's how it works, right? As long as a finger or something survives, I come back.",
+        "time": "01:05",
+        "delayMs": 3500,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Over and over. Dying twice a day down in the sub-levels.",
+        "time": "01:06",
+        "delayMs": 3000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "Fuck being immortal.",
+        "time": "01:07",
+        "delayMs": 4000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "SYSTEM notification: Directive 03/28 added — Purge biological residue from Sector 4 filtration unit.",
+        "time": "01:09",
+        "delayMs": 1500,
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "SYSTEM notification: You currently have [29 directives]. Proceed with doing them or be flagged as disposable.",
+        "time": "01:09",
+        "delayMs": 500,
+        "screenName": "SYSTEM"
+      },
+      {
+        "text": "...twenty nine. Great. See you guys next week. I hope you guys are alright.",
+        "time": "01:10",
+        "delayMs": 3000,
+        "screenName": "Geramiah"
+      },
+      {
+        "text": "I'm going to sleep. Or find a place safe at least.",
+        "time": "01:15",
+        "delayMs": 5000,
+        "screenName": "Geramiah"
+      },
+      {
+        "type": "divider",
+        "label": "Repetitions of a repetition"
+      }
+    ]
+  }
 ]
