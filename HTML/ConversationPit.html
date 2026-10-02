@@ -7,26 +7,6 @@
 <title>Conversation Pit — Eternal Hearthlight Office</title>
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../CSS/TheBonfire.css">
-<script>
-// Detect static/offline hosting environment (file:// protocol or GitHub Pages without API)
-   var isStaticMode = (function () {
-     try { return window.fetch && !window.fetch('../json/gate.json').ok; } catch (e) { return true; }
-   })();
-
-   // Track whether legacy flat file fallback succeeded silently
-   var legacyFileFallbackSucceeded = false;
-  // markup still renders, so surface any failure on the page itself.
-  window.addEventListener('error', function (e) {
-    var el = document.getElementById('wmAlert');
-    if (el) { el.hidden = false; el.textContent = 'Script error: ' + (e.message || e.type) + ' (line ' + (e.lineno || '?') + ')'; }
-    console.error('[bonfire]', e.message, e.filename, e.lineno);
-  });
-  window.addEventListener('unhandledrejection', function (e) {
-    var el = document.getElementById('wmAlert');
-    if (el) { el.hidden = false; el.textContent = 'Unhandled rejection: ' + ((e.reason && e.reason.message) || e.reason); }
-    console.error('[bonfire] unhandled rejection', e.reason);
-  });
-  </script>
   <script src="../js/gate.js"></script>
   <script src="../js/wm.js"></script>
 </head>
@@ -116,18 +96,7 @@
         <span class="chat-progress" id="chatProgress">0 / 0</span>
       </div>
 
-      <div class="chat-body">
-        <!-- Phone-only dimmer for the roster drawer. It sits here, inside the
-             window, rather than beside #sidebarBackdrop at body level: that one
-             is hidden in embed mode and is stacked under #desktop, so it would
-             never catch a tap. -->
-        <div class="roster-backdrop" id="rosterBackdrop"></div>
-        <!-- AIM/Messenger roster: the room switcher. Shown only in embedded mode
-             (.is-embedded); the standalone page already has #sidebar for this, and
-             showing both would list the same rooms twice side by side. -->
-        <nav class="roster" id="roster" aria-label="Conversations"></nav>
         <div class="chat-area" id="chatArea" aria-live="polite" aria-label="Conversation transcript"></div>
-      </div>
 
       <div class="chat-inputbar">
         <span class="chat-input" id="chatInput" aria-hidden="true">observer mode — live feed</span>
@@ -157,26 +126,6 @@
 // embedded copy. DATA_SOURCE records which read answered, so an unreachable
 // store shows an explanation instead of an empty archive.
 let conversations = [];
-  // True only inside the Conv.exe frame (?app=editor). Declared at this scope so
-  // the conversation loaders can see it: that frame shows the editor alone, so
-  // building a chat stream for it would be work nobody ever sees.
-  let EDITOR_ONLY = false;
-let DATA_SOURCE = 'none';
-let DATA_DETAIL = '';
-
-// Backend resolution state, declared HERE on purpose: loadConversations() runs
-// before the dialogue API section, so these must already be initialised by the
-// time dialogueFetch() first touches them (a later declaration is a TDZ error).
-  const BACKEND_CANDIDATES = [
-    '../api/dialogue',                       // Node is serving this page
-    'http://localhost:4173/api/dialogue',
-    'http://127.0.0.1:4173/api/dialogue',
-    'http://localhost:4174/api/dialogue',
-    'http://127.0.0.1:4174/api/dialogue'
-  ];
-  let DIALOGUE_BASE = null;
-
-
 // ── STATE ──
   const DEFAULT_DELAY_MS = 1600;   // gap before a message that doesn't set its own
   const SPEAKER_COLORS = 8;        // .spk-0 … .spk-7 in the stylesheet
@@ -248,52 +197,15 @@ let DATA_DETAIL = '';
 
   // ── CONVERSATION DATA ──
   async function loadConversations() {
-    const list = await fetchConversations();
-    if (list) conversations = list;
-    renderSidebar();
-    renderRoster();
-    // The editor paints once, when its window is built. If it was built before
-    // the store answered - which is exactly what the Conv.exe frame does, by
-    // booting straight into the editor - it is showing an empty list, and
-    // nothing else would ever repaint it. Guarded: a no-op everywhere else.
-    if (WM.isOpen('editor')) renderExplorer();
-    if (conversations.length && !EDITOR_ONLY) openConversation(firstVisibleIndex());
-  }
-
-  // The dialogue store is the source of truth; when it is unreachable (page
-  // opened from file://, the API 404s, or the server is down) fall back to the
-  // legacy flat file, and finally to nothing - recording which read answered.
-  async function fetchConversations() {
     try {
-      const res = await dialogueFetch('?nocache=' + Date.now());
-      if (res.ok) { DATA_SOURCE = 'api'; DATA_DETAIL = ''; const data = await res.json(); noteStore(); return data; }
-      DATA_DETAIL = 'no /api/dialogue on ' + (window.location.origin || 'file://')
-        + ' (tried ' + backendCandidates().length + ' backends, last HTTP ' + res.status + ')';
-    } catch (err) { DATA_DETAIL = DATA_DETAIL || ('api ' + ((err && err.message) || 'failed')); }
-    try {
-      const res2 = await fetch('../json/conversations.json?nocache=' + Date.now());
-      if (res2.ok) {
-        DATA_SOURCE = 'legacy';
-        // keep WHY: the flat file answered, so the actionable fact is that the
-        // running server is older than the dialogue API
-        DATA_DETAIL = (DATA_DETAIL ? DATA_DETAIL + ' | ' : '') + 'legacy file ok - restart the server for /api/dialogue';
-        const data = await res2.json(); noteStore(); return data;
-      }
-      DATA_DETAIL = DATA_DETAIL + ' | legacy HTTP ' + res2.status;
-    } catch (err2) { DATA_DETAIL = DATA_DETAIL + ' | legacy blocked or missing'; }
-    DATA_SOURCE = 'none';
-    noteStore();
-    return null;
-  }
-
-  async function refreshConversations() {
-    const list = await fetchConversations();
-    if (list) conversations = list;
+      const res = await fetch('../json/conversations.json?nocache=' + Date.now());
+      if (res.ok) conversations = await res.json();
+    } catch (err) {
+      // fetch unavailable (e.g. file://) — no embedded copy, so the page
+      // simply starts empty until it is served and the JSON can be fetched
+    }
     renderSidebar();
-    renderRoster();
-    // Same reason as loadConversations(): this is what the editor's Refresh
-    // button calls, and without the repaint the button did nothing visible.
-    if (WM.isOpen('editor')) renderExplorer();
+    if (conversations.length) openConversation(firstVisibleIndex());
   }
 
   function renderSidebar() {
@@ -821,963 +733,257 @@ let DATA_DETAIL = '';
   // ── INIT ──
   const conversationsReady = loadConversations();
 // ── CONVERSATION EDITOR ──
-
-  // The pencil in the topbar toggles the explorer window.
+  // Entry-Editor-style dropdown for building conversations. Save POSTs the whole
+  // array to server.js (/api/conversations), which rewrites json/conversations.json
+  // — the single source the page loads (there is no embedded copy in this HTML).
   function toggleConvEditor() {
-    if (WM.isOpen('editor')) WM.close(WM.wins.get('editor'));
-    else WM.open('editor');
+    const panel = document.getElementById('convEditorPanel');
+    const open = panel.classList.toggle('open');
+    document.querySelector('.editor-toggle').setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) loadConvEditorFields(currentIndex);
   }
 
-  // ── DESKTOP BOOT ──
-  function initDesktop() {
-    if (!WM.init()) return;
-    // Framed by the OS shell this page is an APP, not a desktop: the shell owns
-    // the topbar, the gate trigger and the outer window layer, so this copy
-    // drops its own chrome and fills the frame. Detected by framing rather than
-    // a query flag, so a hand-pasted iframe URL behaves identically.
-    const isEmbedded = window.self !== window.top;
-    // Conv.exe frames this page with ?app=editor: that window is only ever the
-    // conversation editor, so boot straight into it and leave the chat closed.
-    const editorOnly = isEmbedded &&
-      new URLSearchParams(window.location.search).get('app') === 'editor';
-    EDITOR_ONLY = editorOnly;
-    if (isEmbedded) {
-      document.body.classList.add('is-embedded');
-      WM.layer.style.inset = '0';
-    }
-    WM.on('change', () => {
-      renderTaskbar();
-      const toggle = document.querySelector('.editor-toggle');
-      if (toggle) toggle.setAttribute('aria-expanded', WM.isOpen('editor') ? 'true' : 'false');
-    });
-
-    // The chat window is adopted (not rebuilt) and starts "docked" over .main,
-    // so the first paint still reads like the old layout until it is dragged.
-    const chat = document.querySelector('.chat-window');
-    if (chat) {
-      WM.adopt(chat, {
-        appId: 'chat',
-        title: 'Conversation Pit',
-        icon: '../mats/icons/Conversations_icon.png',
-        width: 880, height: 620, minW: 320, minH: 220
-      });
-    }
-    renderTaskbar();
-    if (isEmbedded) {
-      if (editorOnly) {
-        // Conv.exe: one window, maximized, with nothing else to switch between -
-        // so its own taskbar and status line are noise. Safe to close the chat
-        // because its DOM is kept; nothing is destroyed.
-        const chatWin = WM.wins.get('chat');
-        if (chatWin) WM.close(chatWin);
-        const edWin = WM.open('editor');
-        if (edWin) WM.maximize(edWin);
-      } else {
-        // There is no drawer to collapse here, and the app should fill its frame:
-        // the chat window opens docked on the standalone page but maximized
-        // inside the shell, where no desktop surface exists for it to sit on.
-        const win = WM.wins.get('chat');
-        if (win) WM.maximize(win);
-        // Cross-frame contract: the shell's window bar drives the editor window
-        // from outside this document, because the topbar pencil is gone in embed
-        // mode. Same-origin, so the parent may call this directly.
-        window.BonfireApp = { toggleEditor: toggleConvEditor };
-        // On a phone the roster is the only room switcher this window has
-        // (#sidebar is hidden in embed mode), so it boots as a closed drawer -
-        // same reasoning as the standalone branch below.
-        if (isPhone()) setSidebar(false);
-      }
-    } else if (WM.isMobile()) {
-      // On small screens the drawer is open by default and covers the left strip
-      // where the desktop icons sit, so start it collapsed and let the toggle
-      // bring it back - the desktop is the primary surface now.
-      setSidebar(false);
-    }
-
-    // One-shot layer report. The rects logged by WM.open are COMPUTED; what
-    // matters is what the browser actually laid out, so report both. If the
-    // layer came back degenerate, give it an explicit work-area box - a
-    // self-heal is worth more than a complaint.
-    (function reportLayer() {
-      const layer = WM.layer;
-      if (!layer || !layer.getBoundingClientRect) return;
-      const lr = layer.getBoundingClientRect();
-      const chat = WM.wins.get('chat');
-      const wr = chat && chat.el.getBoundingClientRect();
-      if (lr.width >= 80 && lr.height >= 80) {
-        console.debug('[wm] layer ' + Math.round(lr.width) + 'x' + Math.round(lr.height)
-          + ' | chat rendered ' + (wr ? Math.round(wr.width) + 'x' + Math.round(wr.height) : 'n/a')
-          + ' at ' + (wr ? Math.round(wr.left) + ',' + Math.round(wr.top) : 'n/a'));
-        return;
-      }
-      layer.style.position = 'absolute';
-      layer.style.inset = isEmbedded ? '0' : TOPBAR_H + 'px 0 0 0';
-      layer.style.width = '100%';
-      console.warn('[wm] desktop layer measured ' + Math.round(lr.width) + 'x' + Math.round(lr.height)
-        + ' - applied an explicit work-area box so windows can render');
-      WM.fit();
-    })();
+  function flashBtn(cls, text) {
+    const btn = document.querySelector('.' + cls);
+    const orig = btn.textContent;
+    btn.textContent = text;
+    btn.style.color = 'var(--ember-bright)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1800);
   }
 
-  // ── FILE EXPLORER (the Conversation Editor window) ──
-  // Root view lists conversations as folders; a folder view lists that
-  // conversation's messages as files (the real 4-digit names from the store).
-  // Every write goes through the same /api/dialogue helpers the old panel used.
-  const Explorer = { view: 'root', convId: null, selected: null };
-  let expStatusTimer = null;
-
-  // ── COALESCED PERSISTENCE ──
-  // The editor used to persist every change on its own round-trip, so a 40-line
-  // room cost ~42 requests and a full stream rebuild. Edits are now collected
-  // into a burst and written as a single whole-room PUT.
-  const SAVE_DEBOUNCE_MS = 600;
-  const UNDO_LIMIT = 20;
-  const dirty = { convId: null, pending: false, timer: null, saving: false };
-  const undoStacks = new Map();   // convId -> [snapshot, ...]
-  let pendingSnapshot = null;     // pre-change state of the current burst
-  const rowMap = new Map();       // row element -> message object
-
-  function snapshotOf(conv) {
-    return {
-      title: conv.title, status: conv.status, restricted: conv.restricted,
-      messages: JSON.parse(JSON.stringify(conv.messages || []))
-    };
+  function loadConvEditorFields(index) {
+    const c = conversations[index] || { messages: [] };
+    document.getElementById('cd-id').value = c.id || '';
+    document.getElementById('cd-title').value = c.title || '';
+    document.getElementById('cd-status').value = (c.status || 'Offline') === 'Offline' ? 'Offline' : 'Online';
+    document.getElementById('cd-restricted').checked = c.restricted || false;
+    renderMsgEditor(c.messages || []);
   }
 
-  function pushUndo(id, snap) {
-    const stack = undoStacks.get(id) || [];
-    stack.push(snap);
-    while (stack.length > UNDO_LIMIT) stack.shift();
-    undoStacks.set(id, stack);
+  function renderMsgEditor(messages) {
+    const list = document.getElementById('cd-msgList');
+    list.innerHTML = '';
+    messages.forEach((m) => list.appendChild(buildMsgRow(m)));
   }
 
-  // Leaving a room must not silently drop a half-typed one.
-  function beginBurst(conv) {
-    if (dirty.convId !== conv.id) { flushNow(); resetDirty(); }
-    dirty.convId = conv.id;
-    if (!pendingSnapshot) pendingSnapshot = snapshotOf(conv);
+  // The editor hint for a divider row mirrors the rendered card: a SYSTEM
+  // line that announces the chapter's own room, shown when no text is set.
+  function dividerHint() {
+    const room = (conversations[currentIndex] || {}).title || '';
+    return "SYSTEM has set the room: '" + room + "' to sleep";
   }
 
-  function scheduleFlush() {
-    if (dirty.timer) clearTimeout(dirty.timer);
-    dirty.timer = setTimeout(flushNow, SAVE_DEBOUNCE_MS);
-    markDirtyBadge();
-  }
-
-  // One entry point for every mutation. Because a burst is always written as a
-  // whole room there is no index to keep track of, so a reorder or delete can
-  // never redirect a pending write onto the wrong line.
-  function touch(conv) {
-    if (!conv) return;
-    beginBurst(conv);
-    dirty.pending = true;
-    scheduleFlush();
-  }
-
-  function resetDirty() {
-    dirty.pending = false;
-    dirty.convId = null;
-    if (dirty.timer) { clearTimeout(dirty.timer); dirty.timer = null; }
-  }
-
-  function hasPendingWork() { return dirty.pending; }
-
-  async function flushNow() {
-    if (dirty.timer) { clearTimeout(dirty.timer); dirty.timer = null; }
-    const conv = Explorer.convId ? conversations.find((c) => c.id === Explorer.convId) : null;
-    if (!conv || dirty.convId !== conv.id || !hasPendingWork()) return;
-    if (dirty.saving) { dirty.timer = setTimeout(flushNow, 200); return; }
-    dirty.saving = true;
-    // Refuse to send a room the store would reject: the work stays queued, the
-    // bad line is highlighted, and the reason is named in the status line.
-    const bad = firstInvalidMessage(conv);
-    if (bad) {
-      expStatus('Line ' + (bad.i + 1) + ' ' + bad.why + ' - not saved');
-      focusBadRow(bad.i);
-      dirty.saving = false;
-      markDirtyBadge();
-      return;
-    }
-    if (pendingSnapshot) { pushUndo(conv.id, pendingSnapshot); pendingSnapshot = null; }
-    dirty.pending = false;
-    try {
-      await apiSave(conv.id, conv);
-      expStatus('Saved');
-    } catch (err) {
-      // re-queue so the next flush retries rather than losing the work
-      dirty.pending = true;
-      if (err && err.rejected) { expStatus(''); alert(err.message); }
-      else expStatus('Saved (browser only)');
-    } finally {
-      dirty.saving = false;
-      markDirtyBadge();
-    }
-  }
-
-  function undoLastChange() {
-    const conv = Explorer.convId ? conversations.find((c) => c.id === Explorer.convId) : null;
-    if (!conv) return;
-    const stack = undoStacks.get(conv.id);
-    if (!stack || !stack.length) { expStatus('Nothing to undo'); return; }
-    flushNow();
-    const snap = stack.pop();
-    touch(conv);                  // snapshot the pre-undo state, then revert
-    conv.title = snap.title;
-    conv.status = snap.status;
-    conv.restricted = snap.restricted;
-    conv.messages = snap.messages;
-    repaintEditor(conv);
-    syncPlayer();
-    expStatus('Undone');
-  }
-
-  function markDirtyBadge() {
-    const el = document.getElementById('exDirty');
-    if (!el) return;
-    el.hidden = !hasPendingWork();
-    el.textContent = dirty.saving ? 'Saving…' : 'Unsaved';
-  }
-
-  // Best-effort flush so a closed tab cannot eat a burst. pagehide is the
-  // reliable one; beforeunload/visibilitychange are belt and braces.
-  window.addEventListener('pagehide', () => { flushNow(); });
-  window.addEventListener('beforeunload', () => { flushNow(); });
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') flushNow();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (!WM.isOpen('editor')) return;
-    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && String(e.key).toLowerCase() === 'z') {
-      e.preventDefault();
-      undoLastChange();
-      return;
-    }
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); flushNow(); }
-  });
-
-  // Conversations the archive gate allows right now.
-  function visibleConversations() {
-    if (!Array.isArray(conversations)) return [];
-    return conversations.filter((c) => !(c.restricted && !Gate.isUnlocked()));
-  }
-
-  function expStatus(text) {
-    const el = document.getElementById('expStatus');
-    if (!el) return;
-    el.textContent = text;
-    if (expStatusTimer) clearTimeout(expStatusTimer);
-    expStatusTimer = setTimeout(() => { el.textContent = ''; }, 2200);
-  }
-
-  function renderExplorer() {
-    const body = document.getElementById('expBody');
-    if (!body) return;
-    // Backend down is a different situation from "the archive is empty", so it
-    // gets its own notice rather than borrowing the empty-archive copy.
-    const notice = document.getElementById('expNotice');
-    if (notice) {
-      // Keyed on the absence of a resolved API backend rather than on empty
-      // data: a static host still serves the legacy conversations.json, so the
-      // page can look healthy while every save would silently fail.
-      const down = !DIALOGUE_BASE;
-      notice.hidden = !down;
-      notice.textContent = down
-        ? 'Unable to connect to Node backend server. Please ensure server.js is running.'
-        : '';
-    }
-    const conv = Explorer.convId ? conversations.find((c) => c.id === Explorer.convId) : null;
-    if (Explorer.view === 'folder' && !conv) { Explorer.view = 'root'; Explorer.convId = null; }
-
-    const crumbs = document.getElementById('expCrumbs');
-    if (crumbs) {
-      crumbs.innerHTML = '';
-      const root = document.createElement('span');
-      root.className = 'exp-crumb';
-      root.textContent = 'Conversation Pit';
-      crumbs.appendChild(root);
-      if (Explorer.view === 'folder' && conv) {
-        crumbs.appendChild(document.createTextNode('/'));
-        const cur = document.createElement('span');
-        cur.className = 'exp-crumb-current';
-        cur.textContent = conv.id;
-        crumbs.appendChild(cur);
-      }
-    }
-    const back = document.querySelector('[data-exp="root"]');
-    if (back) back.disabled = Explorer.view !== 'folder';
-    const newConv = document.querySelector('[data-exp="newConv"]');
-    if (newConv) newConv.hidden = Explorer.view === 'folder';
-    // The JSON round-trip acts on the open room, so it stays hidden in the root
-    // view along with the folder-only actions.
-    document.querySelectorAll('[data-exp="exportJson"],[data-exp="importJson"]')
-      .forEach((b) => { b.hidden = Explorer.view !== 'folder'; });
-
-    if (Explorer.view === 'folder' && conv) renderFolderView(body, conv);
-    else renderRootView(body);
-  }
-
-  function renderRootView(body) {
-    const list = visibleConversations();
-    body.innerHTML = '';
-    if (!list.length) {
-      const empty = document.createElement('div');
-      empty.className = 'exp-empty';
-      empty.textContent = DATA_SOURCE === 'none'
-        ? 'Could not reach the dialogue store (/api/dialogue) - check the server, or start a conversation here.'
-        : 'No conversations here yet - use "New Conversation" to start one.';
-      body.appendChild(empty);
-      return;
-    }
-    const grid = document.createElement('div');
-    grid.className = 'exp-grid';
-    list.forEach((c) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'exp-folder';
-      btn.title = 'Click to open ' + c.id;
-      btn.innerHTML =
-        '<span class="exp-folder-img" aria-hidden="true"></span>' +
-        '<span class="exp-folder-id"></span>' +
-        '<span class="exp-folder-title"></span>' +
-        '<span class="exp-folder-meta"></span>';
-      btn.querySelector('.exp-folder-id').textContent = c.id;
-      btn.querySelector('.exp-folder-title').textContent = c.title || '(untitled)';
-      const n = (c.messages || []).length;
-      btn.querySelector('.exp-folder-meta').textContent =
-        n + (n === 1 ? ' line' : ' lines') + ' · ' + (c.status || 'Offline') + (c.restricted ? ' · OFF-LOG' : '');
-      // Single click opens the room. This used to require a DOUBLE-click, while a
-      // single click only moved a highlight onto a class nothing reads - which
-      // made the room list look like a dead button. A <button> is expected to
-      // act on click. dblclick is dropped so one press cannot open twice.
-      btn.addEventListener('click', () => {
-        Explorer.selected = c.id;
-        openFolder(c.id);
-      });
-      btn.addEventListener('keydown', (e) => { if (e.key === 'Enter') openFolder(c.id); });
-      grid.appendChild(btn);
-    });
-    body.appendChild(grid);
-  }
-
-  function openFolder(convId) {
-    Explorer.view = 'folder';
-    Explorer.convId = convId;
-    const i = conversations.findIndex((c) => c.id === convId);
-    if (i >= 0) {
-      currentIndex = i;
-      // The editor-only frame (Conv.exe) never shows the chat, so skip the
-      // playback-stream build openConversation() performs. Opening a room here is
-      // for editing its messages, not for playing them - and that build walks
-      // every message in the archive. Gated rooms cannot reach this line at all:
-      // renderRootView() lists visibleConversations() only.
-      if (!EDITOR_ONLY) openConversation(i);
-    }
-    renderExplorer();
-  }
-
-  // ── EDITOR WINDOW (file explorer) ──
-  WM.register('editor', {
-    title: 'Conversation Editor',
-    icon: '../mats/icons/CONV.png',
-    iconClass: 'pwin-ico-editor',
-    width: 580, height: 460, minW: 340, minH: 240,
-    build(win, body) {
-      body.innerHTML =
-        '<div class="exp-toolbar">' +
-          '<button type="button" class="ed-btn" data-exp="root">&#8592; Back</button>' +
-          '<span class="exp-crumbs" id="expCrumbs"></span>' +
-          '<span class="exp-status" id="expStatus" aria-live="polite"></span>' +
-          '<button type="button" class="ed-btn" data-exp="exportJson">Export JSON</button>' +
-          '<button type="button" class="ed-btn" data-exp="importJson">Import JSON</button>' +
-          '<button type="button" class="ed-btn" data-exp="newConv">New Conversation</button>' +
-          '<button type="button" class="ed-btn" data-exp="refresh">Refresh</button>' +
-        '</div>' +
-        '<div class="exp-notice" id="expNotice" hidden></div>' +
-        '<div id="expBody"></div>';
-      body.querySelector('[data-exp="root"]').addEventListener('click', () => {
-        Explorer.view = 'root';
-        Explorer.convId = null;
-        renderExplorer();
-      });
-      body.querySelector('[data-exp="refresh"]').addEventListener('click', async () => {
-        await refreshConversations();
-        renderExplorer();
-      });
-      body.querySelector('[data-exp="newConv"]').addEventListener('click', createConversationFromEditor);
-      body.querySelector('[data-exp="exportJson"]').addEventListener('click', exportConversationJson);
-      body.querySelector('[data-exp="importJson"]').addEventListener('click', startImportJson);
-    },
-    onOpen() {
-      renderExplorer();
-      if (DATA_SOURCE !== 'api') wmStatus('store: ' + DATA_SOURCE + ' - ' + (DATA_DETAIL || 'no detail'), true);
-    }
-  });
-
-  // ── INLINE MESSAGE EDITOR ──
-  // The folder view is the editor: every row is live controls and there is no
-  // second window. Rows mirror conv.messages and are persisted through the
-  // coalesced writer above, so typing never rebuilds the playback stream.
-  function repaintEditor(conv) {
-    renderExplorer();
-  }
-
-  function syncPlayer() {
-    const i = conversations.findIndex((c) => c.id === Explorer.convId);
-    if (i >= 0) { currentIndex = i; openConversation(i); }
-    renderSidebar();
-  }
-
-  const TAGS = ['chat', 'action', 'divider'];
-
-  // A new line starts VALID, so a room that is only half typed can still be
-  // saved: the store rejects a chat line with no screenName and any
-  // non-divider line with no text.
-  function blankMessage(type) {
-    if (type === 'divider') return { type: 'divider', text: '', label: '', time: '', delayMs: 0 };
-    return { type: type, text: 'New line', screenName: '???', time: '', delayMs: DEFAULT_DELAY_MS };
-  }
-
-  // Mirrors js/dialogue.js validateMessage, but reports the offending line so
-  // the author can see which one is holding the room back.
-  function firstInvalidMessage(conv) {
-    const list = conv.messages || [];
-    for (let i = 0; i < list.length; i++) {
-      const m = list[i] || {};
-      const type = (m.type === 'action' || m.type === 'divider') ? m.type : 'chat';
-      if (type !== 'divider' && !String(m.text || '').trim()) return { i: i, why: 'has no text' };
-      if (type === 'chat' && !String(m.screenName || '').trim()) return { i: i, why: 'has no screen name' };
-      if (m.delayMs !== undefined && m.delayMs !== '' && !(Number(m.delayMs) >= 0)) {
-        return { i: i, why: 'has a negative delay' };
-      }
-    }
-    return null;
-  }
-
-  function focusBadRow(i) {
-    const list = editorListEl();
-    if (!list) return;
-    Array.prototype.forEach.call(list.querySelectorAll('.ex-row.is-bad'), (el) => el.classList.remove('is-bad'));
-    const row = list.querySelector('.ex-row[data-i="' + i + '"]');
-    if (!row) return;
-    row.classList.add('is-bad');
-    focusCell(row, '.ex-text');
-  }
-
-  // .ex-editor-list is unique to the message editor; the root view's folder grid
-  // uses .exp-grid, and the explorer body is #expBody (an id, not a class).
-  function editorListEl() {
-    if (Explorer.view !== 'folder') return null;
-    return document.querySelector('.ex-editor-list');
-  }
-
-  function renderFolderView(body, conv) {
-    body.innerHTML = '';
-
-    // Room metadata joins the same coalesced burst as the rows, so there is no
-    // separate Save step and no create-then-rename round trip.
-    const meta = document.createElement('div');
-    meta.className = 'exp-meta';
-    meta.innerHTML =
-      '<input type="text" class="exp-meta-title" placeholder="Conversation title" aria-label="Conversation title">' +
-      '<select aria-label="Status"><option value="Online">Online</option><option value="Offline">Offline</option></select>' +
-      '<label><input type="checkbox"> Restricted</label>' +
-      '<button type="button" class="ed-btn ed-delete" data-exp="delConv">Delete room</button>';
-    const titleEl = meta.querySelector('.exp-meta-title');
-    const statusEl = meta.querySelector('select');
-    const restrictedEl = meta.querySelector('input[type="checkbox"]');
-    titleEl.value = conv.title || '';
-    statusEl.value = (conv.status || 'Offline') === 'Offline' ? 'Offline' : 'Online';
-    restrictedEl.checked = !!conv.restricted;
-    meta.addEventListener('change', () => {
-      touch(conv);                   // snapshot first, then mutate
-      conv.title = titleEl.value.trim();
-      conv.status = statusEl.value;
-      conv.restricted = restrictedEl.checked;
-    });
-    meta.querySelector('[data-exp="delConv"]').addEventListener('click', () => deleteConversationFromEditor(conv));
-    body.appendChild(meta);
-
-    const bar = document.createElement('div');
-    bar.className = 'exp-bar';
-    bar.innerHTML =
-      '<button type="button" class="ed-btn" data-exp="addRow">+ New Line</button>' +
-      '<button type="button" class="ed-btn" data-exp="undo">Undo</button>' +
-      '<button type="button" class="ed-btn" data-exp="saveNow">Save now</button>' +
-      '<button type="button" class="ed-btn" data-exp="refresh">Refresh player</button>' +
-      '<span class="ex-dirty" id="exDirty" hidden>Unsaved</span>';
-    bar.querySelector('[data-exp="addRow"]').addEventListener('click', () => {
-      const added = appendRow(conv, (conv.messages || []).length, 'chat');
-      if (added) focusCell(added, '.ex-text');
-    });
-    bar.querySelector('[data-exp="undo"]').addEventListener('click', () => undoLastChange());
-    bar.querySelector('[data-exp="saveNow"]').addEventListener('click', () => flushNow());
-    // The player is stale while authoring on purpose; refresh is explicit.
-    bar.querySelector('[data-exp="refresh"]').addEventListener('click', () => syncPlayer());
-    body.appendChild(bar);
-
-    body.appendChild(buildMessageList(conv));
-    markDirtyBadge();
-  }
-
-  function buildMessageList(conv) {
-    const list = document.createElement('div');
-    list.className = 'exp-list ex-editor-list';
-    rowMap.clear();
-    const messages = conv.messages || [];
-    messages.forEach((m, i) => list.appendChild(buildEditableRow(conv, m, i)));
-    if (!messages.length) {
-      const empty = document.createElement('div');
-      empty.className = 'exp-empty';
-      empty.textContent = 'No messages yet - click "+ New Line" to write the first one.';
-      list.appendChild(empty);
-    }
-    return list;
-  }
-
-  // Only structural changes rebuild the list; the new row is handed back so the
-  // caller can drop the caret straight into it.
-  function replaceList(conv) {
-    const old = editorListEl();
-    if (!old || !old.parentNode) { repaintEditor(conv); return null; }
-    const fresh = buildMessageList(conv);
-    old.parentNode.replaceChild(fresh, old);
-    return fresh;
-  }
-
-  function rowElAt(list, index) {
-    return list ? list.querySelector('.ex-row[data-i="' + index + '"]') : null;
-  }
-
-  function appendRow(conv, index, type) {
-    const msgs = conv.messages || (conv.messages = []);
-    const at = Math.max(0, Math.min(index, msgs.length));
-    touch(conv);
-    msgs.splice(at, 0, blankMessage(TAGS.indexOf(type) >= 0 ? type : 'chat'));
-    return rowElAt(replaceList(conv), at);
-  }
-
-  // Reordering is read back from the DOM (each row carries its message in
-  // rowMap), so there is no positional bookkeeping that can go stale.
-  function commitOrderFromDom(conv) {
-    const list = editorListEl();
-    if (!list) return;
-    const els = Array.prototype.slice.call(list.querySelectorAll('.ex-row'));
-    const next = els.map((el) => rowMap.get(el));
-    if (next.length !== (conv.messages || []).length || next.indexOf(undefined) >= 0) return;
-    els.forEach((el, k) => { el.dataset.i = String(k); });
-    touch(conv);
-    conv.messages = next;
-  }
-
-  function focusCell(row, sel) {
-    const el = row && row.querySelector(sel);
-    if (!el) return;
-    el.focus();
-    const end = (el.value || '').length;
-    try { el.setSelectionRange(end, end); } catch (e) { /* input type without a range */ }
-  }
-
-  function autoGrow(el) {
-    if (!el) return;
-    el.rows = 1;
-    const px = el.scrollHeight;
-    if (px > 0) el.rows = Math.max(1, Math.ceil(px / 18));
-  }
-
-  // Writes the saved message back into the controls (Escape).
-  function fillRow(row, m) {
-    const set = (sel, v) => { const el = row.querySelector(sel); if (el) el.value = v; };
-    set('.ex-tag', TAGS.indexOf(m.type) >= 0 ? m.type : 'chat');
-    set('.ex-name', m.screenName || '');
-    set('.ex-time', m.time || '');
-    set('.ex-delay', (m.delayMs === undefined || m.delayMs === null) ? '' : m.delayMs);
-    set('.ex-label', m.label || '');
-    set('.ex-text', m.text || '');
-    autoGrow(row.querySelector('.ex-text'));
-  }
-
-  function nudgeRow(conv, row, dir) {
-    const parent = row && row.parentNode;
-    if (!parent) return;
-    if (dir < 0 && row.previousElementSibling && row.previousElementSibling.classList.contains('ex-row')) {
-      parent.insertBefore(row, row.previousElementSibling);
-    } else if (dir > 0 && row.nextElementSibling && row.nextElementSibling.classList.contains('ex-row')) {
-      parent.insertBefore(row.nextElementSibling, row);
-    } else { return; }
-    commitOrderFromDom(conv);
-    focusCell(row, '.ex-text');
-  }
-
-  function deleteRow(conv, row) {
-    const msg = row && rowMap.get(row);
-    const at = (conv.messages || []).indexOf(msg);
-    if (at < 0) return;
-    // Every index after the gap shifted, so the whole room is rewritten.
-    touch(conv);
-    conv.messages.splice(at, 1);
-    const fresh = replaceList(conv);
-    const next = fresh && fresh.querySelector('.ex-row[data-i="' + Math.min(at, conv.messages.length - 1) + '"]');
-    if (next) focusCell(next, '.ex-text');
-  }
-
-  function bindDrag(conv, row, grip) {
-    if (!grip) return;
-    grip.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0) return;
-      const list = editorListEl();
-      if (!list) return;
-      e.preventDefault();
-      row.classList.add('is-dragging');
-      try { grip.setPointerCapture(e.pointerId); } catch (err) { /* capture unsupported */ }
-      // The dragged row is moved live in the DOM; the order is committed once
-      // on release, which is a single write instead of one per arrow click.
-      const onMove = (ev) => {
-        const rows = Array.prototype.slice.call(list.querySelectorAll('.ex-row'));
-        for (let k = 0; k < rows.length; k++) {
-          const other = rows[k];
-          if (other === row) continue;
-          const b = other.getBoundingClientRect();
-          if (ev.clientY < b.top + b.height / 2) { list.insertBefore(row, other); return; }
-        }
-        list.appendChild(row);
-      };
-      const onUp = () => {
-        grip.removeEventListener('pointermove', onMove);
-        grip.removeEventListener('pointerup', onUp);
-        grip.removeEventListener('pointercancel', onUp);
-        row.classList.remove('is-dragging');
-        commitOrderFromDom(conv);
-      };
-      grip.addEventListener('pointermove', onMove);
-      grip.addEventListener('pointerup', onUp);
-      grip.addEventListener('pointercancel', onUp);
-    });
-  }
-
-  // One row = one message, fully editable in place. The stored filename is
-  // derived from the message index, so it is deliberately not shown here.
-  function buildEditableRow(conv, m, i) {
+  function buildMsgRow(m) {
     const row = document.createElement('div');
-    row.className = 'ex-row' + (m.type === 'divider' ? ' is-divider' : '');
-    row.dataset.i = String(i);
-    rowMap.set(row, m);
-    row.innerHTML =
-      '<span class="ex-grip" title="Drag to reorder">\u283F</span>' +
-      '<select class="ex-tag" aria-label="Tag">' +
-        TAGS.map((t) => '<option value="' + t + '">' + t + '</option>').join('') +
-      '</select>' +
-      '<input type="text" class="ex-name" placeholder="screen name" aria-label="Screen name">' +
-      '<input type="text" class="ex-time" placeholder="00:00" size="7" aria-label="Time">' +
-      '<input type="number" class="ex-delay" placeholder="ms" min="0" step="50" aria-label="Delay in milliseconds">' +
-      '<input type="text" class="ex-label" placeholder="chapter title" aria-label="Chapter title">' +
-      '<textarea class="ex-text" rows="1" aria-label="Text"></textarea>' +
-      '<span class="ex-nudge">' +
-        '<button type="button" class="ed-btn ex-up" title="Move up" aria-label="Move up">\u25B2</button>' +
-        '<button type="button" class="ed-btn ex-down" title="Move down" aria-label="Move down">\u25BC</button>' +
-      '</span>' +
-      '<button type="button" class="ed-btn ed-delete ex-del" title="Delete line" aria-label="Delete line">\u2715</button>';
+    row.className = 'conv-msg-row';
 
-    const q = (s) => row.querySelector(s);
-    const tagEl = q('.ex-tag');
-    const nameEl = q('.ex-name');
-    const delayEl = q('.ex-delay');
-    const textEl = q('.ex-text');
-    fillRow(row, m);
-    if (m.type === 'action') nameEl.placeholder = 'action (blank when unnamed)';
-
-    const applyPlaceholder = () => {
-      textEl.placeholder = tagEl.value === 'divider' ? dividerHint(conv) : 'the line itself...';
+    const kind = document.createElement('select');
+    kind.className = 'conv-msg-kind';
+    kind.setAttribute('aria-label', 'Message kind');
+    const optChat = document.createElement('option');
+    optChat.value = 'chat'; optChat.textContent = 'chat';
+    const optAction = document.createElement('option');
+    optAction.value = 'action'; optAction.textContent = 'action';
+    const optDivider = document.createElement('option');
+    optDivider.value = 'divider'; optDivider.textContent = 'divider';
+    kind.appendChild(optChat); kind.appendChild(optAction); kind.appendChild(optDivider);
+    kind.value = m.type === 'action' ? 'action' : (m.type === 'divider' ? 'divider' : 'chat');
+    // Divider rows act like action tags with a bold card: they carry a label
+    // that names the divider in the fast-forward dropdown plus an authorable
+    // line that renders bold on the board. Name/time/delay go inert.
+    const applyDividerState = (isDivider) => {
+      row.classList.toggle('is-divider', isDivider);
+      name.disabled = isDivider;
+      time.disabled = isDivider;
+      delay.disabled = isDivider;
+      label.disabled = !isDivider;
+      text.disabled = false;      // the card's own bold line stays authorable
+      text.placeholder = isDivider ? dividerHint() : 'the line itself…';
     };
-    applyPlaceholder();
 
-    const read = () => {
-      m.type = tagEl.value;
-      m.screenName = nameEl.value;
-      m.time = q('.ex-time').value;
-      m.delayMs = delayEl.value === '' ? undefined : Math.max(0, Number(delayEl.value) || 0);
-      m.label = q('.ex-label').value;
-      m.text = textEl.value;
-    };
-    // 'change' rather than 'input': a keystroke is not a commit, and it is the
-    // flush that costs a request.
-    row.addEventListener('change', () => { touch(conv); read(); });
-    tagEl.addEventListener('change', () => {
-      touch(conv);
-      read();
-      row.classList.toggle('is-divider', m.type === 'divider');
-      applyPlaceholder();
-    });
-    textEl.addEventListener('input', () => autoGrow(textEl));
+    kind.addEventListener('change', () => applyDividerState(kind.value === 'divider'));
 
-    row.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { fillRow(row, m); e.stopPropagation(); return; }
-      // Enter commits the line and walks the caret down, creating the next
-      // line on the last row. Shift+Enter stays a newline.
-      if (e.key === 'Enter' && !e.shiftKey && e.target === textEl) {
-        e.preventDefault();
-        touch(conv);
-        read();
-        const rows = Array.prototype.slice.call(row.parentNode.querySelectorAll('.ex-row'));
-        const at = rows.indexOf(row);
-        if (at >= 0 && at + 1 < rows.length) { focusCell(rows[at + 1], '.ex-text'); return; }
-        const added = appendRow(conv, at + 1, tagEl.value);
-        if (added) focusCell(added, '.ex-text');
-      }
-    });
+    const name = document.createElement('input');
+    name.type = 'text'; name.className = 'conv-msg-name';
+    name.placeholder = 'screenName'; name.value = m.screenName || '';
 
-    row.querySelector('.ex-up').addEventListener('click', () => nudgeRow(conv, row, -1));
-    row.querySelector('.ex-down').addEventListener('click', () => nudgeRow(conv, row, 1));
-    row.querySelector('.ex-del').addEventListener('click', () => deleteRow(conv, row));
-    bindDrag(conv, row, q('.ex-grip'));
+    const time = document.createElement('input');
+    time.type = 'text'; time.className = 'conv-msg-time';
+    time.placeholder = 'time'; time.value = m.time || '';
+
+    const delay = document.createElement('input');
+    delay.type = 'number'; delay.className = 'conv-msg-delay';
+    delay.min = '0'; delay.placeholder = 'delay ms';
+    delay.title = 'Delay before this line (ms)';
+    delay.value = m.delayMs != null ? m.delayMs : '';
+
+    const label = document.createElement('input');
+    label.type = 'text'; label.className = 'conv-msg-label';
+    label.placeholder = 'chapter title';
+    label.title = 'Names this divider in the fast-forward dropdown; blank falls back to the card line or an ordinal';
+    label.value = m.label || '';
+
+    const text = document.createElement('input');
+    text.type = 'text'; text.className = 'conv-msg-text';
+    text.placeholder = m.type === 'divider' ? dividerHint() : 'the line itself…';
+    text.value = m.text || '';
+
+    const actions = document.createElement('div');
+    actions.className = 'conv-msg-actions';
+    actions.appendChild(rowBtn('▲', 'Move message up', () => moveMsgRow(row, -1)));
+    actions.appendChild(rowBtn('▼', 'Move message down', () => moveMsgRow(row, 1)));
+    actions.appendChild(rowBtn('×', 'Remove message', () => row.remove()));
+
+    row.appendChild(kind); row.appendChild(name); row.appendChild(time);
+    row.appendChild(delay); row.appendChild(label); row.appendChild(text);
+    row.appendChild(actions);
+    applyDividerState(kind.value === 'divider');
     return row;
   }
-  // ── JSON ROUND-TRIP ──
-  // The store keeps one file per message, so bulk editing means moving between
-  // that layout and a single blob. Export hands out exactly the shape the
-  // importer accepts, so export -> edit -> import is a stable loop.
-  let BLOB = null;
 
-  function blobModal() {
-    let m = document.getElementById('blobModal');
-    if (m) return m;
-    m = document.createElement('div');
-    m.className = 'blob-modal';
-    m.id = 'blobModal';
-    m.hidden = true;
-    m.innerHTML =
-      '<div class="blob-card" role="dialog" aria-modal="true" aria-label="Conversation JSON">' +
-        '<div class="blob-head">' +
-          '<span class="blob-title" id="blobTitle">Conversation JSON</span>' +
-          '<button type="button" class="blob-x" data-blob="close" aria-label="Close">&times;</button>' +
-        '</div>' +
-        '<textarea class="blob-area" id="blobArea" spellcheck="false" aria-label="Conversation JSON"></textarea>' +
-        '<div class="blob-foot">' +
-          '<span class="blob-msg" id="blobMsg" aria-live="polite"></span>' +
-          '<button type="button" class="ed-btn" data-blob="copy">Copy</button>' +
-          '<button type="button" class="ed-btn" data-blob="download">Download as .json</button>' +
-          '<button type="button" class="ed-btn" data-blob="doImport">Import into this room</button>' +
-        '</div>' +
-      '</div>' +
-      '<input type="file" id="blobFile" accept=".json,application/json" hidden>';
-    document.body.appendChild(m);
-    m.querySelector('[data-blob="close"]').addEventListener('click', blobClose);
-    m.addEventListener('click', (ev) => { if (ev.target === m) blobClose(); });
-    document.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape' && !m.hidden) blobClose();
-    });
-    m.querySelector('#blobArea').addEventListener('input', blobLiveCount);
-    m.querySelector('#blobFile').addEventListener('change', onImportFile);
-    m.querySelector('[data-blob="copy"]').addEventListener('click', blobCopy);
-    m.querySelector('[data-blob="download"]').addEventListener('click', blobDownload);
-    m.querySelector('[data-blob="doImport"]').addEventListener('click', blobDoImport);
-    return m;
+  function rowBtn(html, label, fn) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'ed-btn conv-row-btn';
+    b.innerHTML = html; b.title = label;
+    b.setAttribute('aria-label', label);
+    b.onclick = fn;
+    return b;
   }
 
-  function blobMsg(m, text) { m.querySelector('#blobMsg').textContent = text; }
-
-  function blobClose() {
-    const m = document.getElementById('blobModal');
-    if (m) m.hidden = true;
-    BLOB = null;
+  function moveMsgRow(row, dir) {
+    const list = row.parentNode;
+    const idx = Array.prototype.indexOf.call(list.children, row);
+    const target = idx + dir;
+    if (target < 0 || target >= list.children.length) return;
+    list.insertBefore(row, dir > 0 ? list.children[target + 1] : list.children[target]);
   }
 
-  function blobOpen(mode, blob) {
-    BLOB = { mode: mode, blob: blob };
-    const m = blobModal();
-    const area = m.querySelector('#blobArea');
-    area.value = blob.text;
-    area.readOnly = mode === 'export';
-    m.querySelector('#blobTitle').textContent =
-      (mode === 'export' ? 'Export ' : 'Import into ') + blob.convId;
-    m.querySelector('[data-blob="download"]').hidden = mode !== 'export';
-    m.querySelector('[data-blob="doImport"]').hidden = mode !== 'import';
-    blobMsg(m, blob.note || '');
-    m.hidden = false;
-    if (mode === 'export') area.focus();
+function addMsgRow() {
+    document.getElementById('cd-msgList').appendChild(buildMsgRow({ type: 'chat' }));
   }
 
-  function blobRoom() {
-    if (Explorer.view !== 'folder' || !Explorer.convId) {
-      expStatus('Open a room first'); return null;
-    }
-    const conv = conversations.find((c) => c.id === Explorer.convId);
-    if (!conv) { expStatus('No conversation is open'); return null; }
-    return conv;
+  function addDividerRow() {
+    document.getElementById('cd-msgList').appendChild(buildMsgRow({ type: 'divider' }));
   }
 
-  async function exportConversationJson() {
-    const conv = blobRoom();
-    if (!conv) return;
-    // A queued burst would not be in the file, so land it before reading.
-    if (hasPendingWork()) await flushNow();
-    // Built field by field so the export is exactly the import format: meta
-    // keys, then the message array. writeFiles() copies every non-messages
-    // key into meta.json, so this round-trips.
-    const out = {
-      id: conv.id, title: conv.title, status: conv.status,
-      restricted: !!conv.restricted, messages: conv.messages || []
+  function messagesFromEditor() {
+    return Array.from(document.querySelectorAll('#cd-msgList .conv-msg-row')).map((row) => {
+      const kind = row.querySelector('.conv-msg-kind').value;
+      const name = row.querySelector('.conv-msg-name').value.trim();
+      if (kind === 'divider') {
+        // A saved divider carries its type plus optional label (dropdown name)
+        // and text (the bold line); a blank text falls back to the derived
+        // room caption on the board.
+        const msg = { type: 'divider' };
+        const chapterLabel = row.querySelector('.conv-msg-label').value.trim();
+        const display = row.querySelector('.conv-msg-text').value.trim();
+        if (chapterLabel) msg.label = chapterLabel;
+        if (display) msg.text = display;
+        return msg;
+      }
+      const text = row.querySelector('.conv-msg-text').value.trim();
+      if (!text && !name) return null;  // unfilled row — drop it
+      const msg = { text: text };
+      const time = row.querySelector('.conv-msg-time').value.trim();
+      if (time) msg.time = time;
+      const delay = row.querySelector('.conv-msg-delay').value;
+      if (delay !== '') msg.delayMs = Number(delay);
+      if (kind === 'action') {
+        msg.type = 'action';
+        if (name) msg.screenName = name;  // renderer prefixes it when present
+      } else {
+        msg.screenName = name;
+      }
+      return msg;
+    }).filter(Boolean);
+  }
+
+  function fieldsToConversation() {
+    return {
+      id: document.getElementById('cd-id').value.trim(),
+      title: document.getElementById('cd-title').value.trim(),
+      status: document.getElementById('cd-status').value,
+      restricted: document.getElementById('cd-restricted').checked,
+      messages: messagesFromEditor()
     };
-    blobOpen('export', {
-      convId: conv.id,
-      text: JSON.stringify(out, null, 2) + '\n',
-      note: (conv.messages || []).length + ' lines - edit elsewhere, then use Import JSON'
+  }
+
+  function validateConversation(conv) {
+    if (!conv.title) throw new Error('every conversation needs a title');
+    if (!conv.messages.length) throw new Error('add at least one message');
+    if (!conv.messages[0] || conv.messages[0].type !== 'divider') {
+      throw new Error('every conversation opens with a divider — move a divider row to the top');
+    }
+    conv.messages.forEach((m) => {
+      if (m.type !== 'divider' && !m.text) throw new Error('every message needs text');
+      if (m.type !== 'action' && m.type !== 'divider' && !m.screenName) {
+        throw new Error('chat messages need a screenName');
+      }
+      if (m.delayMs != null && (!(m.delayMs >= 0) || m.delayMs > 86400000)) {
+        throw new Error('delayMs must be between 0 and 86400000');
+      }
     });
   }
 
-  function blobDownload() {
-    if (!BLOB) return;
-    const url = URL.createObjectURL(new Blob([BLOB.blob.text], { type: 'application/json' }));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = BLOB.blob.convId + '.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-
-  function blobCopy() {
-    if (!BLOB) return;
-    const area = document.getElementById('blobArea');
-    area.select();
-    let ok = false;
-    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
-    blobMsg(blobModal(), ok ? 'Copied' : 'Select the text and copy manually');
-  }
-
-  // Structural check only. The per-line rules (text / screenName / delayMs)
-  // live in js/dialogue.js behind /api/dialogue and are the authority; copying
-  // them here would make a second table to keep in sync, and the store's own
-  // rejection is surfaced verbatim a few lines below.
-  function parseBlobText(text, convId) {
-    // Windows editors and PowerShell's `Set-Content -Encoding UTF8` prepend a
-    // BOM, which JSON.parse rejects outright.
-    const clean = String(text).replace(/^\uFEFF/, '');
-    let v;
-    try { v = JSON.parse(clean); }
-    catch (e) { return { error: 'not valid JSON: ' + e.message }; }
-    if (!v || typeof v !== 'object' || Array.isArray(v)) return { error: 'expected a JSON object' };
-    if (!Array.isArray(v.messages)) return { error: 'expected a "messages" array' };
-    if (v.messages.some((m) => !m || typeof m !== 'object' || Array.isArray(m))) {
-      return { error: 'every entry in "messages" must be an object' };
-    }
-    const differs = typeof v.id === 'string' && v.id.trim() && v.id !== convId;
-    return { value: v, differs: differs };
-  }
-
-  function startImportJson() {
-    const conv = blobRoom();
-    if (!conv) return;
-    // A queued burst would be flushed AFTER the import and silently overwrite it.
-    if (hasPendingWork()) { expStatus('Wait for the save to finish'); return; }
-    blobModal().querySelector('#blobFile').click();
-  }
-
-  function onImportFile(ev) {
-    const conv = blobRoom();
-    const file = ev.target.files && ev.target.files[0];
-    ev.target.value = '';                       // allow re-picking the same file
-    if (!file || !conv) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const parsed = parseBlobText(reader.result, conv.id);
-      if (parsed.error) { expStatus('Import rejected - ' + parsed.error); return; }
-      const v = parsed.value;
-      blobOpen('import', {
-        convId: conv.id,
-        parsed: v,
-        text: JSON.stringify(v, null, 2) + '\n',
-        baseCount: (conv.messages || []).length,
-        note: (conv.messages || []).length + ' -> ' + v.messages.length + ' lines'
-          + (parsed.differs ? ' - file says ' + v.id + ', keeping ' + conv.id : '')
+  async function persistConversations() {
+    try {
+      const res = await fetch('../api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(conversations)
       });
+      if (!res.ok) {
+        // surface the server's own reason (validation, markers, etc.) instead
+        // of hiding behind a bare status code; a rejected save must not
+        // masquerade as "browser only"
+        let detail = '';
+        try {
+          const body = await res.json();
+          if (body && body.error) detail = ': ' + body.error;
+        } catch (_) { /* non-JSON body — keep just the status */ }
+        throw Object.assign(new Error('server rejected the save (' + res.status + ')' + detail), { rejected: true });
+      }
+      return 'written';
+    } catch (err) {
+      if (err && err.rejected) throw err;
+      // no server (file:// open) — the edit stays in memory until the page is served
+      return 'offline';
+    }
+  }
+
+  async function saveConversation() {
+    if (!conversations.length) return;
+    const draft = fieldsToConversation();
+    try { validateConversation(draft); }
+    catch (err) { alert("Can't save: " + err.message); return; }
+    conversations[currentIndex] = draft;
+    openConversation(currentIndex);
+    let wrote = 'offline';
+    try { wrote = await persistConversations(); }
+    catch (err) { alert('Save failed: ' + err.message); }
+    flashBtn('ed-save', wrote === 'written' ? 'Saved to file!' : 'Saved (browser only)');
+  }
+
+  function newConversation() {
+    const blank = {
+      id: 'CONV-' + String(conversations.length + 1).padStart(3, '0'),
+      title: 'New Conversation',
+      status: 'Online',
+      restricted: false,
+      messages: []
     };
-    reader.onerror = () => expStatus('Could not read that file');
-    reader.readAsText(file);
+    conversations.push(blank);
+    currentIndex = conversations.length - 1;
+    loadConvEditorFields(currentIndex);
+    openConversation(currentIndex);
   }
 
-  async function blobDoImport() {
-    const conv = blobRoom();
-    if (!BLOB || BLOB.mode !== 'import' || !conv) return;
-    if (hasPendingWork()) { expStatus('Wait for the save to finish'); blobClose(); return; }
-    // Re-read the textarea instead of trusting BLOB.blob.parsed, which is only
-    // what the file picker produced BEFORE any live edits. The box is editable
-    // on purpose, so what is on screen is what gets written.
-    const m = blobModal();
-    const edited = parseBlobText(m.querySelector('#blobArea').value, conv.id);
-    if (edited.error) {
-      // Keep the modal open: the point is to let the user fix the JSON in place.
-      blobMsg(m, edited.error);
-      expStatus('Import rejected - ' + edited.error);
-      return;
-    }
-    const before = (conv.messages || []).length;
-    // Option 1: the file lands IN the open room and the room keeps its own id.
-    // Honouring the file's id would make the store read the difference as a
-    // rename - saveConversation() writes the new folder and deletes the old one.
-    // The current room is the base so a file with no title/status is still valid.
-    const next = Object.assign({}, conv, edited.value, { id: conv.id });
-    pushUndo(conv.id, snapshotOf(conv));         // seeded before the write lands
-    try {
-      await apiSave(conv.id, next);
-      await refreshConversations();
-      renderExplorer();
-      expStatus('Imported ' + next.messages.length + ' lines (was ' + before + ')');
-      blobClose();
-    } catch (err) {
-      expStatus('Import rejected - ' + (err && err.message ? err.message : String(err)));
-    }
-  }
-
-  // Keep the "N -> M lines" note honest while the JSON is being edited.
-  function blobLiveCount() {
-    if (!BLOB || BLOB.mode !== 'import') return;
-    const m = document.getElementById('blobModal');
-    const parsed = parseBlobText(m.querySelector('#blobArea').value, BLOB.blob.convId);
-    if (parsed.error) { blobMsg(m, parsed.error); return; }
-    blobMsg(m, BLOB.blob.baseCount + ' -> ' + parsed.value.messages.length + ' lines'
-      + (parsed.differs ? ' - file says ' + parsed.value.id + ', keeping ' + BLOB.blob.convId : ''));
-  }
-
-  async function createConversationFromEditor() {
-    const seed = { title: 'New Conversation', status: 'Online', restricted: false, messages: [] };
-    let id = null;
-    try { const r = await apiCreate(seed); id = r && r.id; }
-    catch (err) { /* no server - fall through to a browser-only room */ }
-    if (!id) {
-      id = 'CONV-' + String(conversations.length + 1).padStart(3, '0');
-      conversations.push({
-        id: id, title: seed.title, status: seed.status, restricted: false,
-        messages: [{ type: 'divider', label: seed.title }]
-      });
-      expStatus('Added (browser only)');
-    } else {
-      await refreshConversations();
-      expStatus('Conversation created');
-    }
-    Explorer.view = 'folder';
-    Explorer.convId = id;
-    const i = conversations.findIndex((c) => c.id === id);
-    if (i >= 0) { currentIndex = i; openConversation(i); }
-    renderSidebar();
-    renderExplorer();
-  }
-
-  async function deleteConversationFromEditor(conv) {
-    if (!confirm('Delete "' + (conv.title || conv.id) + '" and all of its messages?')) return;
-    try {
-      await apiDeleteConversation(conv.id);
-    } catch (err) {
-      if (err && err.rejected) { alert(err.message); return; }
-    }
-    const at = conversations.indexOf(conv);
-    if (at >= 0) conversations.splice(at, 1);
-    currentIndex = Math.max(0, Math.min(currentIndex, conversations.length - 1));
-    Explorer.view = 'root';
-    Explorer.convId = null;
-    renderSidebar();
-    renderRoster();          // unlocking may reveal rooms that were gated out
+  async function deleteConversation() {
+    const c = conversations[currentIndex];
+    if (!c) return;
+    if (!confirm(`Delete "${c.title}"?`)) return;
+    conversations.splice(currentIndex, 1);
+    currentIndex = Math.max(0, currentIndex - 1);
     if (conversations.length) {
       openConversation(currentIndex);
     } else {
@@ -1789,109 +995,21 @@ let DATA_DETAIL = '';
       timeline = [];
       msgNodes = [];
     }
-    renderExplorer();
+    let wrote = 'offline';
+    try { wrote = await persistConversations(); }
+    catch (err) { alert('Delete failed: ' + err.message); }
+    flashBtn('ed-delete', wrote === 'written' ? 'Deleted' : 'Deleted (browser only)');
   }
 
-  // ── DIALOGUE API ──
-  // Where the dialogue store lives, resolved by probing rather than guessing.
-  // The page is frequently previewed by a static live-reload host (VS Code Live
-  // Server on :5500) that cannot serve /api/*, so we fall through to the Node
-  // server. The first candidate that answers is latched for the session; a
-  // latched backend that later dies is re-probed once, so a restart on another
-  // port recovers. ?backend=http://host:port overrides the list (phones, or a
-  // custom PORT).
-  function backendCandidates() {
-    const list = BACKEND_CANDIDATES.slice();
-    let override = null;
-    try { override = new URLSearchParams(window.location.search).get('backend'); }
-    catch (e) { /* no search available */ }
-    if (override) list.unshift(override.replace(/\/+$/, '') + '/api/dialogue');
-    return list;
-  }
-
-  // A network failure or a "no such route" status means "this host is not the
-  // backend", not "give up" - so walk the candidates and latch the first that
-  // answers. Both the read path and the editor's writes go through here.
-  async function dialogueFetch(suffix, opts) {
-    const routeless = (r) => r.status === 404 || r.status === 405 || r.status === 501;
-    if (DIALOGUE_BASE) {
-      try {
-        const res = await fetch(DIALOGUE_BASE + suffix, opts);
-        if (!routeless(res)) return res;
-      } catch (e) { /* fell through to a full re-probe */ }
-      DIALOGUE_BASE = null;
-    }
-    const list = backendCandidates();
-    let lastErr = null;
-    for (let i = 0; i < list.length; i++) {
-      try {
-        const res = await fetch(list[i] + suffix, opts);
-        if (!routeless(res)) { DIALOGUE_BASE = list[i]; return res; }
-        lastErr = new Error('HTTP ' + res.status);
-      } catch (err) { lastErr = err; }
-    }
-    DIALOGUE_BASE = null;
-    throw lastErr || new Error('no backend answered');
-  }
-
-  async function apiSend(method, suffix, body) {
-    const opts = { method: method, headers: {} };
-    if (body !== undefined) {
-      opts.headers['Content-Type'] = 'application/json';
-      opts.body = JSON.stringify(body);
-    }
-    const res = await dialogueFetch(suffix, opts);
-    if (!res.ok) {
-      // surface the store's own reason rather than a bare status code, so a
-      // rejected change never masquerades as a silent success
-      let detail = '';
-      try { const j = await res.json(); if (j && j.error) detail = ': ' + j.error; }
-      catch (e) { /* non-JSON body - keep just the status */ }
-      throw Object.assign(new Error('server rejected the change (' + res.status + ')' + detail), { rejected: true });
-    }
-    return res.json().catch(() => ({}));
-  }
-
-  function apiCreate(conv) { return apiSend('POST', '', conv); }
-  function apiSave(id, conv) { return apiSend('PUT', '/' + encodeURIComponent(id), conv); }
-  function apiDeleteConversation(id) { return apiSend('DELETE', '/' + encodeURIComponent(id)); }
-
-  // The placeholder for a divider's card line mirrors the rendered board caption.
-  function dividerHint(conv) {
-    const room = ((conv || conversations[currentIndex]) || {}).title || '';
-    return "SYSTEM has set the room: '" + room + "' to sleep";
-  }
-
-  // ── BOOT ──
-  initDesktop();
-
-  // Persistent diagnostic line: proves this script ran, how many windows the
-  // manager owns, the measured layer, and which read answered. The read is
-  // async, so noteStore() repeats all of this once it lands.
-  function updateBootLine() {
-    const el = document.getElementById('wmBoot');
-    if (!el || !WM.layer) return;
-    const box = WM.bounds();
-    el.textContent = 'WM ready · ' + WM.list().length + ' window(s) · layer ' + box.w + 'x' + box.h
-      + ' · store: ' + DATA_SOURCE
-      + ' · backend: ' + (DIALOGUE_BASE || 'none')
-      + (DATA_SOURCE === 'api' ? '' : '  (' + (DATA_DETAIL || 'fallback') + ')');
-    el.classList.toggle('is-warn', DATA_SOURCE !== 'api');
-  }
-
-  function noteStore() {
-    updateBootLine();
-    // The verdict flips from "not read yet" to "api" once the read lands, so it
-    // owns a slot that clears itself; the fatal banner above never auto-clears.
-    const el = document.getElementById('wmStoreWarn');
-    if (!el) return;
-    if (DATA_SOURCE === 'api') { el.hidden = true; el.textContent = ''; return; }
-    el.hidden = false;
-    el.textContent = DATA_SOURCE === 'none'
-      ? 'No /api/dialogue and no legacy file on ' + (window.location.origin || 'file://')
-        + ' - serve the page from the Node server: http://localhost:4173/'
-      : 'Serving the legacy flat file (' + (DATA_DETAIL || 'fallback') + ')'
-        + ' - restart the Node server for /api/dialogue';
+  function exportConversations() {
+    if (!conversations.length) return;
+    const blob = new Blob([JSON.stringify(conversations, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'conversations.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    flashBtn('ed-export', 'Exported!');
   }
 
   noteStore();
@@ -1914,12 +1032,6 @@ let DATA_DETAIL = '';
       i = firstVisibleIndex();
     }
     openConversation(i);
-    // The explorer hides gated folders too, and a composer for a room that just
-    // locked must not stay open.
-    if (WM.isOpen('editor')) {
-      renderExplorer();
-      if (!visibleConversations().some((c) => c.id === Explorer.convId)) WM.close(WM.wins.get('editor'));
-    }
   });
 
 </script>
