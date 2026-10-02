@@ -135,6 +135,10 @@
   }
 
   function syncPanelState() {
+    // Nothing to sync until the panel exists on first use. A copy of this script
+    // running inside the OS shell's iframe never opens the panel, but it still
+    // receives the cross-frame storage event that calls this.
+    if (!panel || !inputField) return;
     inputField.hidden = unlocked;
     unlockBtn.hidden = unlocked;
     relockBtn.hidden = !unlocked;
@@ -335,6 +339,21 @@
 
   // Load persisted settings (backed by the gate route in server.js when served).
   loadConfig();
+
+  // ── CROSS-FRAME SYNC ──
+  // The OS shell hosts the Conversation Pit in an iframe, and each document runs
+  // its own copy of this script, so 'unlocked' is per-document. The storage event
+  // fires in every OTHER same-origin browsing context when localStorage changes,
+  // which is the channel that crosses the frame boundary - our own 'eho:gatechange'
+  // does not. Without this the frame stays locked until it reloads.
+  window.addEventListener('storage', function (ev) {
+    if (ev.key !== STORAGE_KEY) return;
+    var next = ev.newValue === '1';
+    if (next === unlocked) return;
+    unlocked = next;
+    syncPanelState();
+    fireChange();
+  });
 
   // Only isUnlocked is consumed by the pages (both call sites are guarded-entry
   // checks). open/lock/tryUnlock/saveConfig stay wired to their own panel

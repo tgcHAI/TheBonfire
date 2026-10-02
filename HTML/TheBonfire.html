@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../CSS/TheBonfire.css">
   <script src="../js/gate.js"></script>
+  <script src="../js/wm.js"></script>
 </head>
 <body>
 
@@ -20,12 +21,9 @@
     <div class="topbar-logo"></div>
     <span class="topbar-title">Bonfire.exe</span>
     <nav class="topbar-nav" aria-label="Sections">
-      <a class="topbar-nav-item active" href="TheBonfire.html" aria-current="page" title="Files — the lore archive" aria-label="Files">
-        <span class="nav-ico nav-ico-files" aria-hidden="true"></span>
-      </a>
-      <a class="topbar-nav-item" href="ConversationPit.html" title="Conversation Pit" aria-label="Conversation Pit">
-        <span class="nav-ico nav-ico-conversations" aria-hidden="true"></span>
-      </a>
+      <!-- Files and the Conversation Pit are desktop icons now, not page links:
+           this shell owns the window layer, so navigating away would be a step
+           backwards. The remaining slots are apps that do not exist yet. -->
       <span class="topbar-nav-item is-soon" role="link" aria-disabled="true" title="Personnel — coming soon" aria-label="Personnel — coming soon">
         <span class="nav-ico nav-ico-personnel" aria-hidden="true"></span>
       </span>
@@ -34,11 +32,25 @@
       </span>
     </nav>
     <span class="topbar-sub">Eternal Hearthlight Office — Lore Archive</span>
-    <button class="editor-toggle" onclick="toggleEditor()" title="Open Entry Editor" aria-label="Open the entry editor" aria-expanded="false">&#9998;</button>
+    <button class="editor-toggle" onclick="openAdmin()" title="Open Admin.exe" aria-label="Open the administration tools" aria-expanded="false">&#9998;</button>
   </header>
 
-  <!-- EDITOR DROPDOWN -->
-  <div class="editor-panel" id="editorPanel">
+  <!-- ADMIN WINDOW (adopted into the window layer at boot, so it is written here
+       and WM.adopt() relocates it). It holds the entry editor plus a launcher for
+       the conversation editor, which lives inside the framed Conversation Pit and
+       cannot be moved into this document. The entry editor used to be a
+       full-width dropdown hanging off the topbar, which no longer suits a desktop. -->
+  <section class="pwin" id="win-admin" role="dialog" aria-label="Admin.exe">
+    <div class="pwin-bar" data-wm-drag>
+      <span class="pwin-ico pwin-ico-admin" aria-hidden="true"></span>
+      <span class="pwin-title">Admin.exe</span>
+      <span class="pwin-btns">
+        <button type="button" class="pwin-btn" data-wm-act="min" title="Minimize" aria-label="Minimize the window">_</button>
+        <button type="button" class="pwin-btn" data-wm-act="max" title="Maximize" aria-label="Maximize the window">&#9633;</button>
+        <button type="button" class="pwin-btn" data-wm-act="close" title="Close" aria-label="Close the window">&#215;</button>
+      </span>
+    </div>
+    <div class="pwin-body admin-body">
     <div class="editor-inner">
       <div class="editor-heading">
         <span>Entry Editor</span>
@@ -94,34 +106,99 @@
         </div>
       </div>
     </div>
-  </div>
+
+      <!-- The conversation editor is a window inside the framed Conversation Pit,
+           not in this document, so it is reached through that frame rather than
+           by embedding a second copy of the app. -->
+      <div class="admin-launch">
+        <div class="editor-heading">
+          <span>Conversation Editor</span>
+          <div class="editor-actions">
+            <button class="ed-btn" type="button" onclick="openConvEditor()">Open</button>
+          </div>
+        </div>
+        <p class="admin-hint">Opens in the Conversation Pit window, which starts if it is closed.</p>
+      </div>
+    </div>
+  </section>
 
   <div class="body">
 
-    <!-- SIDEBAR -->
-    <nav class="sidebar" id="sidebar">
-      <div class="sidebar-label">Entries</div>
-      <!-- populated by JS -->
-    </nav>
-
-    <!-- MAIN -->
-    <main class="main" id="main">
-      <div class="entry-header" id="entryHeader">
-        <!-- populated by JS -->
+    <!-- DESKTOP SURFACE (wallpaper + app icons; the window layer sits above) -->
+    <main class="main" id="main" aria-label="Desktop surface">
+      <div class="desk-icons" id="deskIcons" aria-label="Desktop icons">
+        <button type="button" class="desk-ico" data-wm-open="files" title="Open the lore archive">
+          <span class="desk-ico-img desk-ico-files" aria-hidden="true"></span>
+          <span class="desk-ico-label">Files</span>
+        </button>
+        <button type="button" class="desk-ico" data-wm-open="chat" title="Open the Conversation Pit">
+          <span class="desk-ico-img desk-ico-chat" aria-hidden="true"></span>
+          <span class="desk-ico-label">Conversation Pit</span>
+        </button>
       </div>
-      <div class="entry-box-wrap">
-        <div class="entry-box" id="entryBox">
-          <!-- populated by JS -->
-        </div>
-        <button type="button" class="entry-skip-btn" id="skipBtn" onclick="skipEntryDecode()" aria-label="Skip: unscramble this entry now">Skip &#10095;</button>
+
+      <!-- Bottom-right corner of the surface: the administration tools, kept
+           apart from the two reading apps that sit top-left. -->
+      <div class="desk-corner" id="deskCorner">
+        <button type="button" class="desk-ico" data-wm-open="admin" title="Open Admin.exe">
+          <span class="desk-ico-img desk-ico-admin" aria-hidden="true"></span>
+          <span class="desk-ico-label">Admin.exe</span>
+        </button>
       </div>
     </main>
 
   </div>
 
-  <!-- MOBILE: collapse/expand the entry list (hidden on desktop) -->
-  <button id="sidebarToggle" class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Hide the entry list" aria-expanded="true" aria-controls="sidebar">&#10094;</button>
-  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <!-- DESKTOP WINDOW LAYER (pseudo-window host). Pointer-transparent so the
+       desktop icons underneath stay clickable; windows opt back in. -->
+  <div class="desktop" id="desktop">
+
+    <!-- FILES WINDOW: adopted rather than rebuilt, so the decode engine keeps
+         its live references to #entryBox and the scroll/auto-follow state. -->
+    <section class="pwin" id="win-files" role="dialog" aria-label="Files">
+      <div class="pwin-bar" data-wm-drag>
+        <span class="pwin-ico pwin-ico-files" aria-hidden="true"></span>
+        <span class="pwin-title">Files</span>
+        <span class="pwin-btns">
+          <button type="button" class="pwin-btn" data-wm-act="min" title="Minimize" aria-label="Minimize the window">_</button>
+          <button type="button" class="pwin-btn" data-wm-act="max" title="Maximize" aria-label="Maximize the window">&#9633;</button>
+          <button type="button" class="pwin-btn" data-wm-act="close" title="Close" aria-label="Close the window">&#215;</button>
+        </span>
+      </div>
+
+      <div class="pwin-body files-body">
+        <nav class="sidebar" id="sidebar" aria-label="Entries">
+          <div class="sidebar-label">Entries</div>
+          <!-- populated by JS -->
+        </nav>
+
+        <div class="files-main">
+          <div class="entry-header" id="entryHeader">
+            <!-- populated by JS -->
+          </div>
+          <div class="entry-box-wrap">
+            <div class="entry-box" id="entryBox">
+              <!-- populated by JS -->
+            </div>
+            <button type="button" class="entry-skip-btn" id="skipBtn" onclick="skipEntryDecode()" aria-label="Skip: unscramble this entry now">Skip &#10095;</button>
+          </div>
+        </div>
+
+        <!-- MOBILE: collapse/expand the entry list. Lives inside this window so
+             it cannot escape onto the desktop surface. -->
+        <button id="sidebarToggle" class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Hide the entry list" aria-expanded="true" aria-controls="sidebar">&#10094;</button>
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+      </div>
+    </section>
+
+    <div class="wm-alert" id="wmAlert" role="alert" hidden></div>
+
+    <!-- TRANSIENT STATUS (last window action) -->
+    <span class="wm-status" id="wmStatus" role="status" aria-live="polite"></span>
+
+    <!-- TASKBAR: a chip per open window -->
+    <div class="wm-taskbar" id="wmTaskbar" role="toolbar" aria-label="Open windows"></div>
+  </div>
 </div>
 
 <script>
@@ -389,17 +466,34 @@
     renderEntry(index);
     // On phones the drawer overlays the text — dismiss it once an entry is picked.
     if (isMobile() && !document.body.classList.contains('sidebar-collapsed')) setSidebar(false);
-    // keep the editor form aligned with the entry being viewed when the panel
-    // is open (otherwise the form and editingIndex can silently point at another entry**
-    if (document.getElementById('editorPanel').classList.contains('open')) loadEditorFields(index);
+    // keep the editor form aligned with the entry being viewed when the admin
+    // window is open (otherwise the form and editingIndex can silently point at
+    // another entry)
+    if (typeof WM !== 'undefined' && WM.isOpen('admin')) loadEditorFields(index);
   }
 
-  // ── EDITOR TOGGLE ──
-  function toggleEditor() {
-    const panel = document.getElementById('editorPanel');
-    const open = panel.classList.toggle('open');
-    document.querySelector('.editor-toggle').setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) loadEditorFields(currentIndex);
+  // ── EDITOR LAUNCHERS ──
+  // Both entry points reach the same window: the topbar pencil and the Admin.exe
+  // icon are two doors to one room.
+  function openAdmin() {
+    const win = WM.open('admin');
+    if (win) loadEditorFields(currentIndex);
+  }
+
+  // The conversation editor is a window inside the framed Conversation Pit, so
+  // opening it means reaching through that frame. Shared by the Admin window and
+  // the Conversation Pit's own window bar.
+  function openConvEditor() {
+    const win = WM.open('chat');            // opens or refocuses, and builds the frame
+    if (!win || !win.frame) {
+      wmStatus('the Conversation Pit window is still loading', true);
+      return;
+    }
+    try {
+      win.frame.contentWindow.BonfireApp.toggleEditor();
+    } catch (err) {
+      wmStatus('the editor is not ready in that window yet', true);
+    }
   }
 
   // MOBILE SIDEBAR DRAWER
@@ -567,8 +661,86 @@
     renderEntry(currentIndex);
   });
 
+  // ── OS SHELL BOOT ──
+  // This page is the desktop: the reader lives in the Files window and the
+  // Conversation Pit runs inside a frame in the Conversation Pit window. Both
+  // are opened from the icons on the surface, so there is no page navigation.
+  function initShell() {
+    if (!WM.init()) return;
+    WM.on('change', () => {
+      renderTaskbar();
+      const toggle = document.querySelector('.editor-toggle');
+      if (toggle) toggle.setAttribute('aria-expanded', WM.isOpen('admin') ? 'true' : 'false');
+    });
+
+    // Adopted, not rebuilt: the decode engine holds a live reference to
+    // #entryBox and to its scroll state, so the nodes must not be recreated.
+    const files = document.getElementById('win-files');
+    if (files) {
+      WM.adopt(files, {
+        appId: 'files',
+        title: 'Files',
+        icon: '../mats/icons/Files_icon.png',
+        width: 900, height: 640, minW: 340, minH: 260
+      });
+    }
+
+    // Admin.exe is adopted too, then closed: an app should not be on screen
+    // until it is opened, and the desktop icon is the way in.
+    const admin = document.getElementById('win-admin');
+    if (admin) {
+      const win = WM.adopt(admin, {
+        appId: 'admin',
+        title: 'Admin.exe',
+        icon: '../mats/icons/Personnel_icon.png',
+        width: 760, height: 620, minW: 340, minH: 260
+      });
+      if (win) WM.close(win);
+    }
+
+    WM.register('chat', {
+      appId: 'chat',
+      title: 'Conversation Pit',
+      icon: '../mats/icons/Conversations_icon.png',
+      iconClass: 'pwin-ico-chat',
+      width: 900, height: 640, minW: 340, minH: 260,
+      build: function (win, body) {
+        const frame = document.createElement('iframe');
+        frame.className = 'app-frame';
+        frame.title = 'Conversation Pit';
+        frame.src = 'ConversationPit.html';
+        body.appendChild(frame);
+        win.frame = frame;
+        // Clicking into the frame does not bubble to this document, so the
+        // window would never come forward on its own.
+        frame.addEventListener('focus', () => WM.focus(win));
+
+        // In embed mode the frame hides its own topbar, which carried the
+        // pencil that opens the Conversation Editor. The shell offers it here
+        // instead. Same-origin, so this call is direct, not postMessage.
+        const btns = win.el.querySelector('.pwin-btns');
+        if (btns) {
+          const edit = document.createElement('button');
+          edit.type = 'button';
+          edit.className = 'pwin-btn';
+          edit.title = 'Conversation Editor';
+          edit.setAttribute('aria-label', 'Open the conversation editor');
+          edit.textContent = '✎';
+          edit.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openConvEditor();
+          });
+          btns.insertBefore(edit, btns.firstChild);
+        }
+      }
+    });
+
+    renderTaskbar();
+  }
+
   trackEntryScrollActivity();
   loadEntries();
+  initShell();
 </script>
 
 </body>

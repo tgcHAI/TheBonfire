@@ -299,9 +299,12 @@ body::before {
 .entry-box {
     height: 100%;
     overflow-y: auto;
-    /* wheel-picker breathing room: viewport-relative so first/last lines
-       sit near the vertical centre regardless of the box width */
-    padding: 40vh 24px;
+    /* wheel-picker breathing room so the first/last lines sit near the vertical
+       centre of the reading area. This was 40vh when the box filled the viewport;
+       the box now lives inside a resizable window, where a viewport-relative
+       padding would swallow most of a short window. Rems scale with the font
+       instead, so the effect holds whatever size the window is dragged to. */
+    padding: 7rem 1.5rem;
     background: var(--panel-raised);
     border: 1px solid var(--border-dim);
     border-radius: 12px;
@@ -891,13 +894,16 @@ body { -webkit-tap-highlight-color: transparent; }
     .chat-area { padding: 12px 10px; }
     .chat-bubble { max-width: 100%; }
 
-    /* sidebar slides over the content as a drawer */
+    /* sidebar slides over the content as a drawer. It now lives inside the
+       Files window, so it is positioned against .files-body rather than the
+       viewport - a fixed drawer would escape the window and float over the
+       desktop surface. */
     .sidebar {
-        position: fixed;
-        top: 48px;
+        position: absolute;
+        top: 0;
         bottom: 0;
         left: 0;
-        width: min(300px, 85vw);
+        width: min(300px, 85%);
         z-index: 60;
         padding-top: 12px;
         box-shadow: 2px 0 18px rgba(0,0,0,0.55);
@@ -912,8 +918,8 @@ body { -webkit-tap-highlight-color: transparent; }
     /* dimmed backdrop; tapping it closes the drawer */
     .sidebar-backdrop {
         display: block;
-        position: fixed;
-        top: 48px;
+        position: absolute;
+        top: 0;
         left: 0;
         right: 0;
         bottom: 0;
@@ -932,9 +938,9 @@ body { -webkit-tap-highlight-color: transparent; }
         display: flex;
         align-items: center;
         justify-content: center;
-        position: fixed;
+        position: absolute;
         top: 50%;
-        left: calc(min(300px, 85vw) - 22px);
+        left: calc(min(300px, 85%) - 22px);
         transform: translate(0, -50%);
         width: 44px;
         height: 44px;
@@ -950,7 +956,7 @@ body { -webkit-tap-highlight-color: transparent; }
         transition: transform 0.25s ease, color 0.15s;
     }
     body.sidebar-collapsed .sidebar-toggle {
-        transform: translate(calc(22px - min(300px, 85vw)), -50%);
+        transform: translate(calc(22px - min(300px, 85%)), -50%);
     }
     .sidebar-toggle:hover { color: var(--ember); }
 
@@ -997,7 +1003,7 @@ body { -webkit-tap-highlight-color: transparent; }
 
 /* landscape phones: keep the reading line in view */
 @media (max-height: 480px) {
-    .entry-box { padding: 12vh 16px; }
+    .entry-box { padding: 2.5rem 1.25rem; }
     .main { padding: 10px 14px; }
 }
 
@@ -1082,9 +1088,84 @@ body { -webkit-tap-highlight-color: transparent; }
     filter: brightness(0.85) sepia(0.95) saturate(2.3); transition: filter 0.15s;
 }
 .desk-ico:hover .desk-ico-img { filter: brightness(1.05) sepia(1) saturate(2.7) drop-shadow(0 0 6px rgba(196,127,23,0.5)); }
+.desk-ico-files { background-image: url('../mats/icons/Files_icon.png'); }
 .desk-ico-chat { background-image: url('../mats/icons/Conversations_icon.png'); }
+.desk-ico-admin { background-image: url('../mats/icons/Personnel_icon.png'); }
 .desk-ico-editor { background-image: url('../mats/icons/CONV.png'); }
 .desk-ico-label { text-align: center; }
+
+/* ── EMBEDDED APP MODE ──
+   ConversationPit.html detects it is framed and drops its own desktop chrome:
+   the OS shell (TheBonfire.html) supplies the topbar, the gate trigger and the
+   outer window layer, so a second set inside the frame would be stacked bars.
+   The taskbar and alert banner stay - the frame still owns the chat and editor
+   windows, and something has to report a failed boot. */
+.is-embedded .topbar,
+.is-embedded .body,
+.is-embedded .skip-link { display: none; }
+.is-embedded .desktop { inset: 0; }
+/* The shell drives the editor from its own window bar; without a drawer there
+   is nothing for this toggle to collapse. */
+.is-embedded .sidebar-toggle,
+.is-embedded .sidebar-backdrop { display: none; }
+
+/* ── OS SHELL ──
+   TheBonfire.html is the desktop. The reader runs inside the adopted Files
+   window, so .files-body takes over the old .body grid role: drawer + reader in
+   a row, with position:relative because the mobile drawer is now anchored here
+   instead of the viewport. */
+.body { grid-template-columns: 1fr; }
+.files-body {
+    display: flex;
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+}
+.files-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 14px 16px;
+}
+/* The frame is the whole window body: no padding, no border, no scrollbars. */
+.app-frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: var(--bg);
+}
+
+/* Admin.exe lives in the bottom-right corner of the surface, away from the two
+   reading apps top-left. Positioned against .main rather than joined to the icon
+   strip, so it stays put as the strip wraps. */
+.main { position: relative; }
+.desk-corner {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* The entry editor was authored as a full-width dropdown; inside a window body
+   its own generous padding would double up with .pwin-body's. */
+.admin-body .editor-inner { padding: 2px 2px 14px; }
+.admin-launch {
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-dim);
+}
+.admin-launch .editor-heading { margin-bottom: 6px; }
+.admin-hint {
+    margin: 0;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+}
 
 /* pseudo-window */
 .pwin {
@@ -1116,7 +1197,9 @@ body { -webkit-tap-highlight-color: transparent; }
     background-repeat: no-repeat; background-position: center; background-size: 16px 16px;
     filter: brightness(0.85) sepia(0.95) saturate(2.3);
 }
+.pwin-ico-files { background-image: url('../mats/icons/Files_icon.png'); }
 .pwin-ico-chat { background-image: url('../mats/icons/Conversations_icon.png'); }
+.pwin-ico-admin { background-image: url('../mats/icons/Personnel_icon.png'); }
 .pwin-ico-editor { background-image: url('../mats/icons/CONV.png'); }
 .pwin-title {
     font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-dim);
