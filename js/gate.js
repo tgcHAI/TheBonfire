@@ -81,8 +81,144 @@
       if (ev.key === 'Enter') { ev.preventDefault(); tryUnlock(inputEl.value); }
       if (ev.key === 'Escape') close();
     });
-    document.addEventListener('keydown', function (ev) {
-      if (ev.key === 'Escape' && panel && panel.classList.contains('open')) close();
+  }
+
+  // Re-apply the current settings strings to the unlock view. Runs on panel
+  // build, when a late-config fetch resolves, and after a save keeps the next
+  // panel open current without touching the rest of the DOM.
+  function syncPanelText() {
+    if (!panel) return;
+    var titleEl = panel.querySelector('#gateTitle');
+    if (titleEl) titleEl.textContent = config.title;
+    if (inputEl) inputEl.placeholder = config.placeholder;
+    if (hintEl) hintEl.textContent = unlocked ? config.hintOpen : config.hintLocked;
+    if (errorEl) errorEl.textContent = config.error;
+  }
+
+  function syncPanelState() {
+    inputField.hidden = unlocked;
+    unlockBtn.hidden = unlocked;
+    relockBtn.hidden = !unlocked;
+    hintEl.hidden = false;
+    errorEl.hidden = true;
+    inputEl.value = '';
+  }
+
+  // Edit mode: the dropdown swaps to the settings form. Field values are set as
+  // element properties (never interpolated into markup), so labels containing
+  // quotes or angle brackets cannot break the panel.
+  function showEditView() {
+    panel.innerHTML =
+      '<div class="editor-inner">' +
+        '<div class="editor-heading">' +
+          '<span id="gateTitle">Gate Panel Editor</span>' +
+          '<div class="editor-actions">' +
+            '<button class="ed-btn" id="gateEditCancel" type="button">Cancel</button>' +
+            '<button class="ed-btn ed-save" id="gateSave" type="button">Save</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="editor-fields">' +
+          '<div class="ed-row">' +
+            '<div class="ed-field">' +
+              '<label for="gateCode">Access code</label>' +
+              '<input type="text" id="gateCode" autocomplete="off" spellcheck="false">' +
+            '</div>' +
+            '<div class="ed-field">' +
+              '<label for="gatePanelTitle">Panel title</label>' +
+              '<input type="text" id="gatePanelTitle">' +
+            '</div>' +
+          '</div>' +
+          '<div class="ed-row">' +
+            '<div class="ed-field">' +
+              '<label for="gateHintLocked">Hint — archive locked</label>' +
+              '<input type="text" id="gateHintLocked">' +
+            '</div>' +
+            '<div class="ed-field">' +
+              '<label for="gateHintOpen">Hint — archive open</label>' +
+              '<input type="text" id="gateHintOpen">' +
+            '</div>' +
+          '</div>' +
+          '<div class="ed-row">' +
+            '<div class="ed-field">' +
+              '<label for="gatePlaceholder">Code field placeholder</label>' +
+              '<input type="text" id="gatePlaceholder">' +
+            '</div>' +
+            '<div class="ed-field">' +
+              '<label for="gateError">Wrong-code message</label>' +
+              '<input type="text" id="gateError">' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    panel.querySelector('#gateCode').value = config.code;
+    panel.querySelector('#gatePanelTitle').value = config.title;
+    panel.querySelector('#gateHintLocked').value = config.hintLocked;
+    panel.querySelector('#gateHintOpen').value = config.hintOpen;
+    panel.querySelector('#gatePlaceholder').value = config.placeholder;
+    panel.querySelector('#gateError').value = config.error;
+
+    panel.querySelector('#gateEditCancel').addEventListener('click', function () {
+      showUnlockView();
+      syncPanelState();
+    });
+    panel.querySelector('#gateSave').addEventListener('click', saveConfigFromPanel);
+    panel.querySelector('#gateCode').addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter') { ev.preventDefault(); saveConfigFromPanel(); }
+      if (ev.key === 'Escape') close();
+    });
+  }
+
+  function flashEditorBtn(text) {
+    var btn = panel.querySelector('#gateSave');
+    if (!btn) return;
+    var orig = btn.textContent;
+    btn.textContent = text;
+    btn.style.color = 'var(--ember-bright)';
+    setTimeout(function () {
+      btn.textContent = orig;
+      btn.style.color = '';
+    }, 1800);
+  }
+
+  function persistConfig(done) {
+    try {
+      fetch('../api/gate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+      }).then(function (res) {
+        done(res.ok);
+      }).catch(function () {
+        done(false); // browser-only save: the change stays in memory until served
+      });
+    } catch (e) {
+      done(false);
+    }
+  }
+
+  // Programmatic save (also used by the panel); merges over the current config
+  // and persists atomically on the server. `done` receives true on success.
+  function saveConfig(next, done) {
+    config = Object.assign({}, DEFAULTS, config, next || {});
+    persistConfig(function (ok) {
+      if (done) done(ok);
+    });
+  }
+
+  function saveConfigFromPanel() {
+    var next = {
+      code: panel.querySelector('#gateCode').value.trim(),
+      title: panel.querySelector('#gatePanelTitle').value.trim(),
+      hintLocked: panel.querySelector('#gateHintLocked').value.trim(),
+      hintOpen: panel.querySelector('#gateHintOpen').value.trim(),
+      placeholder: panel.querySelector('#gatePlaceholder').value.trim(),
+      error: panel.querySelector('#gateError').value.trim()
+    };
+    if (!next.code) { flashEditorBtn('Code required'); return; }
+    saveConfig(next, function (ok) {
+      flashEditorBtn(ok ? 'Saved!' : 'Saved (browser only)');
+      if (ok) setTimeout(close, 450);
     });
   }
 
@@ -163,6 +299,9 @@
   } else {
     wireLogo();
   }
+
+  // Load persisted settings (backed by the gate route in server.js when served).
+  loadConfig();
 
   // Only isUnlocked is consumed by the pages (both call sites are guarded-entry
   // checks). open/lock/tryUnlock/saveConfig stay wired to their own panel
