@@ -369,41 +369,6 @@ body::before {
     100% { opacity: 0.85; }
 }
 
-.entry-content {
-    font-size: 13px;
-    line-height: 1.85;
-    color: var(--text);
-    max-width: 68ch;
-}
-
-.entry-content p {
-    margin-bottom: 1.2em;
-}
-
-.entry-content p:first-child {
-    margin-top: 32px;
-}
-
-.entry-content p:last-child {
-    margin-bottom: 32px;
-}
-
-.entry-content .drop {
-    font-size: 28px;
-    font-weight: 700;
-    float: left;
-    line-height: 1;
-    margin-right: 4px;
-    color: var(--ember);
-    text-shadow: 0 0 12px rgba(196,127,23,0.5);
-}
-
-/* hidden entries */
-.entry-content { display: none; }
-.entry-content.active { display: block; }
-.entry-header-data { display: none; }
-.entry-header-data.active { display: block; }
-
 /* ── EDITOR TOGGLE BUTTON ── */
 .editor-toggle {
     margin-left: auto;
@@ -559,175 +524,6 @@ body::before {
     border-color: var(--ember);
 }
 
-/* ── CONVERSATION EDITOR MESSAGE LIST ── */
-/* The Pit's editor panel is taller than the Files one, and its message rows
-   flex-wrap so kind/name/time/delay/text/actions degrade gracefully on phones. */
-.conv-panel.open { max-height: 560px; }
-.conv-msg-list {
-    background: var(--panel-raised);
-    border: 1px solid var(--border-dim);
-    border-radius: 6px;
-    max-height: 220px;
-    overflow-y: auto;
-    padding: 6px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-.conv-msg-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    align-items: center;
-}
-.conv-msg-row input[type="text"],
-.conv-msg-row input[type="number"],
-.conv-msg-row select.conv-msg-kind {
-    background: var(--panel);
-    border: 1px solid var(--border-dim);
-    color: var(--text);
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    padding: 3px 6px;
-    min-width: 0;
-}
-.conv-msg-kind { width: 62px; }
-.conv-msg-name { width: 130px; }
-/* Divider rows are pure cards: name, time and delay columns go away entirely */
-.conv-msg-row.is-divider .conv-msg-name,
-.conv-msg-row.is-divider .conv-msg-time,
-.conv-msg-row.is-divider .conv-msg-delay { display: none; }
-.conv-msg-time { width: 58px; }
-.conv-msg-delay { width: 76px; }
-/* the chapter label exists only on divider rows: it names the card in the dropdown */
-.conv-msg-label { width: 190px; }
-.conv-msg-row:not(.is-divider) .conv-msg-label { display: none; }
-/* a divider's card line stays authorable and reads like the bold board caption */
-.conv-msg-row.is-divider .conv-msg-text { font-weight: 700; }
-.conv-msg-text { flex: 1 1 160px; min-width: 130px; }
-.conv-msg-actions { display: flex; gap: 3px; }
-.conv-row-btn { padding: 1px 7px; min-width: 20px; }
-.ed-addmsg { margin-top: 6px; }
-.ed-addmsg + .ed-addmsg { margin-left: 6px; }
-
-/* ── CHATROOM COMPOSER (Conversation Pit editor) ── */
-/* The editor mirrors the chat window: a transcript you read top-down plus a
-   composer that writes the next line (or edits the one you picked). */
-.de-field { margin-top: 2px; }
-
-.de-list {
-    background: var(--panel-raised);
-    border: 1px solid var(--border-dim);
-    border-radius: 6px;
-    max-height: 260px;
-    overflow-y: auto;
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-}
-.de-list::-webkit-scrollbar { width: 4px; }
-.de-list::-webkit-scrollbar-track { background: transparent; }
-.de-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-.de-empty {
-    font-size: 11px;
-    color: var(--text-faint);
-    padding: 8px 4px;
-    letter-spacing: 0.04em;
-}
-
-.de-msg {
-    border: 1px solid var(--border-dim);
-    border-left: 2px solid var(--spk, var(--ember));
-    border-radius: 2px 6px 6px 6px;
-    background: var(--panel);
-    padding: 5px 8px;
-}
-.de-msg-head {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 10.5px;
-    letter-spacing: 0.05em;
-}
-.de-msg-seq { color: var(--text-faint); }
-.de-msg-name { font-weight: 700; color: var(--spk, var(--ember)); }
-.de-msg-time { color: var(--text-faint); }
-.de-msg-delay { color: var(--text-faint); }
-.de-msg-tools { display: flex; gap: 3px; margin-left: auto; }
-.de-row-btn { padding: 0 6px; min-width: 20px; line-height: 1.4; }
-
-.de-msg-body {
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--text);
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    margin-top: 2px;
-}
-
-/* action lines read as centred system events, like the board */
-.de-msg-action { border-left-color: var(--border); background: transparent; }
-.de-msg-action .de-msg-name { color: var(--text-faint); font-weight: 400; font-style: italic; }
-.de-msg-action .de-msg-body { text-align: center; font-style: italic; color: var(--text-faint); font-size: 11px; }
-
-/* dividers are chapter cards: bold, centred, accented */
-.de-msg-divider { border-left-color: var(--ember); background: transparent; }
-.de-msg-divider .de-msg-name { color: var(--ember-bright); text-transform: uppercase; }
-.de-msg-divider .de-msg-body {
-    text-align: center;
-    font-weight: 700;
-    color: var(--ember-bright);
-    letter-spacing: 0.08em;
-}
-
-/* ── COMPOSER BAR ── */
-.de-composer {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin-top: 8px;
-    padding: 8px;
-    border: 1px solid var(--border-dim);
-    border-radius: 6px;
-    background: var(--panel-raised);
-}
-.de-composer-row { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
-.de-composer input,
-.de-composer select {
-    background: var(--panel);
-    border: 1px solid var(--border-dim);
-    color: var(--text);
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    padding: 4px 6px;
-    min-width: 0;
-}
-.de-composer input:disabled { opacity: 0.4; }
-.de-composer input:focus,
-.de-composer select:focus { outline: 1px solid var(--ember); }
-.de-composer-kind { width: 68px; }
-.de-composer-name { width: 130px; }
-.de-composer-time { width: 60px; }
-.de-composer-delay { width: 78px; }
-/* the chapter label exists only on divider rows */
-.de-composer-label { width: 190px; display: none; }
-.de-composer.is-divider .de-composer-label { display: initial; }
-.de-composer-text { flex: 1 1 180px; min-width: 140px; }
-.de-composer-send,
-.de-composer-cancel { flex: 0 0 auto; }
-
-@media (max-width: 820px) {
-    .de-composer-name,
-    .de-composer-time,
-    .de-composer-delay,
-    .de-composer-label { flex: 1 1 100px; width: auto; }
-    .de-list { max-height: 200px; }
-}
-
 /* account for editor panel pushing layout */
 .body {
     transition: margin-top 0.3s;
@@ -755,12 +551,30 @@ body::before {
 }
 
 /* ── FORMATTING ── */
-.entry-content p strong,
+/* The reader injects its markup straight into #entryBox, so these hang off
+   .entry-box. An earlier revision styled a .entry-content wrapper that no longer
+   exists in the markup, which silently killed the drop cap and left every
+   paragraph on browser-default margins. */
+.entry-box p { margin-bottom: 1.2em; }
+.entry-box p:first-child { margin-top: 32px; }
+.entry-box p:last-child { margin-bottom: 32px; }
+
 .entry-box p strong { color: var(--ember-bright); font-weight: 700; }
 
 .entry-box p em { font-style: italic; color: var(--text); opacity: 0.85; }
 
 .entry-box p u { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ember); }
+
+/* drop cap: the opening letter floats into the left margin */
+.entry-box .drop {
+    font-size: 28px;
+    font-weight: 700;
+    float: left;
+    line-height: 1;
+    margin-right: 4px;
+    color: var(--ember);
+    text-shadow: 0 0 12px rgba(196,127,23,0.5);
+}
 
 /* intentional blank line spacer */
 .spacer { height: 1.2em; display: block; }
@@ -1304,7 +1118,6 @@ body { -webkit-tap-highlight-color: transparent; }
 }
 .pwin-ico-chat { background-image: url('../mats/icons/Conversations_icon.png'); }
 .pwin-ico-editor { background-image: url('../mats/icons/CONV.png'); }
-.pwin-ico-inspector { background-image: url('../mats/icons/messages.png'); }
 .pwin-title {
     font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-dim);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -1441,23 +1254,7 @@ body { -webkit-tap-highlight-color: transparent; }
 .exp-meta label { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; color: var(--text-dim); }
 
 .exp-list { display: flex; flex-direction: column; gap: 4px; }
-.exp-row {
-    display: flex; align-items: center; gap: 8px;
-    padding: 5px 7px;
-    border: 1px solid var(--border-dim); border-radius: 4px; background: var(--panel);
-    color: var(--text); font-size: 11px; cursor: pointer;
-    transition: border-color 0.15s, background-color 0.15s;
-}
-.exp-row:hover, .exp-row.is-selected { border-color: var(--ember); background: var(--ember-glow2); }
-.exp-row-ico {
-    width: 14px; height: 14px; flex-shrink: 0;
-    background: url('../mats/icons/messages.png') center / 14px 14px no-repeat;
-    filter: brightness(0.85) sepia(0.95) saturate(2.3);
-}
-.exp-file { flex-shrink: 0; font-size: 10.5px; color: var(--text-faint); }
-.exp-prev { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.exp-acts { display: flex; gap: 3px; flex-shrink: 0; }
-.exp-empty, .exp-hint { padding: 10px 2px; color: var(--text-faint); font-size: 11px; letter-spacing: 0.04em; }
+.exp-empty { padding: 10px 2px; color: var(--text-faint); font-size: 11px; letter-spacing: 0.04em; }
 
 /* backend-down notice: deliberately unlike .exp-empty, so "cannot reach the
    store" never reads as "no conversations yet" */
@@ -1473,15 +1270,56 @@ body { -webkit-tap-highlight-color: transparent; }
     letter-spacing: 0.03em;
 }
 
-/* ── MESSAGE INSPECTOR (composer) ── */
-.insp .de-composer { margin-top: 0; }
-.insp-text {
-    width: 100%; min-height: 84px; resize: vertical;
-    background: var(--panel); border: 1px solid var(--border-dim); color: var(--text);
-    font-family: 'Courier Prime', monospace; font-size: 12px; line-height: 1.6; padding: 6px 8px;
+/* ── INLINE MESSAGE EDITOR ──
+   The folder view is the editor: every message is a row of live controls, so
+   there is no composer window and no derived 0001.json filename on screen. */
+.exp-bar {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    padding: 6px 2px; border-bottom: 1px solid var(--border-dim);
 }
-.insp-text:focus { outline: 1px solid var(--ember); }
-.insp-foot { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+.ex-dirty {
+    margin-left: auto; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ember);
+}
+
+.ex-editor-list { gap: 0; }
+.ex-row {
+    display: grid;
+    grid-template-columns: 16px 68px minmax(60px, 1fr) 62px 66px minmax(60px, 0.9fr) minmax(120px, 2fr) auto auto;
+    align-items: center; gap: 4px;
+    padding: 3px 2px; border-bottom: 1px solid var(--border-dim);
+}
+.ex-row:hover { background: var(--ember-glow2); }
+.ex-row.is-dragging { opacity: 0.45; }
+.ex-row.is-divider { background: rgba(255, 255, 255, 0.03); }
+.ex-row.is-divider .ex-text { font-weight: 700; }
+.ex-row.is-divider .ex-name,
+.ex-row.is-divider .ex-time,
+.ex-row.is-divider .ex-delay { opacity: 0.35; }
+/* A line the store would reject: highlighted, and the status line names it. */
+.ex-row.is-bad { background: rgba(196, 127, 23, 0.12); box-shadow: inset 2px 0 0 var(--ember-bright); }
+
+.ex-grip {
+    cursor: grab; text-align: center; color: var(--text-dim); line-height: 1;
+    user-select: none; touch-action: none;
+}
+.ex-grip:active { cursor: grabbing; }
+
+.ex-row input, .ex-row select, .ex-row textarea {
+    min-width: 0; padding: 3px 5px;
+    background: var(--panel); color: var(--text);
+    border: 1px solid var(--border-dim); border-radius: 3px;
+    font-family: 'Courier Prime', monospace; font-size: 12px; line-height: 1.5;
+}
+.ex-row input:focus, .ex-row select:focus, .ex-row textarea:focus {
+    border-color: var(--ember); outline: none;
+}
+.ex-row input::placeholder, .ex-row textarea::placeholder { color: var(--text-faint); }
+.ex-delay { text-align: right; }
+.ex-text { resize: none; overflow: hidden; }
+.ex-nudge { display: flex; gap: 2px; }
+.ex-nudge .ed-btn { padding: 2px 5px; font-size: 9px; line-height: 1; }
+.ex-del { padding: 2px 6px; }
 
 @media (max-width: 820px) {
     /* phones get one maximized window at a time; drag is disabled in JS */
