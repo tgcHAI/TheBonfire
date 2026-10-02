@@ -164,8 +164,13 @@
     wireLogo();
   }
 
+  // Only isUnlocked is consumed by the pages (both call sites are guarded-entry
+  // checks). open/lock/tryUnlock/saveConfig stay wired to their own panel
+  // controls in here, so they are internal and are not part of the public API.
   window.Gate = {
     isUnlocked: function () { return unlocked; },
+    getConfig: function () { return Object.assign({}, config); },
+    saveConfig: saveConfig,
     open: open,
     lock: lock,
     tryUnlock: tryUnlock
