@@ -610,6 +610,124 @@ body::before {
 .ed-addmsg { margin-top: 6px; }
 .ed-addmsg + .ed-addmsg { margin-left: 6px; }
 
+/* ── CHATROOM COMPOSER (Conversation Pit editor) ── */
+/* The editor mirrors the chat window: a transcript you read top-down plus a
+   composer that writes the next line (or edits the one you picked). */
+.de-field { margin-top: 2px; }
+
+.de-list {
+    background: var(--panel-raised);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+.de-list::-webkit-scrollbar { width: 4px; }
+.de-list::-webkit-scrollbar-track { background: transparent; }
+.de-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.de-empty {
+    font-size: 11px;
+    color: var(--text-faint);
+    padding: 8px 4px;
+    letter-spacing: 0.04em;
+}
+
+.de-msg {
+    border: 1px solid var(--border-dim);
+    border-left: 2px solid var(--spk, var(--ember));
+    border-radius: 2px 6px 6px 6px;
+    background: var(--panel);
+    padding: 5px 8px;
+}
+.de-msg-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    letter-spacing: 0.05em;
+}
+.de-msg-seq { color: var(--text-faint); }
+.de-msg-name { font-weight: 700; color: var(--spk, var(--ember)); }
+.de-msg-time { color: var(--text-faint); }
+.de-msg-delay { color: var(--text-faint); }
+.de-msg-tools { display: flex; gap: 3px; margin-left: auto; }
+.de-row-btn { padding: 0 6px; min-width: 20px; line-height: 1.4; }
+
+.de-msg-body {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-top: 2px;
+}
+
+/* action lines read as centred system events, like the board */
+.de-msg-action { border-left-color: var(--border); background: transparent; }
+.de-msg-action .de-msg-name { color: var(--text-faint); font-weight: 400; font-style: italic; }
+.de-msg-action .de-msg-body { text-align: center; font-style: italic; color: var(--text-faint); font-size: 11px; }
+
+/* dividers are chapter cards: bold, centred, accented */
+.de-msg-divider { border-left-color: var(--ember); background: transparent; }
+.de-msg-divider .de-msg-name { color: var(--ember-bright); text-transform: uppercase; }
+.de-msg-divider .de-msg-body {
+    text-align: center;
+    font-weight: 700;
+    color: var(--ember-bright);
+    letter-spacing: 0.08em;
+}
+
+/* ── COMPOSER BAR ── */
+.de-composer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 8px;
+    padding: 8px;
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    background: var(--panel-raised);
+}
+.de-composer-row { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.de-composer input,
+.de-composer select {
+    background: var(--panel);
+    border: 1px solid var(--border-dim);
+    color: var(--text);
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    padding: 4px 6px;
+    min-width: 0;
+}
+.de-composer input:disabled { opacity: 0.4; }
+.de-composer input:focus,
+.de-composer select:focus { outline: 1px solid var(--ember); }
+.de-composer-kind { width: 68px; }
+.de-composer-name { width: 130px; }
+.de-composer-time { width: 60px; }
+.de-composer-delay { width: 78px; }
+/* the chapter label exists only on divider rows */
+.de-composer-label { width: 190px; display: none; }
+.de-composer.is-divider .de-composer-label { display: initial; }
+.de-composer-text { flex: 1 1 180px; min-width: 140px; }
+.de-composer-send,
+.de-composer-cancel { flex: 0 0 auto; }
+
+@media (max-width: 820px) {
+    .de-composer-name,
+    .de-composer-time,
+    .de-composer-delay,
+    .de-composer-label { flex: 1 1 100px; width: auto; }
+    .de-list { max-height: 200px; }
+}
+
 /* account for editor panel pushing layout */
 .body {
     transition: margin-top 0.3s;
@@ -1095,4 +1213,289 @@ body { -webkit-tap-highlight-color: transparent; }
     25% { transform: translateX(-6px); }
     50% { transform: translateX(6px); }
     75% { transform: translateX(-4px); }
+}
+
+/* ── DESKTOP WINDOW MANAGER ── */
+/* A small, page-agnostic pseudo-window layer. Windows are absolutely positioned
+   inside the #desktop host, so their coordinate space is the work area rather
+   than the viewport - which is what lets this grow into a full desktop surface
+   later without touching the manager. The host is pointer-transparent so the
+   sidebar and desktop icons underneath stay clickable; windows opt back in.
+   The z band (10..49; taskbar 52) deliberately stops short of the restricted
+   gate (.editor-panel, z-index 100) and the mobile drawer (55/60/65), so a
+   window can never cover the gate. */
+:root {
+    --wm-taskbar-h: 28px;
+    --wm-bar-h: 30px;
+}
+
+.desktop {
+    /* Positioned against .shell (position: relative) rather than placed in a
+       grid row: an fr track's automatic minimum is its content's min-content
+       size, so tall siblings could inflate that row and push this layer - and
+       every window inside it - below the viewport, where overflow:hidden on
+       <body> clipped it away. inset pins the box to the work area outright, and
+       overflow stays visible so a wrong box can never hide a window. */
+    position: absolute;
+    inset: 48px 0 0 0;
+    z-index: 2;
+    pointer-events: none;
+}
+.desktop::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(196,127,23,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(196,127,23,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+}
+
+/* desktop icons (live in .main, beneath the window layer) */
+.desk-icons { display: flex; flex-wrap: wrap; gap: 16px; align-content: flex-start; }
+.desk-ico {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    width: 104px; padding: 10px 6px;
+    background: transparent; border: 1px solid transparent; border-radius: 8px;
+    color: var(--text-dim); font-family: inherit; font-size: 11px; letter-spacing: 0.04em;
+    cursor: pointer; transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.desk-ico:hover { background: rgba(196,127,23,0.08); border-color: var(--border-dim); color: var(--ember-bright); }
+.desk-ico-img {
+    width: 40px; height: 40px;
+    background-repeat: no-repeat; background-position: center; background-size: 40px 40px;
+    filter: brightness(0.85) sepia(0.95) saturate(2.3); transition: filter 0.15s;
+}
+.desk-ico:hover .desk-ico-img { filter: brightness(1.05) sepia(1) saturate(2.7) drop-shadow(0 0 6px rgba(196,127,23,0.5)); }
+.desk-ico-chat { background-image: url('../mats/icons/Conversations_icon.png'); }
+.desk-ico-editor { background-image: url('../mats/icons/CONV.png'); }
+.desk-ico-label { text-align: center; }
+
+/* pseudo-window */
+.pwin {
+    position: absolute; display: flex; flex-direction: column;
+    min-width: 240px; min-height: 140px;
+    pointer-events: auto;
+    background: var(--panel-raised);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.4);
+}
+.pwin.is-focused {
+    border-color: var(--ember);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.6), 0 0 16px rgba(196,127,23,0.22), 0 0 0 1px rgba(0,0,0,0.45);
+}
+.pwin.is-min, .pwin.is-closed { display: none; }
+.pwin.is-max { border-radius: 0; }
+.pwin.is-dragging { opacity: 0.94; }
+
+.pwin-bar {
+    display: flex; align-items: center; gap: 8px;
+    height: var(--wm-bar-h); padding: 0 8px 0 10px; flex-shrink: 0;
+    background: linear-gradient(180deg, #241a0c 0%, #17100a 100%);
+    border-bottom: 1px solid var(--border);
+}
+.pwin-bar[data-wm-drag] { cursor: grab; touch-action: none; }
+.pwin.is-dragging .pwin-bar { cursor: grabbing; }
+.pwin-ico {
+    width: 16px; height: 16px; flex-shrink: 0;
+    background-repeat: no-repeat; background-position: center; background-size: 16px 16px;
+    filter: brightness(0.85) sepia(0.95) saturate(2.3);
+}
+.pwin-ico-chat { background-image: url('../mats/icons/Conversations_icon.png'); }
+.pwin-ico-editor { background-image: url('../mats/icons/CONV.png'); }
+.pwin-ico-inspector { background-image: url('../mats/icons/messages.png'); }
+.pwin-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-dim);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pwin.is-focused .pwin-title { color: var(--ember-bright); text-shadow: 0 0 10px rgba(196,127,23,0.45); }
+.pwin-btns { display: flex; gap: 4px; margin-left: auto; }
+.pwin-body { flex: 1; min-height: 0; overflow: auto; padding: 12px; }
+
+/* window controls: the same AIM mini-button look, now interactive */
+.pwin-btn,
+.chat-winbtn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 14px; padding: 0;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 2px;
+    color: var(--text-faint); font-family: inherit; font-size: 9px; line-height: 1;
+    cursor: pointer; transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+.pwin-btn:hover,
+.chat-winbtn:hover { color: var(--ember-bright); border-color: var(--ember); background: rgba(196,127,23,0.1); }
+.pwin-btn[data-wm-act="close"]:hover,
+.chat-winbtn[data-wm-act="close"]:hover { color: #be6d6d; border-color: #6d3a3a; background: rgba(190,109,109,0.12); }
+
+/* ── TASKBAR (becomes the Option-3 dock) ── */
+.wm-taskbar {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: var(--wm-taskbar-h);
+    display: flex; align-items: center; gap: 6px;
+    padding: 0 8px;
+    z-index: 52; pointer-events: auto;
+    background: rgba(18,13,6,0.92);
+    border-top: 1px solid var(--border);
+}
+/* the dock strip is permanent, not collapsed when empty: that keeps
+   WM.bounds() (and therefore maximize + the docked start rect) stable */
+.wm-taskbar { min-height: var(--wm-taskbar-h); }
+
+/* transient status line: names the last window action and which store answered,
+   so a failed open or an unreachable store reads as an explanation rather than
+   as an empty desktop */
+.wm-status {
+    position: absolute;
+    left: 10px;
+    bottom: calc(var(--wm-taskbar-h) + 8px);
+    z-index: 51;
+    max-width: 62%;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    pointer-events: none;
+}
+.wm-status.is-warn { color: var(--ember); }
+
+.wm-alert {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 40px;
+    z-index: 53;
+    padding: 6px 10px;
+    background: rgba(60, 18, 18, 0.94);
+    border: 1px solid #be6d6d;
+    border-radius: 4px;
+    color: #e6a0a0;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+}
+.wm-boot {
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    z-index: 51;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    pointer-events: none;
+}
+.wm-boot.is-warn { color: var(--ember); }
+
+/* the async store verdict sits between the boot line and the fatal banner */
+.wm-store { top: 22px; }
+.wm-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    max-width: 200px; height: 20px; padding: 0 8px;
+    background: var(--panel); border: 1px solid var(--border-dim); border-radius: 3px;
+    color: var(--text-dim); font-family: inherit; font-size: 10.5px; letter-spacing: 0.05em;
+    cursor: pointer; transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+.wm-chip:hover { color: var(--ember-bright); border-color: var(--ember); }
+.wm-chip.is-active { color: var(--ember-bright); border-color: var(--ember); background: var(--ember-glow2); }
+.wm-chip-ico {
+    width: 12px; height: 12px; flex-shrink: 0;
+    background-repeat: no-repeat; background-position: center; background-size: 12px 12px;
+    filter: brightness(0.85) sepia(0.95) saturate(2.3);
+}
+.wm-chip-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── FILE EXPLORER (Conversation Editor window body) ── */
+.exp-toolbar { display: flex; align-items: center; gap: 6px; margin-bottom: 9px; flex-wrap: wrap; }
+.exp-crumbs { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 11px; letter-spacing: 0.06em; }
+.exp-crumb { color: var(--text-faint); }
+.exp-crumb-current { color: var(--ember-bright); font-weight: 700; }
+.exp-status { margin-left: auto; font-size: 10px; color: var(--ember-bright); letter-spacing: 0.06em; }
+.exp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; }
+.exp-folder {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px 6px;
+    background: transparent; border: 1px solid transparent; border-radius: 6px;
+    color: var(--text-dim); font-family: inherit; font-size: 10.5px; letter-spacing: 0.03em;
+    cursor: pointer; text-align: center;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.exp-folder:hover, .exp-folder.is-selected { background: rgba(196,127,23,0.08); border-color: var(--border-dim); color: var(--ember-bright); }
+.exp-folder-img {
+    width: 34px; height: 34px;
+    background: url('../mats/icons/CONV.png') center / 34px 34px no-repeat;
+    filter: brightness(0.85) sepia(0.95) saturate(2.3); transition: filter 0.15s;
+}
+.exp-folder:hover .exp-folder-img,
+.exp-folder.is-selected .exp-folder-img { filter: brightness(1.05) sepia(1) saturate(2.7) drop-shadow(0 0 6px rgba(196,127,23,0.5)); }
+.exp-folder-id { font-size: 10px; color: var(--text-faint); }
+.exp-folder-title { font-weight: 700; }
+.exp-folder-meta { font-size: 9.5px; color: var(--text-faint); }
+
+.exp-meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+    padding: 7px 8px; margin-bottom: 9px;
+    border: 1px solid var(--border-dim); border-radius: 5px; background: var(--panel);
+}
+.exp-meta input[type="text"], .exp-meta select {
+    background: var(--panel-raised); border: 1px solid var(--border-dim); color: var(--text);
+    font-family: 'Courier Prime', monospace; font-size: 11px; padding: 3px 6px; min-width: 0;
+}
+.exp-meta-title { flex: 1 1 130px; }
+.exp-meta label { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; color: var(--text-dim); }
+
+.exp-list { display: flex; flex-direction: column; gap: 4px; }
+.exp-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 7px;
+    border: 1px solid var(--border-dim); border-radius: 4px; background: var(--panel);
+    color: var(--text); font-size: 11px; cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+.exp-row:hover, .exp-row.is-selected { border-color: var(--ember); background: var(--ember-glow2); }
+.exp-row-ico {
+    width: 14px; height: 14px; flex-shrink: 0;
+    background: url('../mats/icons/messages.png') center / 14px 14px no-repeat;
+    filter: brightness(0.85) sepia(0.95) saturate(2.3);
+}
+.exp-file { flex-shrink: 0; font-size: 10.5px; color: var(--text-faint); }
+.exp-prev { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.exp-acts { display: flex; gap: 3px; flex-shrink: 0; }
+.exp-empty, .exp-hint { padding: 10px 2px; color: var(--text-faint); font-size: 11px; letter-spacing: 0.04em; }
+
+/* backend-down notice: deliberately unlike .exp-empty, so "cannot reach the
+   store" never reads as "no conversations yet" */
+.exp-notice {
+    margin-bottom: 9px;
+    padding: 7px 9px;
+    border: 1px solid #6d3a3a;
+    border-left: 2px solid #be6d6d;
+    border-radius: 4px;
+    background: rgba(190, 109, 109, 0.08);
+    color: #e0a0a0;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+}
+
+/* ── MESSAGE INSPECTOR (composer) ── */
+.insp .de-composer { margin-top: 0; }
+.insp-text {
+    width: 100%; min-height: 84px; resize: vertical;
+    background: var(--panel); border: 1px solid var(--border-dim); color: var(--text);
+    font-family: 'Courier Prime', monospace; font-size: 12px; line-height: 1.6; padding: 6px 8px;
+}
+.insp-text:focus { outline: 1px solid var(--ember); }
+.insp-foot { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+
+@media (max-width: 820px) {
+    /* phones get one maximized window at a time; drag is disabled in JS */
+    .pwin { border-radius: 0; }
+    .desk-icons { gap: 10px; }
+    .exp-grid { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
+}
+
+/* ── SMALL-SCREEN STACKING ──
+   The drawer backdrop (z 55) spans the whole work area, so if the window layer
+   stays below it every tap on a window only dismisses the drawer. Lift the layer
+   above the backdrop and keep the drawer (z 60) on top of it, as a menu should.
+   Written last, and with body .desktop, because a @media rule does NOT gain
+   specificity - the base .desktop rule would otherwise win on source order. */
+@media (max-width: 820px) {
+    #desktop { z-index: 56; }
 }

@@ -7,6 +7,20 @@
 <title>Conversation Pit — Eternal Hearthlight Office</title>
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../CSS/TheBonfire.css">
+  <script>
+  // A dead script used to look exactly like "the icons do nothing": the static
+  // markup still renders, so surface any failure on the page itself.
+  window.addEventListener('error', function (e) {
+    var el = document.getElementById('wmAlert');
+    if (el) { el.hidden = false; el.textContent = 'Script error: ' + (e.message || e.type) + ' (line ' + (e.lineno || '?') + ')'; }
+    console.error('[bonfire]', e.message, e.filename, e.lineno);
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    var el = document.getElementById('wmAlert');
+    if (el) { el.hidden = false; el.textContent = 'Unhandled rejection: ' + ((e.reason && e.reason.message) || e.reason); }
+    console.error('[bonfire] unhandled rejection', e.reason);
+  });
+  </script>
   <script src="../js/gate.js"></script>
 </head>
 <body>
@@ -36,60 +50,6 @@
     <button class="editor-toggle" onclick="toggleConvEditor()" title="Open Conversation Editor" aria-label="Open the conversation editor" aria-expanded="false">&#9998;</button>
   </header>
 
-  <!-- EDITOR DROPDOWN -->
-  <div class="editor-panel conv-panel" id="convEditorPanel">
-    <div class="editor-inner">
-      <div class="editor-heading">
-        <span>Conversation Editor</span>
-        <div class="editor-actions">
-          <button class="ed-btn ed-new" onclick="newConversation()">New</button>
-          <button class="ed-btn ed-save" onclick="saveConversation()">Save</button>
-          <button class="ed-btn ed-delete" onclick="deleteConversation()">Delete</button>
-          <button class="ed-btn ed-export" onclick="exportConversations()">Export JSON</button>
-        </div>
-      </div>
-      <div class="editor-fields">
-        <div class="ed-row">
-          <div class="ed-field">
-            <label for="cd-id">ID</label>
-            <input type="text" id="cd-id" placeholder="CONV-004">
-          </div>
-          <div class="ed-field">
-            <label for="cd-title">Title</label>
-            <input type="text" id="cd-title" placeholder="Conversation title">
-          </div>
-          <div class="ed-field">
-            <label for="cd-status">Status</label>
-            <select id="cd-status">
-              <option value="Online">Online</option>
-              <option value="Offline">Offline</option>
-            </select>
-          </div>
-          <div class="ed-field ed-field-hint">
-            <label>Order</label>
-            <span class="ed-hint">Use the arrows on each line</span>
-          </div>
-        </div>
-        <div class="ed-row">
-          <div class="ed-field ed-field-check">
-            <label>
-              <input type="checkbox" id="cd-restricted">
-              Restricted
-            </label>
-          </div>
-        </div>
-        <div class="ed-field ed-body-field cnv-msg">
-          <label for="cd-msgList">Messages <span class="ed-hint">(chat = screen name + line; action = event line; divider = bold chapter card with a dropdown name, no name/time/delay)</span></label>
-          <div class="conv-msg-list" id="cd-msgList">
-            <!-- populated by JS -->
-          </div>
-          <button class="ed-btn ed-addmsg" onclick="addMsgRow()">+ Add message</button>
-          <button class="ed-btn ed-addmsg ed-addend" onclick="addDividerRow()">+ Add divider</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="body">
 
     <!-- CONVERSATION LIST -->
@@ -97,38 +57,67 @@
       <!-- populated by JS -->
     </nav>
 
-    <!-- CHAT WINDOW -->
-    <main class="main" id="main">
-      <div class="chat-window">
-        <div class="chat-titlebar">
-          <span class="chat-title" id="chatTitle">Conversation Pit</span>
-          <span class="restricted-badge" id="chatOflog" hidden>[OFF-LOG]</span>
-          <span class="chat-status">
-            <span class="chat-status-dot" id="chatStatusDot"></span>
-            <span id="chatStatusText">Offline</span>
-          </span>
-          <div class="chat-winbtns" aria-hidden="true">
-            <span class="chat-winbtn">_</span>
-            <span class="chat-winbtn">&#9633;</span>
-            <span class="chat-winbtn">&#215;</span>
-          </div>
-        </div>
-
-        <div class="chat-transport">
-          <button class="chat-btn" id="playBtn" onclick="togglePlay()" aria-label="Play the stream">&#9654; Play</button>
-          <button class="chat-btn" id="replayBtn" onclick="replayConversation()" aria-label="Replay the whole stream from the start">&#8635; Replay</button>
-          <select class="chat-btn" id="dividerJumpBtn" onchange="dividerJumpChange()" aria-label="Fast-forward to a divider in this conversation" title="Fast-forward to a divider in this conversation"></select>
-          <span class="chat-progress" id="chatProgress">0 / 0</span>
-        </div>
-
-        <div class="chat-area" id="chatArea" aria-live="polite" aria-label="Conversation transcript"></div>
-
-        <div class="chat-inputbar">
-          <span class="chat-input" id="chatInput" aria-hidden="true">observer mode — live feed</span>
-          <span class="chat-hint">read only</span>
-        </div>
+    <!-- DESKTOP SURFACE (wallpaper + icons; the floating window layer sits above) -->
+    <main class="main" id="main" aria-label="Desktop surface">
+      <div class="desk-icons" id="deskIcons" aria-label="Desktop icons">
+        <button type="button" class="desk-ico" data-wm-open="chat" title="Open the Conversation Pit">
+          <span class="desk-ico-img desk-ico-chat" aria-hidden="true"></span>
+          <span class="desk-ico-label">Conversation Pit</span>
+        </button>
+        <button type="button" class="desk-ico" data-wm-open="editor" title="Open the Conversation Editor">
+          <span class="desk-ico-img desk-ico-editor" aria-hidden="true"></span>
+          <span class="desk-ico-label">Conversation Editor</span>
+        </button>
       </div>
     </main>
+
+  </div>
+
+  <!-- DESKTOP WINDOW LAYER (pseudo-window host). Pointer-transparent so the
+       sidebar and desktop icons underneath stay clickable; windows opt back in. -->
+  <div class="desktop" id="desktop">
+
+    <!-- CHAT WINDOW: a real pseudo-window (drag the bar, use _ square x) -->
+    <section class="pwin chat-window" id="win-chat" data-wm="chat" role="dialog" aria-label="Conversation Pit">
+      <div class="chat-titlebar pwin-bar" data-wm-drag>
+        <span class="pwin-ico pwin-ico-chat" aria-hidden="true"></span>
+        <span class="chat-title" id="chatTitle">Conversation Pit</span>
+        <span class="restricted-badge" id="chatOflog" hidden>[OFF-LOG]</span>
+        <span class="chat-status">
+          <span class="chat-status-dot" id="chatStatusDot"></span>
+          <span id="chatStatusText">Offline</span>
+        </span>
+        <div class="chat-winbtns">
+          <button type="button" class="chat-winbtn" data-wm-act="min" title="Minimize" aria-label="Minimize the window">_</button>
+          <button type="button" class="chat-winbtn" data-wm-act="max" title="Maximize" aria-label="Maximize the window">&#9633;</button>
+          <button type="button" class="chat-winbtn" data-wm-act="close" title="Close" aria-label="Close the window">&#215;</button>
+        </div>
+      </div>
+
+      <div class="chat-transport">
+        <button class="chat-btn" id="playBtn" onclick="togglePlay()" aria-label="Play the stream">&#9654; Play</button>
+        <button class="chat-btn" id="replayBtn" onclick="replayConversation()" aria-label="Replay the whole stream from the start">&#8635; Replay</button>
+        <select class="chat-btn" id="dividerJumpBtn" onchange="dividerJumpChange()" aria-label="Fast-forward to a divider in this conversation" title="Fast-forward to a divider in this conversation"></select>
+        <span class="chat-progress" id="chatProgress">0 / 0</span>
+      </div>
+
+      <div class="chat-area" id="chatArea" aria-live="polite" aria-label="Conversation transcript"></div>
+
+      <div class="chat-inputbar">
+        <span class="chat-input" id="chatInput" aria-hidden="true">observer mode — live feed</span>
+        <span class="chat-hint">read only</span>
+      </div>
+    </section>
+
+    <div class="wm-alert" id="wmAlert" role="alert" hidden></div>
+    <div class="wm-alert wm-store" id="wmStoreWarn" role="status" hidden></div>
+    <span class="wm-boot" id="wmBoot" aria-live="polite"></span>
+
+    <!-- TRANSIENT STATUS (last window action / which store answered) -->
+    <span class="wm-status" id="wmStatus" role="status" aria-live="polite"></span>
+
+    <!-- TASKBAR: a chip per open window (becomes the Option-3 dock) -->
+    <div class="wm-taskbar" id="wmTaskbar" role="toolbar" aria-label="Open windows"></div>
 
   </div>
 
@@ -138,9 +127,26 @@
 </div>
 
 <script>
-// Conversations load from json/conversations.json over HTTP; there is no
-// embedded copy, so the JSON file is the single source of truth.
+// Conversations load from the /api/dialogue store over HTTP; there is no
+// embedded copy. DATA_SOURCE records which read answered, so an unreachable
+// store shows an explanation instead of an empty archive.
 let conversations = [];
+let DATA_SOURCE = 'none';
+let DATA_DETAIL = '';
+
+// Backend resolution state, declared HERE on purpose: loadConversations() runs
+// before the dialogue API section, so these must already be initialised by the
+// time dialogueFetch() first touches them (a later declaration is a TDZ error).
+  const BACKEND_CANDIDATES = [
+    '../api/dialogue',                       // Node is serving this page
+    'http://localhost:4173/api/dialogue',
+    'http://127.0.0.1:4173/api/dialogue',
+    'http://localhost:4174/api/dialogue',
+    'http://127.0.0.1:4174/api/dialogue'
+  ];
+  let DIALOGUE_BASE = null;
+
+
 // ── STATE ──
   const DEFAULT_DELAY_MS = 1600;   // gap before a message that doesn't set its own
   const SPEAKER_COLORS = 8;        // .spk-0 … .spk-7 in the stylesheet
@@ -195,15 +201,42 @@ let conversations = [];
 
   // ── CONVERSATION DATA ──
   async function loadConversations() {
-    try {
-      const res = await fetch('../json/conversations.json?nocache=' + Date.now());
-      if (res.ok) conversations = await res.json();
-    } catch (err) {
-      // fetch unavailable (e.g. file://) — no embedded copy, so the page
-      // simply starts empty until it is served and the JSON can be fetched
-    }
+    const list = await fetchConversations();
+    if (list) conversations = list;
     renderSidebar();
     if (conversations.length) openConversation(firstVisibleIndex());
+  }
+
+  // The dialogue store is the source of truth; when it is unreachable (page
+  // opened from file://, the API 404s, or the server is down) fall back to the
+  // legacy flat file, and finally to nothing - recording which read answered.
+  async function fetchConversations() {
+    try {
+      const res = await dialogueFetch('?nocache=' + Date.now());
+      if (res.ok) { DATA_SOURCE = 'api'; DATA_DETAIL = ''; const data = await res.json(); noteStore(); return data; }
+      DATA_DETAIL = 'no /api/dialogue on ' + (window.location.origin || 'file://')
+        + ' (tried ' + backendCandidates().length + ' backends, last HTTP ' + res.status + ')';
+    } catch (err) { DATA_DETAIL = DATA_DETAIL || ('api ' + ((err && err.message) || 'failed')); }
+    try {
+      const res2 = await fetch('../json/conversations.json?nocache=' + Date.now());
+      if (res2.ok) {
+        DATA_SOURCE = 'legacy';
+        // keep WHY: the flat file answered, so the actionable fact is that the
+        // running server is older than the dialogue API
+        DATA_DETAIL = (DATA_DETAIL ? DATA_DETAIL + ' | ' : '') + 'legacy file ok - restart the server for /api/dialogue';
+        const data = await res2.json(); noteStore(); return data;
+      }
+      DATA_DETAIL = DATA_DETAIL + ' | legacy HTTP ' + res2.status;
+    } catch (err2) { DATA_DETAIL = DATA_DETAIL + ' | legacy blocked or missing'; }
+    DATA_SOURCE = 'none';
+    noteStore();
+    return null;
+  }
+
+  async function refreshConversations() {
+    const list = await fetchConversations();
+    if (list) conversations = list;
+    renderSidebar();
   }
 
   function renderSidebar() {
@@ -670,259 +703,795 @@ let conversations = [];
   // ── INIT ──
   loadConversations();
 // ── CONVERSATION EDITOR ──
-  // Entry-Editor-style dropdown for building conversations. Save POSTs the whole
-  // array to server.js (/api/conversations), which rewrites json/conversations.json
-  // — the single source the page loads (there is no embedded copy in this HTML).
-  function toggleConvEditor() {
-    const panel = document.getElementById('convEditorPanel');
-    const open = panel.classList.toggle('open');
-    document.querySelector('.editor-toggle').setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) loadConvEditorFields(currentIndex);
-  }
+  // ── WINDOW MANAGER ──
+  // A small, page-agnostic pseudo-window layer. Windows are absolutely positioned
+  // inside the #desktop host, so their coordinate space is the work area rather
+  // than the viewport - which is what lets this later grow into a full desktop
+  // surface without touching the manager.
+  //
+  // The z band (10..49; taskbar 52) deliberately stops short of the restricted
+  // gate (.editor-panel, z-index 100) and the mobile drawer (55/60/65), so a
+  // window can never cover the gate. Closed windows keep their DOM (cheap, and
+  // it keeps the playback engine's nodes valid) and drop off the taskbar.
+  // Matches the .shell grid row; only used when the layer has no box yet.
+  const TOPBAR_H = 48;
 
-  function flashBtn(cls, text) {
-    const btn = document.querySelector('.' + cls);
-    const orig = btn.textContent;
-    btn.textContent = text;
-    btn.style.color = 'var(--ember-bright)';
-    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1800);
-  }
+  const WM = {
+    apps: new Map(),      // appId -> spec  (register())
+    wins: new Map(),      // appId -> window record (one window per app id)
+    order: [],            // appIds in focus order; last one is frontmost
+    zMin: 10,
+    zMax: 49,
+    cascade: 0,
+    layer: null,          // #desktop host
+    bar: null,            // #wmTaskbar
+    listeners: [],
 
-  function loadConvEditorFields(index) {
-    const c = conversations[index] || { messages: [] };
-    document.getElementById('cd-id').value = c.id || '';
-    document.getElementById('cd-title').value = c.title || '';
-    document.getElementById('cd-status').value = (c.status || 'Offline') === 'Offline' ? 'Offline' : 'Online';
-    document.getElementById('cd-restricted').checked = c.restricted || false;
-    renderMsgEditor(c.messages || []);
-  }
+    isMobile() { return window.matchMedia('(max-width: 820px)').matches; },
+    register(appId, spec) { this.apps.set(appId, spec); },
+    on(evt, fn) { if (evt === 'change') this.listeners.push(fn); },
+    emit() { this.listeners.forEach((fn) => { try { fn(); } catch (e) { /* a listener must not break the layer */ } }); },
 
-  function renderMsgEditor(messages) {
-    const list = document.getElementById('cd-msgList');
-    list.innerHTML = '';
-    messages.forEach((m) => list.appendChild(buildMsgRow(m)));
-  }
+    // Usable work area: the layer minus the taskbar strip. Measured from the live
+    // box with an inner-size fallback, then floored - a layer that has not been
+    // laid out must not collapse every window to 0x0.
+    bounds() {
+      // The layer can be absent when this copy of the page predates the desktop
+      // layer, so fall back to the viewport instead of throwing: one missing
+      // element must not take the whole window manager down with it.
+      const el = this.layer;
+      const r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : null;
+      const w = (r && Math.round(r.width)) || (el && el.clientWidth) || (window.innerWidth || 0);
+      const h = (r && Math.round(r.height)) || (el && el.clientHeight)
+              || Math.max(0, (window.innerHeight || 0) - TOPBAR_H);
+      return { w: Math.max(320, w), h: Math.max(240, h - (this.bar ? this.bar.offsetHeight : 0)) };
+    },
 
-  // The editor hint for a divider row mirrors the rendered card: a SYSTEM
-  // line that announces the chapter's own room, shown when no text is set.
-  function dividerHint() {
-    const room = (conversations[currentIndex] || {}).title || '';
-    return "SYSTEM has set the room: '" + room + "' to sleep";
-  }
+    // Belt and braces: a window must never stay hidden by inline styling left
+    // over from a previous state, must be positioned, and must sit in the band.
+    ensureVisible(win) {
+      const el = win.el;
+      if (el.style.display === 'none') el.style.removeProperty('display');
+      if (el.style.visibility) el.style.removeProperty('visibility');
+      if (el.style.opacity) el.style.removeProperty('opacity');
+      el.style.position = 'absolute';
+      const z = Number(el.style.zIndex);
+      if (!z || z < this.zMin || z > this.zMax) el.style.zIndex = String(this.zMin);
+    },
 
-  function buildMsgRow(m) {
-    const row = document.createElement('div');
-    row.className = 'conv-msg-row';
+    apply(win) {
+      const el = win.el;
+      this.ensureVisible(win);
+      el.style.left = win.rect.x + 'px';
+      el.style.top = win.rect.y + 'px';
+      el.style.width = win.rect.w + 'px';
+      el.style.height = win.rect.h + 'px';
+    },
 
-    const kind = document.createElement('select');
-    kind.className = 'conv-msg-kind';
-    kind.setAttribute('aria-label', 'Message kind');
-    const optChat = document.createElement('option');
-    optChat.value = 'chat'; optChat.textContent = 'chat';
-    const optAction = document.createElement('option');
-    optAction.value = 'action'; optAction.textContent = 'action';
-    const optDivider = document.createElement('option');
-    optDivider.value = 'divider'; optDivider.textContent = 'divider';
-    kind.appendChild(optChat); kind.appendChild(optAction); kind.appendChild(optDivider);
-    kind.value = m.type === 'action' ? 'action' : (m.type === 'divider' ? 'divider' : 'chat');
-    // Divider rows act like action tags with a bold card: they carry a label
-    // that names the divider in the fast-forward dropdown plus an authorable
-    // line that renders bold on the board. Name/time/delay go inert.
-    const applyDividerState = (isDivider) => {
-      row.classList.toggle('is-divider', isDivider);
-      name.disabled = isDivider;
-      time.disabled = isDivider;
-      delay.disabled = isDivider;
-      label.disabled = !isDivider;
-      text.disabled = false;      // the card's own bold line stays authorable
-      text.placeholder = isDivider ? dividerHint() : 'the line itself…';
-    };
+    // keep the title bar reachable and the body inside the work area
+    clampRect(win) {
+      const b = this.bounds();
+      // A slice of every window must stay inside the layer, otherwise a
+      // window opened while the layer was briefly small is left off-screen.
+      const visX = Math.min(win.rect.w, 240);
+      const visY = Math.min(win.rect.h, 120);
+      win.rect.w = Math.min(b.w, Math.max(win.minW, win.rect.w));
+      win.rect.h = Math.min(b.h, Math.max(win.minH, win.rect.h));
+      win.rect.x = Math.max(-(win.rect.w - visX), Math.min(win.rect.x, b.w - visX));
+      win.rect.y = Math.max(-(win.rect.h - visY), Math.min(win.rect.y, b.h - visY));
+    },
 
-    kind.addEventListener('change', () => applyDividerState(kind.value === 'divider'));
+    // The desktop icon strip in layer coordinates. No window is ever spawned on
+    // top of an icon, whichever app it belongs to.
+    avoidRect() {
+      const icons = document.getElementById('deskIcons');
+      if (!icons || !icons.getBoundingClientRect) return null;
+      const ir = icons.getBoundingClientRect();
+      if (!this.layer || !this.layer.getBoundingClientRect) return null;
+      const lr = this.layer.getBoundingClientRect();
+      if (!ir.width || !ir.height) return null;
+      return { x: ir.left - lr.left, y: ir.top - lr.top, w: ir.width, h: ir.height };
+    },
 
-    const name = document.createElement('input');
-    name.type = 'text'; name.className = 'conv-msg-name';
-    name.placeholder = 'screenName'; name.value = m.screenName || '';
-
-    const time = document.createElement('input');
-    time.type = 'text'; time.className = 'conv-msg-time';
-    time.placeholder = 'time'; time.value = m.time || '';
-
-    const delay = document.createElement('input');
-    delay.type = 'number'; delay.className = 'conv-msg-delay';
-    delay.min = '0'; delay.placeholder = 'delay ms';
-    delay.title = 'Delay before this line (ms)';
-    delay.value = m.delayMs != null ? m.delayMs : '';
-
-    const label = document.createElement('input');
-    label.type = 'text'; label.className = 'conv-msg-label';
-    label.placeholder = 'chapter title';
-    label.title = 'Names this divider in the fast-forward dropdown; blank falls back to the card line or an ordinal';
-    label.value = m.label || '';
-
-    const text = document.createElement('input');
-    text.type = 'text'; text.className = 'conv-msg-text';
-    text.placeholder = m.type === 'divider' ? dividerHint() : 'the line itself…';
-    text.value = m.text || '';
-
-    const actions = document.createElement('div');
-    actions.className = 'conv-msg-actions';
-    actions.appendChild(rowBtn('▲', 'Move message up', () => moveMsgRow(row, -1)));
-    actions.appendChild(rowBtn('▼', 'Move message down', () => moveMsgRow(row, 1)));
-    actions.appendChild(rowBtn('×', 'Remove message', () => row.remove()));
-
-    row.appendChild(kind); row.appendChild(name); row.appendChild(time);
-    row.appendChild(delay); row.appendChild(label); row.appendChild(text);
-    row.appendChild(actions);
-    applyDividerState(kind.value === 'divider');
-    return row;
-  }
-
-  function rowBtn(html, label, fn) {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'ed-btn conv-row-btn';
-    b.innerHTML = html; b.title = label;
-    b.setAttribute('aria-label', label);
-    b.onclick = fn;
-    return b;
-  }
-
-  function moveMsgRow(row, dir) {
-    const list = row.parentNode;
-    const idx = Array.prototype.indexOf.call(list.children, row);
-    const target = idx + dir;
-    if (target < 0 || target >= list.children.length) return;
-    list.insertBefore(row, dir > 0 ? list.children[target + 1] : list.children[target]);
-  }
-
-function addMsgRow() {
-    document.getElementById('cd-msgList').appendChild(buildMsgRow({ type: 'chat' }));
-  }
-
-  function addDividerRow() {
-    document.getElementById('cd-msgList').appendChild(buildMsgRow({ type: 'divider' }));
-  }
-
-  function messagesFromEditor() {
-    return Array.from(document.querySelectorAll('#cd-msgList .conv-msg-row')).map((row) => {
-      const kind = row.querySelector('.conv-msg-kind').value;
-      const name = row.querySelector('.conv-msg-name').value.trim();
-      if (kind === 'divider') {
-        // A saved divider carries its type plus optional label (dropdown name)
-        // and text (the bold line); a blank text falls back to the derived
-        // room caption on the board.
-        const msg = { type: 'divider' };
-        const chapterLabel = row.querySelector('.conv-msg-label').value.trim();
-        const display = row.querySelector('.conv-msg-text').value.trim();
-        if (chapterLabel) msg.label = chapterLabel;
-        if (display) msg.text = display;
-        return msg;
+    // Centre the window, cascade each new one, then step clear of the icons.
+    spawnRect(w, h) {
+      const b = this.bounds();
+      const step = (this.cascade++ % 6) * 26;
+      const rect = {
+        x: Math.max(0, Math.min((b.w - w) / 2 - 60 + step, b.w - w)),
+        y: Math.max(0, Math.min(48 + step, b.h - h)),
+        w: Math.round(w), h: Math.round(h)
+      };
+      const avoid = this.avoidRect();
+      if (avoid) {
+        const hits = (r) => r.x < avoid.x + avoid.w && r.x + r.w > avoid.x &&
+                             r.y < avoid.y + avoid.h && r.y + r.h > avoid.y;
+        if (hits(rect)) {
+          const below = avoid.y + avoid.h + 12;
+          if (below + rect.h <= b.h) rect.y = below;
+          else rect.x = Math.max(0, Math.min(avoid.x + avoid.w + 12, b.w - rect.w));
+        }
       }
-      const text = row.querySelector('.conv-msg-text').value.trim();
-      if (!text && !name) return null;  // unfilled row — drop it
-      const msg = { text: text };
-      const time = row.querySelector('.conv-msg-time').value.trim();
-      if (time) msg.time = time;
-      const delay = row.querySelector('.conv-msg-delay').value;
-      if (delay !== '') msg.delayMs = Number(delay);
-      if (kind === 'action') {
-        msg.type = 'action';
-        if (name) msg.screenName = name;  // renderer prefixes it when present
-      } else {
-        msg.screenName = name;
+      return rect;
+    },
+
+    open(appId, payload) {
+      // An existing window record wins even without a registered builder, so
+      // adopted windows (the chat) reopen from a desktop icon or the taskbar.
+      const existing = this.wins.get(appId);
+      let win = existing;
+      const spec = this.apps.get(appId);
+      if (existing) {
+        existing.payload = payload;
+        if (existing.state !== 'normal') this.restore(existing);
+        this.focus(existing);
+      } else if (spec) {
+        win = this.create(appId, spec, payload);
       }
-      return msg;
-    }).filter(Boolean);
-  }
+      if (!win) { wmStatus('no app registered: ' + appId, true); return null; }
+      console.debug('[wm] open', appId, '->', win.title, win.rect);
+      wmStatus('opened: ' + win.title);
+      if (spec && spec.onOpen) spec.onOpen(win);
+      return win;
+    },
 
-  function fieldsToConversation() {
-    return {
-      id: document.getElementById('cd-id').value.trim(),
-      title: document.getElementById('cd-title').value.trim(),
-      status: document.getElementById('cd-status').value,
-      restricted: document.getElementById('cd-restricted').checked,
-      messages: messagesFromEditor()
-    };
-  }
+    create(appId, spec, payload) {
+      const b = this.bounds();
+      const w = Math.min(spec.width || 480, b.w);
+      const h = Math.min(spec.height || 360, b.h);
+      const win = {
+        id: appId, appId: appId, title: spec.title || appId, icon: spec.icon || '',
+        payload: payload, state: 'normal', restore: null,
+        rect: this.spawnRect(w, h),
+        minW: spec.minW || 240, minH: spec.minH || 140, el: null
+      };
+      const el = document.createElement('section');
+      el.className = 'pwin';
+      el.id = 'win-' + appId;
+      el.setAttribute('data-wm', appId);
+      el.setAttribute('role', 'dialog');
+      el.setAttribute('aria-label', win.title);
+      el.innerHTML =
+        '<div class="pwin-bar" data-wm-drag>' +
+          '<span class="pwin-ico ' + (spec.iconClass || '') + '" aria-hidden="true"></span>' +
+          '<span class="pwin-title"></span>' +
+          '<span class="pwin-btns">' +
+            '<button type="button" class="pwin-btn" data-wm-act="min" title="Minimize" aria-label="Minimize the window">_</button>' +
+            '<button type="button" class="pwin-btn" data-wm-act="max" title="Maximize" aria-label="Maximize the window">&#9633;</button>' +
+            '<button type="button" class="pwin-btn" data-wm-act="close" title="Close" aria-label="Close the window">&#215;</button>' +
+          '</span>' +
+        '</div>' +
+        '<div class="pwin-body"></div>';
+      win.el = el;
+      el.querySelector('.pwin-title').textContent = win.title;
+      if (spec.build) spec.build(win, el.querySelector('.pwin-body'));
+      this.layer.insertBefore(el, this.bar);
+      this.wins.set(appId, win);
+      this.order.push(appId);
+      this.bindWindow(win);
+      // onOpen is left to open(): the window is attached by now, and open()
+      // reports the action first so a builder warning is not clobbered.
+      if (this.isMobile()) this.maximize(win); else this.apply(win);
+      this.renumber();
+      this.emit();
+      return win;
+    },
+    adopt(el, spec) {
+      // Wrap an element already in the markup (the chat window) as a managed
+      // window without rebuilding it, so the playback engine keeps its nodes.
+      const b = this.bounds();
+      const bw = Math.min(spec.width || 480, b.w);
+      const bh = Math.min(spec.height || 360, b.h);
+      const win = {
+        id: spec.appId, appId: spec.appId, title: spec.title, icon: spec.icon || '',
+        payload: null, state: 'normal', restore: null,
+        rect: spec.rect ? Object.assign({}, spec.rect) : this.spawnRect(bw, bh),
+        minW: spec.minW || 260, minH: spec.minH || 160, el: el
+      };
+      this.layer.insertBefore(el, this.bar);
+      el.classList.add('pwin');
+      el.setAttribute('data-wm', win.id);
+      this.wins.set(win.id, win);
+      this.order.push(win.id);
+      this.bindWindow(win);
+      this.clampRect(win);
+      if (this.isMobile()) this.maximize(win); else this.apply(win);
+      this.renumber();
+      this.emit();
+      return win;
+    },
 
-  function validateConversation(conv) {
-    if (!conv.title) throw new Error('every conversation needs a title');
-    if (!conv.messages.length) throw new Error('add at least one message');
-    if (!conv.messages[0] || conv.messages[0].type !== 'divider') {
-      throw new Error('every conversation opens with a divider — move a divider row to the top');
+    bindWindow(win) {
+      const el = win.el;
+      el.addEventListener('pointerdown', () => this.focus(win), true);
+      const handle = el.querySelector('[data-wm-drag]');
+      if (handle) this.bindDrag(win, handle);
+      el.querySelectorAll('[data-wm-act]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const act = btn.getAttribute('data-wm-act');
+          if (act === 'min') this.minimize(win);
+          else if (act === 'max') this.toggleMax(win);
+          else if (act === 'close') this.close(win);
+        });
+      });
+    },
+
+    bindDrag(win, handle) {
+      let start = null;
+      handle.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('[data-wm-act]')) return;   // let the controls work
+        if (this.isMobile() || win.state === 'max') return;
+        start = { px: e.clientX, py: e.clientY, x: win.rect.x, y: win.rect.y };
+        win.el.classList.add('is-dragging');
+        try { handle.setPointerCapture(e.pointerId); } catch (err) { /* older engines */ }
+        e.preventDefault();
+      });
+      handle.addEventListener('pointermove', (e) => {
+        if (!start) return;
+        win.rect.x = start.x + (e.clientX - start.px);
+        win.rect.y = start.y + (e.clientY - start.py);
+        this.clampRect(win);
+        this.apply(win);
+      });
+      const end = (e) => {
+        if (!start) return;
+        start = null;
+        win.el.classList.remove('is-dragging');
+        try { handle.releasePointerCapture(e.pointerId); } catch (err) { /* already released */ }
+      };
+      handle.addEventListener('pointerup', end);
+      handle.addEventListener('pointercancel', end);
+    },
+
+    focus(win) {
+      if (!win || !this.wins.has(win.id)) return;
+      this.order = this.order.filter((id) => id !== win.id).concat(win.id);
+      this.renumber();
+      this.emit();
+    },
+
+    // bounded depth: renumber from the focus order rather than chasing a counter,
+    // so the band never creeps up towards the gate
+    renumber() {
+      const top = this.order[this.order.length - 1];
+      this.order.forEach((id, i) => {
+        const win = this.wins.get(id);
+        if (!win) return;
+        win.el.style.zIndex = String(this.zMin + i);
+        win.el.classList.toggle('is-focused', id === top && (win.state === 'normal' || win.state === 'max'));
+      });
+    },
+
+    minimize(win) {
+      if (!win) return;
+      win.state = 'min';
+      win.el.classList.add('is-min');
+      this.order = this.order.filter((id) => id !== win.id).concat(win.id);
+      this.renumber();
+      this.emit();
+    },
+
+    close(win) {
+      // hides but keeps the DOM; the taskbar chip goes away, so it is reopened
+      // from a desktop icon (or the pencil) rather than rebuilt
+      if (!win) return;
+      win.state = 'closed';
+      win.el.classList.add('is-closed');
+      this.renumber();
+      this.emit();
+    },
+
+    restore(win) {
+      if (!win) return;
+      win.el.classList.remove('is-min', 'is-closed', 'is-max');
+      if (win.state === 'max' && win.restore) win.rect = win.restore;
+      win.state = 'normal';
+      win.restore = null;
+      this.clampRect(win);
+      this.apply(win);
+      this.renumber();
+      this.emit();
+    },
+
+    maximize(win) {
+      if (!win) return;
+      if (win.state !== 'max') win.restore = Object.assign({}, win.rect);
+      win.state = 'max';
+      win.el.classList.remove('is-min', 'is-closed');
+      win.el.classList.add('is-max');
+      const b = this.bounds();
+      win.rect = { x: 0, y: 0, w: b.w, h: b.h };
+      this.apply(win);
+      this.renumber();
+      this.emit();
+    },
+
+    toggleMax(win) {
+      if (!win) return;
+      if (win.state === 'max') this.restore(win); else this.maximize(win);
+    },
+    isOpen(appId) {
+      const win = this.wins.get(appId);
+      return !!(win && win.state !== 'closed' && win.state !== 'min');
+    },
+
+    list() {
+      return this.order
+        .map((id) => this.wins.get(id))
+        .filter((w) => w && w.state !== 'closed')
+        .map((w) => ({ id: w.id, title: w.title, icon: w.icon, state: w.state,
+                       focused: w.id === this.order[this.order.length - 1] }));
+    },
+
+    setTitle(win, text) {
+      if (!win) return;
+      win.title = text;
+      win.el.querySelector('.pwin-title').textContent = text;
+      win.el.setAttribute('aria-label', text);
+      this.emit();
+    },
+
+    // keep windows inside the layer across viewport changes
+    fit() {
+      this.wins.forEach((win) => {
+        if (win.state === 'min' || win.state === 'closed') return;
+        if (win.state === 'max') {
+          const b = this.bounds();
+          win.rect = { x: 0, y: 0, w: b.w, h: b.h };
+        } else {
+          this.clampRect(win);
+        }
+        this.apply(win);
+      });
+    },
+
+    init() {
+      this.layer = document.getElementById('desktop');
+      this.bar = document.getElementById('wmTaskbar');
+      if (!this.layer) {
+        wmAlert('This page copy has no desktop layer (#desktop), so the window manager cannot start. '
+          + 'It is a stale copy: hard-refresh (Ctrl+Shift+R) and make sure HTML/ConversationPit.html is the file being served.');
+        return false;
+      }
+      window.addEventListener('resize', () => this.fit());
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        // gate.js owns Escape while its panel is open; never steal it
+        if (document.querySelector('.editor-panel.open')) return;
+        const top = this.order[this.order.length - 1];
+        if (top) this.close(this.wins.get(top));
+      });
+      // any element carrying data-wm-open launches (or refocuses) that app
+      document.addEventListener('click', (e) => {
+        const opener = e.target.closest('[data-wm-open]');
+        if (opener) this.open(opener.getAttribute('data-wm-open'));
+      });
+      return true;
     }
-    conv.messages.forEach((m) => {
-      if (m.type !== 'divider' && !m.text) throw new Error('every message needs text');
-      if (m.type !== 'action' && m.type !== 'divider' && !m.screenName) {
-        throw new Error('chat messages need a screenName');
-      }
-      if (m.delayMs != null && (!(m.delayMs >= 0) || m.delayMs > 86400000)) {
-        throw new Error('delayMs must be between 0 and 86400000');
-      }
+  };
+
+  // ── TASKBAR ──
+  // Rendered from WM.list() on every change, so it already behaves like the dock
+  // that a full desktop surface will want.
+  function renderTaskbar() {
+    const bar = WM.bar;
+    if (!bar) return;
+    bar.innerHTML = '';
+    WM.list().forEach((w) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'wm-chip' + (w.focused && w.state !== 'min' ? ' is-active' : '');
+      chip.title = w.title;
+
+      const ico = document.createElement('span');
+      ico.className = 'wm-chip-ico';
+      ico.setAttribute('aria-hidden', 'true');
+      if (w.icon) ico.style.backgroundImage = "url('" + w.icon + "')";
+
+      const label = document.createElement('span');
+      label.className = 'wm-chip-title';
+      label.textContent = w.title;
+
+      chip.appendChild(ico);
+      chip.appendChild(label);
+      chip.addEventListener('click', () => {
+        const win = WM.wins.get(w.id);
+        if (!win) return;
+        if (win.state === 'min') WM.restore(win);
+        WM.focus(win);
+      });
+      bar.appendChild(chip);
     });
   }
 
-  async function persistConversations() {
-    try {
-      const res = await fetch('../api/conversations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(conversations)
+  // Transient line in the desktop layer naming the last window action, so a
+  // failed open or an unreachable store reads as an explanation, not silence.
+  let wmStatusTimer = null;
+  function wmStatus(text, warn) {
+    const el = document.getElementById('wmStatus');
+    if (!el) return;
+    el.textContent = text;
+    el.classList.toggle('is-warn', !!warn);
+    if (wmStatusTimer) clearTimeout(wmStatusTimer);
+    wmStatusTimer = setTimeout(function () {
+      el.textContent = '';
+      el.classList.remove('is-warn');
+    }, 4000);
+  }
+
+  // Permanent banner for conditions the reader must act on: a stale page copy, or
+  // a host with no dialogue API. Unlike wmStatus it does not auto-clear.
+  function wmAlert(text) {
+    const el = document.getElementById('wmAlert');
+    if (!el) { console.error('[bonfire]', text); return; }
+    el.hidden = false;
+    el.textContent = text;
+  }
+
+  // The pencil in the topbar toggles the explorer window.
+  function toggleConvEditor() {
+    if (WM.isOpen('editor')) WM.close(WM.wins.get('editor'));
+    else WM.open('editor');
+  }
+
+  // ── DESKTOP BOOT ──
+  function initDesktop() {
+    if (!WM.init()) return;
+    WM.on('change', () => {
+      renderTaskbar();
+      const toggle = document.querySelector('.editor-toggle');
+      if (toggle) toggle.setAttribute('aria-expanded', WM.isOpen('editor') ? 'true' : 'false');
+    });
+
+    // The chat window is adopted (not rebuilt) and starts "docked" over .main,
+    // so the first paint still reads like the old layout until it is dragged.
+    const chat = document.querySelector('.chat-window');
+    if (chat) {
+      WM.adopt(chat, {
+        appId: 'chat',
+        title: 'Conversation Pit',
+        icon: '../mats/icons/Conversations_icon.png',
+        width: 880, height: 620, minW: 320, minH: 220
       });
-      if (!res.ok) {
-        // surface the server's own reason (validation, markers, etc.) instead
-        // of hiding behind a bare status code; a rejected save must not
-        // masquerade as "browser only"
-        let detail = '';
-        try {
-          const body = await res.json();
-          if (body && body.error) detail = ': ' + body.error;
-        } catch (_) { /* non-JSON body — keep just the status */ }
-        throw Object.assign(new Error('server rejected the save (' + res.status + ')' + detail), { rejected: true });
+    }
+    renderTaskbar();
+    // On small screens the drawer is open by default and covers the left strip
+    // where the desktop icons sit, so start it collapsed and let the toggle
+    // bring it back - the desktop is the primary surface now.
+    if (WM.isMobile()) setSidebar(false);
+
+    // One-shot layer report. The rects logged by WM.open are COMPUTED; what
+    // matters is what the browser actually laid out, so report both. If the
+    // layer came back degenerate, give it an explicit work-area box - a
+    // self-heal is worth more than a complaint.
+    (function reportLayer() {
+      const layer = WM.layer;
+      if (!layer || !layer.getBoundingClientRect) return;
+      const lr = layer.getBoundingClientRect();
+      const chat = WM.wins.get('chat');
+      const wr = chat && chat.el.getBoundingClientRect();
+      if (lr.width >= 80 && lr.height >= 80) {
+        console.debug('[wm] layer ' + Math.round(lr.width) + 'x' + Math.round(lr.height)
+          + ' | chat rendered ' + (wr ? Math.round(wr.width) + 'x' + Math.round(wr.height) : 'n/a')
+          + ' at ' + (wr ? Math.round(wr.left) + ',' + Math.round(wr.top) : 'n/a'));
+        return;
       }
-      return 'written';
+      layer.style.position = 'absolute';
+      layer.style.inset = TOPBAR_H + 'px 0 0 0';
+      layer.style.width = '100%';
+      console.warn('[wm] desktop layer measured ' + Math.round(lr.width) + 'x' + Math.round(lr.height)
+        + ' - applied an explicit work-area box so windows can render');
+      WM.fit();
+    })();
+  }
+
+  // ── FILE EXPLORER (the Conversation Editor window) ──
+  // Root view lists conversations as folders; a folder view lists that
+  // conversation's messages as files (the real 4-digit names from the store).
+  // Every write goes through the same /api/dialogue helpers the old panel used.
+  const Explorer = { view: 'root', convId: null, selected: null };
+  let expStatusTimer = null;
+
+  function fileName(index) { return String(index + 1).padStart(4, '0') + '.json'; }
+
+  function previewText(m) {
+    if (m.type === 'divider') return 'divider · ' + (m.label || m.text || '(chapter card)');
+    if (m.type === 'action') return 'action · ' + (m.text || '');
+    return 'chat · ' + (m.screenName || '(no name)') + ': ' + (m.text || '');
+  }
+
+  // Conversations the archive gate allows right now.
+  function visibleConversations() {
+    if (!Array.isArray(conversations)) return [];
+    return conversations.filter((c) => !(c.restricted && !Gate.isUnlocked()));
+  }
+
+  function expStatus(text) {
+    const el = document.getElementById('expStatus');
+    if (!el) return;
+    el.textContent = text;
+    if (expStatusTimer) clearTimeout(expStatusTimer);
+    expStatusTimer = setTimeout(() => { el.textContent = ''; }, 2200);
+  }
+
+  // A change that reaches the server is "saved"; one that only lands in memory
+  // (no server, or a file:// open) reports as browser-only, never as success.
+  async function persistChange(okText, fn) {
+    try {
+      await fn();
+      expStatus(okText);
     } catch (err) {
-      if (err && err.rejected) throw err;
-      // no server (file:// open) — the edit stays in memory until the page is served
-      return 'offline';
+      if (err && err.rejected) { expStatus(''); alert(err.message); }
+      else expStatus(okText + ' (browser only)');
     }
   }
 
-  async function saveConversation() {
-    if (!conversations.length) return;
-    const draft = fieldsToConversation();
-    try { validateConversation(draft); }
-    catch (err) { alert("Can't save: " + err.message); return; }
-    conversations[currentIndex] = draft;
-    openConversation(currentIndex);
-    let wrote = 'offline';
-    try { wrote = await persistConversations(); }
-    catch (err) { alert('Save failed: ' + err.message); }
-    flashBtn('ed-save', wrote === 'written' ? 'Saved to file!' : 'Saved (browser only)');
+  // Point the chat window at the folder being edited, then repaint both views.
+  function syncAfterEdit() {
+    const i = conversations.findIndex((c) => c.id === Explorer.convId);
+    if (i >= 0) { currentIndex = i; openConversation(i); }
+    renderSidebar();
+    renderExplorer();
   }
 
-  function newConversation() {
-    const blank = {
-      id: 'CONV-' + String(conversations.length + 1).padStart(3, '0'),
-      title: 'New Conversation',
-      status: 'Online',
-      restricted: false,
-      messages: []
-    };
-    conversations.push(blank);
-    currentIndex = conversations.length - 1;
-    loadConvEditorFields(currentIndex);
-    openConversation(currentIndex);
+  function renderExplorer() {
+    const body = document.getElementById('expBody');
+    if (!body) return;
+    // Backend down is a different situation from "the archive is empty", so it
+    // gets its own notice rather than borrowing the empty-archive copy.
+    const notice = document.getElementById('expNotice');
+    if (notice) {
+      // Keyed on the absence of a resolved API backend rather than on empty
+      // data: a static host still serves the legacy conversations.json, so the
+      // page can look healthy while every save would silently fail.
+      const down = !DIALOGUE_BASE;
+      notice.hidden = !down;
+      notice.textContent = down
+        ? 'Unable to connect to Node backend server. Please ensure server.js is running.'
+        : '';
+    }
+    const conv = Explorer.convId ? conversations.find((c) => c.id === Explorer.convId) : null;
+    if (Explorer.view === 'folder' && !conv) { Explorer.view = 'root'; Explorer.convId = null; }
+
+    const crumbs = document.getElementById('expCrumbs');
+    if (crumbs) {
+      crumbs.innerHTML = '';
+      const root = document.createElement('span');
+      root.className = 'exp-crumb';
+      root.textContent = 'Conversation Pit';
+      crumbs.appendChild(root);
+      if (Explorer.view === 'folder' && conv) {
+        crumbs.appendChild(document.createTextNode('/'));
+        const cur = document.createElement('span');
+        cur.className = 'exp-crumb-current';
+        cur.textContent = conv.id;
+        crumbs.appendChild(cur);
+      }
+    }
+    const back = document.querySelector('[data-exp="root"]');
+    if (back) back.disabled = Explorer.view !== 'folder';
+    const newConv = document.querySelector('[data-exp="newConv"]');
+    if (newConv) newConv.hidden = Explorer.view === 'folder';
+
+    if (Explorer.view === 'folder' && conv) renderFolderView(body, conv);
+    else renderRootView(body);
   }
 
-  async function deleteConversation() {
-    const c = conversations[currentIndex];
-    if (!c) return;
-    if (!confirm(`Delete "${c.title}"?`)) return;
-    conversations.splice(currentIndex, 1);
-    currentIndex = Math.max(0, currentIndex - 1);
+  function renderRootView(body) {
+    const list = visibleConversations();
+    body.innerHTML = '';
+    if (!list.length) {
+      const empty = document.createElement('div');
+      empty.className = 'exp-empty';
+      empty.textContent = DATA_SOURCE === 'none'
+        ? 'Could not reach the dialogue store (/api/dialogue) - check the server, or start a conversation here.'
+        : 'No conversations here yet - use "New Conversation" to start one.';
+      body.appendChild(empty);
+      return;
+    }
+    const grid = document.createElement('div');
+    grid.className = 'exp-grid';
+    list.forEach((c) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'exp-folder';
+      btn.title = 'Double-click to open ' + c.id;
+      btn.innerHTML =
+        '<span class="exp-folder-img" aria-hidden="true"></span>' +
+        '<span class="exp-folder-id"></span>' +
+        '<span class="exp-folder-title"></span>' +
+        '<span class="exp-folder-meta"></span>';
+      btn.querySelector('.exp-folder-id').textContent = c.id;
+      btn.querySelector('.exp-folder-title').textContent = c.title || '(untitled)';
+      const n = (c.messages || []).length;
+      btn.querySelector('.exp-folder-meta').textContent =
+        n + (n === 1 ? ' file' : ' files') + ' · ' + (c.status || 'Offline') + (c.restricted ? ' · OFF-LOG' : '');
+      btn.addEventListener('click', () => {
+        Explorer.selected = c.id;
+        grid.querySelectorAll('.exp-folder').forEach((el) => el.classList.toggle('is-selected', el === btn));
+      });
+      btn.addEventListener('dblclick', () => openFolder(c.id));
+      btn.addEventListener('keydown', (e) => { if (e.key === 'Enter') openFolder(c.id); });
+      grid.appendChild(btn);
+    });
+    body.appendChild(grid);
+  }
+
+  function openFolder(convId) {
+    Explorer.view = 'folder';
+    Explorer.convId = convId;
+    const i = conversations.findIndex((c) => c.id === convId);
+    if (i >= 0) { currentIndex = i; openConversation(i); }
+    renderExplorer();
+  }
+
+  // ── EDITOR WINDOW (file explorer) ──
+  WM.register('editor', {
+    title: 'Conversation Editor',
+    icon: '../mats/icons/CONV.png',
+    iconClass: 'pwin-ico-editor',
+    width: 580, height: 460, minW: 340, minH: 240,
+    build(win, body) {
+      body.innerHTML =
+        '<div class="exp-toolbar">' +
+          '<button type="button" class="ed-btn" data-exp="root">&#8592; Back</button>' +
+          '<span class="exp-crumbs" id="expCrumbs"></span>' +
+          '<span class="exp-status" id="expStatus" aria-live="polite"></span>' +
+          '<button type="button" class="ed-btn" data-exp="newConv">New Conversation</button>' +
+          '<button type="button" class="ed-btn" data-exp="refresh">Refresh</button>' +
+        '</div>' +
+        '<div class="exp-notice" id="expNotice" hidden></div>' +
+        '<div id="expBody"></div>';
+      body.querySelector('[data-exp="root"]').addEventListener('click', () => {
+        Explorer.view = 'root';
+        Explorer.convId = null;
+        renderExplorer();
+      });
+      body.querySelector('[data-exp="refresh"]').addEventListener('click', async () => {
+        await refreshConversations();
+        renderExplorer();
+      });
+      body.querySelector('[data-exp="newConv"]').addEventListener('click', createConversationFromEditor);
+    },
+    onOpen() {
+      renderExplorer();
+      if (DATA_SOURCE !== 'api') wmStatus('store: ' + DATA_SOURCE + ' - ' + (DATA_DETAIL || 'no detail'), true);
+    }
+  });
+
+  function renderFolderView(body, conv) {
+    body.innerHTML = '';
+
+    // conversation metadata plus the actions that belong to a single folder
+    const meta = document.createElement('div');
+    meta.className = 'exp-meta';
+    meta.innerHTML =
+      '<input type="text" class="exp-meta-title" placeholder="Conversation title" aria-label="Conversation title">' +
+      '<select aria-label="Status"><option value="Online">Online</option><option value="Offline">Offline</option></select>' +
+      '<label><input type="checkbox"> Restricted</label>' +
+      '<button type="button" class="ed-btn" data-exp="saveMeta">Save</button>' +
+      '<button type="button" class="ed-btn" data-exp="newMsg">New Message</button>' +
+      '<button type="button" class="ed-btn ed-delete" data-exp="delConv">Delete</button>';
+    const titleEl = meta.querySelector('.exp-meta-title');
+    const statusEl = meta.querySelector('select');
+    const restrictedEl = meta.querySelector('input[type="checkbox"]');
+    titleEl.value = conv.title || '';
+    statusEl.value = (conv.status || 'Offline') === 'Offline' ? 'Offline' : 'Online';
+    restrictedEl.checked = !!conv.restricted;
+    meta.querySelector('[data-exp="saveMeta"]').addEventListener('click', () => {
+      saveFolderMeta(conv, titleEl.value, statusEl.value, restrictedEl.checked);
+    });
+    meta.querySelector('[data-exp="newMsg"]').addEventListener('click', () => openInspector(conv.id, -1));
+    meta.querySelector('[data-exp="delConv"]').addEventListener('click', () => deleteConversationFromEditor(conv));
+    body.appendChild(meta);
+
+    const messages = conv.messages || [];
+    if (!messages.length) {
+      const empty = document.createElement('div');
+      empty.className = 'exp-empty';
+      empty.textContent = 'No messages yet - use "New Message" to write the first line.';
+      body.appendChild(empty);
+      return;
+    }
+    const list = document.createElement('div');
+    list.className = 'exp-list';
+    messages.forEach((m, i) => list.appendChild(buildFileRow(conv, m, i)));
+    body.appendChild(list);
+  }
+
+  // One message = one "file" row: real filename, a one-line preview, actions.
+  function buildFileRow(conv, m, i) {
+    const row = document.createElement('div');
+    row.className = 'exp-row';
+    row.tabIndex = 0;
+    row.title = 'Double-click to edit ' + fileName(i);
+    row.innerHTML =
+      '<span class="exp-row-ico" aria-hidden="true"></span>' +
+      '<span class="exp-file"></span>' +
+      '<span class="exp-prev"></span>' +
+      '<span class="exp-acts">' +
+        '<button type="button" class="ed-btn" data-act="up" title="Move up" aria-label="Move message up">&#9650;</button>' +
+        '<button type="button" class="ed-btn" data-act="down" title="Move down" aria-label="Move message down">&#9660;</button>' +
+        '<button type="button" class="ed-btn" data-act="edit" title="Edit" aria-label="Edit message">&#9998;</button>' +
+        '<button type="button" class="ed-btn ed-delete" data-act="del" title="Delete" aria-label="Delete message">&#10005;</button>' +
+      '</span>';
+    row.querySelector('.exp-file').textContent = fileName(i);
+    row.querySelector('.exp-prev').textContent = previewText(m);
+    row.addEventListener('dblclick', () => openInspector(conv.id, i));
+    row.addEventListener('keydown', (e) => { if (e.key === 'Enter') openInspector(conv.id, i); });
+    row.querySelector('[data-act="edit"]').addEventListener('click', (e) => { e.stopPropagation(); openInspector(conv.id, i); });
+    row.querySelector('[data-act="up"]').addEventListener('click', (e) => { e.stopPropagation(); moveMessage(conv, i, -1); });
+    row.querySelector('[data-act="down"]').addEventListener('click', (e) => { e.stopPropagation(); moveMessage(conv, i, 1); });
+    row.querySelector('[data-act="del"]').addEventListener('click', (e) => { e.stopPropagation(); removeMessage(conv, i); });
+    return row;
+  }
+
+  // ── DATA OPERATIONS (all through the /api/dialogue helpers) ──
+
+  async function saveFolderMeta(conv, title, status, restricted) {
+    conv.title = title.trim() || conv.title;
+    conv.status = status;
+    conv.restricted = !!restricted;
+    await persistChange('Conversation saved', () => apiSave(conv.id, conv));
+    renderSidebar();
+    renderExplorer();
+  }
+
+  async function removeMessage(conv, index) {
+    if (!confirm('Delete ' + fileName(index) + '?')) return;
+    conv.messages.splice(index, 1);
+    await persistChange('Message deleted', () => apiDeleteMessage(conv.id, index));
+    syncAfterEdit();
+  }
+
+  async function moveMessage(conv, index, dir) {
+    const target = index + dir;
+    if (target < 0 || target >= conv.messages.length) return;
+    const moved = conv.messages.splice(index, 1)[0];
+    conv.messages.splice(target, 0, moved);
+    await persistChange('Message moved', () => apiMoveMessage(conv.id, index, dir));
+    syncAfterEdit();
+  }
+
+  async function createConversationFromEditor() {
+    const seed = { title: 'New Conversation', status: 'Online', restricted: false, messages: [] };
+    let id = null;
+    try { const r = await apiCreate(seed); id = r && r.id; }
+    catch (err) { /* no server - fall through to a browser-only room */ }
+    if (!id) {
+      id = 'CONV-' + String(conversations.length + 1).padStart(3, '0');
+      conversations.push({
+        id: id, title: seed.title, status: seed.status, restricted: false,
+        messages: [{ type: 'divider', label: seed.title }]
+      });
+      expStatus('Added (browser only)');
+    } else {
+      await refreshConversations();
+      expStatus('Conversation created');
+    }
+    Explorer.view = 'folder';
+    Explorer.convId = id;
+    const i = conversations.findIndex((c) => c.id === id);
+    if (i >= 0) { currentIndex = i; openConversation(i); }
+    renderSidebar();
+    renderExplorer();
+  }
+
+  async function deleteConversationFromEditor(conv) {
+    if (!confirm('Delete "' + (conv.title || conv.id) + '" and all of its messages?')) return;
+    try {
+      await apiDeleteConversation(conv.id);
+    } catch (err) {
+      if (err && err.rejected) { alert(err.message); return; }
+    }
+    const at = conversations.indexOf(conv);
+    if (at >= 0) conversations.splice(at, 1);
+    currentIndex = Math.max(0, Math.min(currentIndex, conversations.length - 1));
+    Explorer.view = 'root';
+    Explorer.convId = null;
+    renderSidebar();
     if (conversations.length) {
-      loadConvEditorFields(currentIndex);
       openConversation(currentIndex);
     } else {
       document.getElementById('chatTitle').textContent = 'Conversation Pit';
@@ -933,22 +1502,255 @@ function addMsgRow() {
       timeline = [];
       msgNodes = [];
     }
-    let wrote = 'offline';
-    try { wrote = await persistConversations(); }
-    catch (err) { alert('Delete failed: ' + err.message); }
-    flashBtn('ed-delete', wrote === 'written' ? 'Deleted' : 'Deleted (browser only)');
+    renderExplorer();
   }
 
-  function exportConversations() {
-    if (!conversations.length) return;
-    const blob = new Blob([JSON.stringify(conversations, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'conversations.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
-    flashBtn('ed-export', 'Exported!');
+  // ── DIALOGUE API ──
+  // Where the dialogue store lives, resolved by probing rather than guessing.
+  // The page is frequently previewed by a static live-reload host (VS Code Live
+  // Server on :5500) that cannot serve /api/*, so we fall through to the Node
+  // server. The first candidate that answers is latched for the session; a
+  // latched backend that later dies is re-probed once, so a restart on another
+  // port recovers. ?backend=http://host:port overrides the list (phones, or a
+  // custom PORT).
+  function backendCandidates() {
+    const list = BACKEND_CANDIDATES.slice();
+    let override = null;
+    try { override = new URLSearchParams(window.location.search).get('backend'); }
+    catch (e) { /* no search available */ }
+    if (override) list.unshift(override.replace(/\/+$/, '') + '/api/dialogue');
+    return list;
   }
+
+  // A function rather than a const: loadConversations() runs earlier in the
+  // script and reaches this through fetchConversations().
+  function dialogueApi() { return DIALOGUE_BASE || backendCandidates()[0]; }
+
+  // A network failure or a "no such route" status means "this host is not the
+  // backend", not "give up" - so walk the candidates and latch the first that
+  // answers. Both the read path and the editor's writes go through here.
+  async function dialogueFetch(suffix, opts) {
+    const routeless = (r) => r.status === 404 || r.status === 405 || r.status === 501;
+    if (DIALOGUE_BASE) {
+      try {
+        const res = await fetch(DIALOGUE_BASE + suffix, opts);
+        if (!routeless(res)) return res;
+      } catch (e) { /* fell through to a full re-probe */ }
+      DIALOGUE_BASE = null;
+    }
+    const list = backendCandidates();
+    let lastErr = null;
+    for (let i = 0; i < list.length; i++) {
+      try {
+        const res = await fetch(list[i] + suffix, opts);
+        if (!routeless(res)) { DIALOGUE_BASE = list[i]; return res; }
+        lastErr = new Error('HTTP ' + res.status);
+      } catch (err) { lastErr = err; }
+    }
+    DIALOGUE_BASE = null;
+    throw lastErr || new Error('no backend answered');
+  }
+
+  async function apiSend(method, suffix, body) {
+    const opts = { method: method, headers: {} };
+    if (body !== undefined) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
+    const res = await dialogueFetch(suffix, opts);
+    if (!res.ok) {
+      // surface the store's own reason rather than a bare status code, so a
+      // rejected change never masquerades as a silent success
+      let detail = '';
+      try { const j = await res.json(); if (j && j.error) detail = ': ' + j.error; }
+      catch (e) { /* non-JSON body - keep just the status */ }
+      throw Object.assign(new Error('server rejected the change (' + res.status + ')' + detail), { rejected: true });
+    }
+    return res.json().catch(() => ({}));
+  }
+
+  function apiCreate(conv) { return apiSend('POST', '', conv); }
+  function apiSave(id, conv) { return apiSend('PUT', '/' + encodeURIComponent(id), conv); }
+  function apiDeleteConversation(id) { return apiSend('DELETE', '/' + encodeURIComponent(id)); }
+  function apiAddMessage(id, msg) { return apiSend('POST', '/' + encodeURIComponent(id) + '/messages', msg); }
+  function apiUpdateMessage(id, i, msg) { return apiSend('PUT', '/' + encodeURIComponent(id) + '/messages/' + i, msg); }
+  function apiDeleteMessage(id, i) { return apiSend('DELETE', '/' + encodeURIComponent(id) + '/messages/' + i); }
+  function apiMoveMessage(id, i, dir) { return apiSend('POST', '/' + encodeURIComponent(id) + '/messages/' + i + '/move', { dir: dir }); }
+
+  // The placeholder for a divider's card line mirrors the rendered board caption.
+  function dividerHint() {
+    const room = (conversations[currentIndex] || {}).title || '';
+    return "SYSTEM has set the room: '" + room + "' to sleep";
+  }
+
+  // ── MESSAGE INSPECTOR (composer window) ──
+  // Mirrors the chatroom input: Tag, Screen Name and a text area, plus the
+  // schema's optional time / delay / chapter-label fields (the renderer and the
+  // store's validator both need them). Save adds a message; Update replaces the
+  // one being edited.
+  WM.register('inspector', {
+    title: 'Message',
+    icon: '../mats/icons/messages.png',
+    iconClass: 'pwin-ico-inspector',
+    width: 400, height: 330, minW: 300, minH: 250,
+    build(win, body) {
+      body.classList.add('insp');
+      body.innerHTML =
+        '<div class="de-composer" id="inspForm">' +
+          '<div class="de-composer-row">' +
+            '<select class="de-composer-kind" id="inspKind" aria-label="Tag">' +
+              '<option value="chat">chat</option>' +
+              '<option value="action">action</option>' +
+              '<option value="divider">divider</option>' +
+            '</select>' +
+            '<input class="de-composer-name" id="inspName" type="text" placeholder="screenName" aria-label="Screen name">' +
+            '<input class="de-composer-time" id="inspTime" type="text" placeholder="time" aria-label="Timestamp">' +
+            '<input class="de-composer-delay" id="inspDelay" type="number" min="0" placeholder="delay ms" aria-label="Delay in milliseconds">' +
+            '<input class="de-composer-label" id="inspLabel" type="text" placeholder="chapter title" aria-label="Chapter title">' +
+          '</div>' +
+          '<div class="de-composer-row">' +
+            '<textarea class="insp-text" id="inspText" placeholder="the line itself..." aria-label="Message text"></textarea>' +
+          '</div>' +
+          '<div class="insp-foot">' +
+            '<button type="button" class="ed-btn" id="inspSave">Save</button>' +
+            '<button type="button" class="ed-btn" id="inspCancel">Cancel</button>' +
+            '<span class="exp-status" id="inspStatus" aria-live="polite"></span>' +
+          '</div>' +
+        '</div>';
+      body.querySelector('#inspKind').addEventListener('change', syncInspectorKind);
+      body.querySelector('#inspSave').addEventListener('click', saveInspector);
+      body.querySelector('#inspCancel').addEventListener('click', () => { WM.close(WM.wins.get('inspector')); });
+    },
+    onOpen(win) { hydrateInspector(win); }
+  });
+
+  function openInspector(convId, index) {
+    WM.open('inspector', { convId: convId, index: index });
+  }
+
+  function hydrateInspector(win) {
+    const payload = win.payload || {};
+    const conv = conversations.find((c) => c.id === payload.convId);
+    const index = typeof payload.index === 'number' ? payload.index : -1;
+    const existing = (conv && index >= 0) ? (conv.messages || [])[index] : null;
+    const msg = existing || { type: 'chat' };
+    document.getElementById('inspKind').value =
+      msg.type === 'action' ? 'action' : (msg.type === 'divider' ? 'divider' : 'chat');
+    document.getElementById('inspName').value = msg.screenName || '';
+    document.getElementById('inspTime').value = msg.time || '';
+    document.getElementById('inspDelay').value = msg.delayMs != null ? msg.delayMs : '';
+    document.getElementById('inspLabel').value = msg.label || '';
+    document.getElementById('inspText').value = msg.text || '';
+    document.getElementById('inspSave').textContent = existing ? 'Update' : 'Save';
+    document.getElementById('inspStatus').textContent = '';
+    WM.setTitle(win, (payload.convId || '?') + ' / ' + (existing ? fileName(index) : 'new message'));
+    syncInspectorKind();
+  }
+
+  // A divider carries only a chapter label and a bold line; chat/action carry a
+  // screen name, time and delay - so the fields that don't apply go inert.
+  function syncInspectorKind() {
+    const isDivider = document.getElementById('inspKind').value === 'divider';
+    document.getElementById('inspForm').classList.toggle('is-divider', isDivider);
+    ['inspName', 'inspTime', 'inspDelay'].forEach((id) => { document.getElementById(id).disabled = isDivider; });
+    document.getElementById('inspLabel').disabled = !isDivider;
+    document.getElementById('inspText').placeholder = isDivider ? dividerHint() : 'the line itself...';
+  }
+
+  function messageFromInspector() {
+    const kind = document.getElementById('inspKind').value;
+    if (kind === 'divider') {
+      const msg = { type: 'divider' };
+      const label = document.getElementById('inspLabel').value.trim();
+      const text = document.getElementById('inspText').value.trim();
+      if (label) msg.label = label;
+      if (text) msg.text = text;
+      return msg;
+    }
+    const name = document.getElementById('inspName').value.trim();
+    const text = document.getElementById('inspText').value.trim();
+    if (!text && !name) return null;
+    const msg = { text: text };
+    const time = document.getElementById('inspTime').value.trim();
+    if (time) msg.time = time;
+    const delay = document.getElementById('inspDelay').value;
+    if (delay !== '') msg.delayMs = Number(delay);
+    if (kind === 'action') {
+      msg.type = 'action';
+      if (name) msg.screenName = name;
+    } else {
+      msg.screenName = name;
+    }
+    return msg;
+  }
+
+  async function saveInspector() {
+    const win = WM.wins.get('inspector');
+    if (!win) return;
+    const payload = win.payload || {};
+    const conv = conversations.find((c) => c.id === payload.convId);
+    const status = document.getElementById('inspStatus');
+    if (!conv) { status.textContent = 'Conversation not found.'; return; }
+    const msg = messageFromInspector();
+    if (!msg) { status.textContent = 'Give the line a screenName or some text.'; return; }
+    const isNew = !(typeof payload.index === 'number' && payload.index >= 0);
+    if (!Array.isArray(conv.messages)) conv.messages = [];
+    if (isNew) {
+      conv.messages.push(msg);
+      await persistChange('Message added', () => apiAddMessage(conv.id, msg));
+    } else {
+      conv.messages[payload.index] = msg;
+      await persistChange('Message updated', () => apiUpdateMessage(conv.id, payload.index, msg));
+    }
+    syncAfterEdit();
+    // Stay open: a new message resets to an empty composer (so lines can be
+    // typed back to back); an edit re-hydrates the line just written.
+    hydrateInspector(win);
+    WM.focus(win);
+  }
+
+  // ── BOOT ──
+  initDesktop();
+
+  // Persistent diagnostic line: proves this script ran, how many windows the
+  // manager owns, the measured layer, and which read answered. The read is
+  // async, so noteStore() repeats all of this once it lands.
+  function updateBootLine() {
+    const el = document.getElementById('wmBoot');
+    if (!el || !WM.layer) return;
+    const box = WM.bounds();
+    el.textContent = 'WM ready · ' + WM.list().length + ' window(s) · layer ' + box.w + 'x' + box.h
+      + ' · store: ' + DATA_SOURCE
+      + ' · backend: ' + (DIALOGUE_BASE || 'none')
+      + (DATA_SOURCE === 'api' ? '' : '  (' + (DATA_DETAIL || 'fallback') + ')');
+    el.classList.toggle('is-warn', DATA_SOURCE !== 'api');
+  }
+
+  function noteStore() {
+    updateBootLine();
+    // The verdict flips from "not read yet" to "api" once the read lands, so it
+    // owns a slot that clears itself; the fatal banner above never auto-clears.
+    const el = document.getElementById('wmStoreWarn');
+    if (!el) return;
+    if (DATA_SOURCE === 'api') { el.hidden = true; el.textContent = ''; return; }
+    el.hidden = false;
+    el.textContent = DATA_SOURCE === 'none'
+      ? 'No /api/dialogue and no legacy file on ' + (window.location.origin || 'file://')
+        + ' - serve the page from the Node server: http://localhost:4173/'
+      : 'Serving the legacy flat file (' + (DATA_DETAIL || 'fallback') + ')'
+        + ' - restart the Node server for /api/dialogue';
+  }
+
+  noteStore();
+
+
+
+
+
+
+
+
+
 
   // Re-render when the gate opens or locks so restricted conversations appear
   // in the sidebar and stream (or disappear again on a re-lock). If the current
@@ -959,6 +1761,13 @@ function addMsgRow() {
       i = firstVisibleIndex();
     }
     openConversation(i);
+    // The explorer hides gated folders too, and a composer for a room that just
+    // locked must not stay open.
+    if (WM.isOpen('editor')) renderExplorer();
+    const insp = WM.wins.get('inspector');
+    if (insp && insp.state !== 'closed' && !visibleConversations().some((c) => c.id === (insp.payload || {}).convId)) {
+      WM.close(insp);
+    }
   });
 
 </script>
