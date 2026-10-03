@@ -1,0 +1,227 @@
+diff --git a/CSS/TheBonfire.css b/CSS/TheBonfire.css
+index 544582a..3076266 100644
+--- a/CSS/TheBonfire.css
++++ b/CSS/TheBonfire.css
+@@ -388,6 +388,18 @@ body::before {
+     color: var(--ember);
+     text-shadow: 0 0 8px rgba(196,127,23,0.5);
+ }
++/* Inert placeholder: the pencil is kept in the bar for a future route but must
++   not read as pressable now that Entry.exe is reached through Admin.exe. */
++.editor-toggle:disabled,
++.editor-toggle[aria-disabled="true"] {
++    opacity: 0.4;
++    cursor: default;
++}
++.editor-toggle:disabled:hover,
++.editor-toggle[aria-disabled="true"]:hover {
++    color: var(--text-faint);
++    text-shadow: none;
++}
+ 
+ /* ── EDITOR PANEL ── */
+ .editor-panel {
+@@ -1108,6 +1120,11 @@ body { -webkit-tap-highlight-color: transparent; }
+    is nothing for this toggle to collapse. */
+ .is-embedded .sidebar-toggle,
+ .is-embedded .sidebar-backdrop { display: none; }
++/* The "WM ready · N windows · store · backend" line is a one-shot diagnostic for
++   opening this page on its own, where it is how you spot a dead server. Inside
++   a window it lands on the app's own title bar, so the shell hides it. The
++   store verdict still reports itself through #wmStoreWarn and #wmAlert. */
++.is-embedded .wm-boot { display: none; }
+ 
+ /* ── OS SHELL ──
+    TheBonfire.html is the desktop. The reader runs inside the adopted Files
+diff --git a/HTML/ConversationPit.html b/HTML/ConversationPit.html
+index a8ced30..c602afa 100644
+--- a/HTML/ConversationPit.html
++++ b/HTML/ConversationPit.html
+@@ -132,6 +132,10 @@
+ // embedded copy. DATA_SOURCE records which read answered, so an unreachable
+ // store shows an explanation instead of an empty archive.
+ let conversations = [];
++  // True only inside the Conv.exe frame (?app=editor). Declared at this scope so
++  // the conversation loaders can see it: that frame shows the editor alone, so
++  // building a chat stream for it would be work nobody ever sees.
++  let EDITOR_ONLY = false;
+ let DATA_SOURCE = 'none';
+ let DATA_DETAIL = '';
+ 
+@@ -205,7 +209,12 @@ let DATA_DETAIL = '';
+     const list = await fetchConversations();
+     if (list) conversations = list;
+     renderSidebar();
+-    if (conversations.length) openConversation(firstVisibleIndex());
++    // The editor paints once, when its window is built. If it was built before
++    // the store answered - which is exactly what the Conv.exe frame does, by
++    // booting straight into the editor - it is showing an empty list, and
++    // nothing else would ever repaint it. Guarded: a no-op everywhere else.
++    if (WM.isOpen('editor')) renderExplorer();
++    if (conversations.length && !EDITOR_ONLY) openConversation(firstVisibleIndex());
+   }
+ 
+   // The dialogue store is the source of truth; when it is unreachable (page
+@@ -238,6 +247,9 @@ let DATA_DETAIL = '';
+     const list = await fetchConversations();
+     if (list) conversations = list;
+     renderSidebar();
++    // Same reason as loadConversations(): this is what the editor's Refresh
++    // button calls, and without the repaint the button did nothing visible.
++    if (WM.isOpen('editor')) renderExplorer();
+   }
+ 
+   function renderSidebar() {
+@@ -702,7 +714,7 @@ let DATA_DETAIL = '';
+   }
+ 
+   // ── INIT ──
+-  loadConversations();
++  const conversationsReady = loadConversations();
+ // ── CONVERSATION EDITOR ──
+ 
+   // The pencil in the topbar toggles the explorer window.
+@@ -723,6 +735,7 @@ let DATA_DETAIL = '';
+     // conversation editor, so boot straight into it and leave the chat closed.
+     const editorOnly = embedded &&
+       new URLSearchParams(window.location.search).get('app') === 'editor';
++    EDITOR_ONLY = editorOnly;
+     if (embedded) {
+       document.body.classList.add('is-embedded');
+       WM.layer.style.inset = '0';
+@@ -751,10 +764,19 @@ let DATA_DETAIL = '';
+         // Conv.exe: one window, maximized, with nothing else to switch between -
+         // so its own taskbar and status line are noise. Safe to close the chat
+         // because its DOM is kept; nothing is destroyed.
++        //
++        // The editor is opened only once the store has answered. Opening it
++        // synchronously would paint the folder list against an empty array and
++        // rely on a later repaint; waiting means the list is right on first
++        // frame, and it costs no extra request - this reuses the boot fetch
++        // rather than starting a second one. loadConversations always settles,
++        // even when the store is unreachable, so this cannot hang.
+         const chatWin = WM.wins.get('chat');
+         if (chatWin) WM.close(chatWin);
+-        const edWin = WM.open('editor');
+-        if (edWin) WM.maximize(edWin);
++        conversationsReady.then(() => {
++          const edWin = WM.open('editor');
++          if (edWin) WM.maximize(edWin);
++        });
+       } else {
+         // There is no drawer to collapse here, and the app should fill its frame:
+         // the chat window opens docked on the standalone page but maximized
+diff --git a/HTML/TheBonfire.html b/HTML/TheBonfire.html
+index 19d1ef4..ebc95d1 100644
+--- a/HTML/TheBonfire.html
++++ b/HTML/TheBonfire.html
+@@ -32,7 +32,10 @@
+       </span>
+     </nav>
+     <span class="topbar-sub">Eternal Hearthlight Office — Lore Archive</span>
+-    <button class="editor-toggle" onclick="openEntryEditor()" title="Open Entry.exe" aria-label="Open the entry editor" aria-expanded="false">&#9998;</button>
++    <!-- Entry editing now lives behind Admin.exe -> Entry.exe. The pencil stays in
++         the bar as an inert placeholder for that route, but disabled so it cannot
++         be pressed into a second way in. -->
++    <button class="editor-toggle" type="button" disabled aria-disabled="true" title="Entry editor — open Admin.exe" aria-label="Entry editor — open Admin.exe">&#9998;</button>
+   </header>
+ 
+   <!-- ADMIN HUB (adopted into the window layer at boot, so it is written here and
+@@ -692,11 +695,7 @@
+   // are opened from the icons on the surface, so there is no page navigation.
+   function initShell() {
+     if (!WM.init()) return;
+-    WM.on('change', () => {
+-      renderTaskbar();
+-      const toggle = document.querySelector('.editor-toggle');
+-      if (toggle) toggle.setAttribute('aria-expanded', WM.isOpen('entry') ? 'true' : 'false');
+-    });
++    WM.on('change', () => { renderTaskbar(); });
+ 
+     // Adopted, not rebuilt: the decode engine holds a live reference to
+     // #entryBox and to its scroll state, so the nodes must not be recreated.
+diff --git a/verify-shell.js b/verify-shell.js
+index 7c7658c..dd79bdb 100644
+--- a/verify-shell.js
++++ b/verify-shell.js
+@@ -306,10 +306,23 @@ async function main() {
+   check('Entry.exe has a taskbar chip',
+     [...d.querySelectorAll('#wmTaskbar .wm-chip')].some((c) => c.textContent.indexOf('Entry.exe') >= 0));
+ 
+-  // The topbar pencil is a shortcut straight to Entry.exe, not to the hub.
++  // The topbar pencil is an inert placeholder: Entry.exe is reached only via the hub.
+   ev('WM.close(WM.wins.get("entry"))');
+-  d.querySelector('.editor-toggle').click();
+-  check('the topbar pencil opens Entry.exe directly', ev('WM.isOpen("entry")'));
++  const pencil = d.querySelector('.editor-toggle');
++  check('the topbar pencil is still present', !!pencil);
++  check('the topbar pencil is disabled', pencil.disabled === true);
++  check('the topbar pencil cannot open Entry.exe', (() => {
++    pencil.click();
++    return !ev('WM.isOpen("entry")');
++  })());
++  check('the pencil is styled as inert',
++    w.getComputedStyle(pencil).opacity !== '1'
++    || w.getComputedStyle(pencil).cursor === 'default',
++    'opacity=' + w.getComputedStyle(pencil).opacity + ' cursor=' + w.getComputedStyle(pencil).cursor);
++
++  // Entry.exe must remain reachable, but only through the hub.
++  d.querySelectorAll('#win-admin .hub-card')[0].click();
++  check('Entry.exe is still reachable through the hub', ev('WM.isOpen("entry")'));
+ 
+   // ---- 11. Conv.exe ----
+   check('Conv.exe frame is NOT built before first open', !d.querySelector('#win-conv iframe'));
+@@ -331,12 +344,53 @@ async function main() {
+   const ecw = convFrame.contentWindow;
+   const ecd = ecw.document;
+   check('Conv.exe frame is in editor-only mode', ecd.body.classList.contains('is-editor-only'));
++  // The editor now opens only after the store answers, so it lands a beat after
++  // the frame reports itself ready. Wait for it rather than racing it.
++  await waitFor(() => ecw.eval('WM.isOpen("editor")'), 20000, 'Conv.exe editor open');
+   check('Conv.exe frame booted straight into the editor', ecw.eval('WM.isOpen("editor")'));
+   check('Conv.exe frame left the chat closed', ecw.eval('!WM.isOpen("chat")'));
+   check('Conv.exe frame editor is maximized',
+     ecw.eval('WM.wins.get("editor").state') === 'max');
+   check('Conv.exe frame hides its dock and status line',
+     ecw.getComputedStyle(ecd.getElementById('wmTaskbar')).display === 'none');
++  check('Conv.exe frame hides the WM boot diagnostic',
++    ecw.getComputedStyle(ecd.getElementById('wmBoot')).display === 'none');
++  check('the boot line has no leftover text in the frame',
++    (ecd.getElementById('wmBoot').textContent || '') === ''
++    || ecw.getComputedStyle(ecd.getElementById('wmBoot')).display === 'none');
++
++  // The bug this file was extended to catch: the editor window paints once when
++  // it is built, and Conv.exe boots straight into it BEFORE the store answers,
++  // so it rendered an empty list that nothing ever repainted.
++  await waitFor(() => ecw.eval('conversations.length') > 0, 15000, 'Conv.exe frame data');
++  await sleep(300);
++  const expBody = ecd.getElementById('expBody');
++  const folderBtns = expBody ? expBody.querySelectorAll('.exp-folder').length : 0;
++  check('Conv.exe editor lists the real rooms',
++    folderBtns === ecw.eval('conversations.length'),
++    'rows=' + folderBtns + ' conversations=' + ecw.eval('conversations.length'));
++  check('Conv.exe editor is NOT showing the empty-archive state',
++    expBody && expBody.querySelector('.exp-empty') === null);
++  check('Conv.exe editor did not fall back to the legacy flat file',
++    ecw.eval('DATA_SOURCE') === 'api', ecw.eval('DATA_SOURCE'));
++
++  // Refresh must repaint an already-open editor, not silently do nothing.
++  ecw.eval('refreshConversations()');
++  await sleep(400);
++  const after = ecd.getElementById('expBody').querySelectorAll('.exp-folder').length;
++  check('refreshConversations() repaints the open editor', after === ecw.eval('conversations.length'),
++    'rows=' + after);
++  const refreshBtn = ecd.querySelector('[data-exp="refresh"]');
++  check('the editor exposes a Refresh control', !!refreshBtn);
++  refreshBtn.click();
++  await sleep(400);
++  check('the editor Refresh button repaints the list',
++    ecd.getElementById('expBody').querySelectorAll('.exp-folder').length === ecw.eval('conversations.length'));
++
++  // The editor-only frame must not build a chat stream nobody will see.
++  check('Conv.exe frame skipped the chat stream build',
++    ecw.eval('typeof stream === "undefined" || stream.length === 0'),
++    'stream=' + ecw.eval('typeof stream === "undefined" ? "n/a" : stream.length'));
+ 
+   // The fourth door is gone: the chat window bar no longer carries a pencil.
+   check('the chat window bar no longer has an editor button',

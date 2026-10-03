@@ -132,6 +132,10 @@
 // embedded copy. DATA_SOURCE records which read answered, so an unreachable
 // store shows an explanation instead of an empty archive.
 let conversations = [];
+  // True only inside the Conv.exe frame (?app=editor). Declared at this scope so
+  // the conversation loaders can see it: that frame shows the editor alone, so
+  // building a chat stream for it would be work nobody ever sees.
+  let EDITOR_ONLY = false;
 let DATA_SOURCE = 'none';
 let DATA_DETAIL = '';
 
@@ -205,7 +209,12 @@ let DATA_DETAIL = '';
     const list = await fetchConversations();
     if (list) conversations = list;
     renderSidebar();
-    if (conversations.length) openConversation(firstVisibleIndex());
+    // The editor paints once, when its window is built. If it was built before
+    // the store answered - which is exactly what the Conv.exe frame does, by
+    // booting straight into the editor - it is showing an empty list, and
+    // nothing else would ever repaint it. Guarded: a no-op everywhere else.
+    if (WM.isOpen('editor')) renderExplorer();
+    if (conversations.length && !EDITOR_ONLY) openConversation(firstVisibleIndex());
   }
 
   // The dialogue store is the source of truth; when it is unreachable (page
@@ -238,6 +247,9 @@ let DATA_DETAIL = '';
     const list = await fetchConversations();
     if (list) conversations = list;
     renderSidebar();
+    // Same reason as loadConversations(): this is what the editor's Refresh
+    // button calls, and without the repaint the button did nothing visible.
+    if (WM.isOpen('editor')) renderExplorer();
   }
 
   function renderSidebar() {
@@ -702,7 +714,7 @@ let DATA_DETAIL = '';
   }
 
   // ── INIT ──
-  loadConversations();
+  const conversationsReady = loadConversations();
 // ── CONVERSATION EDITOR ──
 
   // The pencil in the topbar toggles the explorer window.
@@ -723,6 +735,7 @@ let DATA_DETAIL = '';
     // conversation editor, so boot straight into it and leave the chat closed.
     const editorOnly = embedded &&
       new URLSearchParams(window.location.search).get('app') === 'editor';
+    EDITOR_ONLY = editorOnly;
     if (embedded) {
       document.body.classList.add('is-embedded');
       WM.layer.style.inset = '0';
@@ -751,10 +764,19 @@ let DATA_DETAIL = '';
         // Conv.exe: one window, maximized, with nothing else to switch between -
         // so its own taskbar and status line are noise. Safe to close the chat
         // because its DOM is kept; nothing is destroyed.
+        //
+        // The editor is opened only once the store has answered. Opening it
+        // synchronously would paint the folder list against an empty array and
+        // rely on a later repaint; waiting means the list is right on first
+        // frame, and it costs no extra request - this reuses the boot fetch
+        // rather than starting a second one. loadConversations always settles,
+        // even when the store is unreachable, so this cannot hang.
         const chatWin = WM.wins.get('chat');
         if (chatWin) WM.close(chatWin);
-        const edWin = WM.open('editor');
-        if (edWin) WM.maximize(edWin);
+        conversationsReady.then(() => {
+          const edWin = WM.open('editor');
+          if (edWin) WM.maximize(edWin);
+        });
       } else {
         // There is no drawer to collapse here, and the app should fill its frame:
         // the chat window opens docked on the standalone page but maximized

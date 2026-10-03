@@ -32,7 +32,10 @@
       </span>
     </nav>
     <span class="topbar-sub">Eternal Hearthlight Office — Lore Archive</span>
-    <button class="editor-toggle" onclick="openEntryEditor()" title="Open Entry.exe" aria-label="Open the entry editor" aria-expanded="false">&#9998;</button>
+    <!-- Entry editing now lives behind Admin.exe -> Entry.exe. The pencil stays in
+         the bar as an inert placeholder for that route, but disabled so it cannot
+         be pressed into a second way in. -->
+    <button class="editor-toggle" type="button" disabled aria-disabled="true" title="Entry editor — open Admin.exe" aria-label="Entry editor — open Admin.exe">&#9998;</button>
   </header>
 
   <!-- ADMIN HUB (adopted into the window layer at boot, so it is written here and
@@ -692,11 +695,7 @@
   // are opened from the icons on the surface, so there is no page navigation.
   function initShell() {
     if (!WM.init()) return;
-    WM.on('change', () => {
-      renderTaskbar();
-      const toggle = document.querySelector('.editor-toggle');
-      if (toggle) toggle.setAttribute('aria-expanded', WM.isOpen('entry') ? 'true' : 'false');
-    });
+    WM.on('change', () => { renderTaskbar(); });
 
     // Adopted, not rebuilt: the decode engine holds a live reference to
     // #entryBox and to its scroll state, so the nodes must not be recreated.

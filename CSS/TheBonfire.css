@@ -388,6 +388,18 @@ body::before {
     color: var(--ember);
     text-shadow: 0 0 8px rgba(196,127,23,0.5);
 }
+/* Inert placeholder: the pencil is kept in the bar for a future route but must
+   not read as pressable now that Entry.exe is reached through Admin.exe. */
+.editor-toggle:disabled,
+.editor-toggle[aria-disabled="true"] {
+    opacity: 0.4;
+    cursor: default;
+}
+.editor-toggle:disabled:hover,
+.editor-toggle[aria-disabled="true"]:hover {
+    color: var(--text-faint);
+    text-shadow: none;
+}
 
 /* ── EDITOR PANEL ── */
 .editor-panel {
@@ -1108,6 +1120,11 @@ body { -webkit-tap-highlight-color: transparent; }
    is nothing for this toggle to collapse. */
 .is-embedded .sidebar-toggle,
 .is-embedded .sidebar-backdrop { display: none; }
+/* The "WM ready · N windows · store · backend" line is a one-shot diagnostic for
+   opening this page on its own, where it is how you spot a dead server. Inside
+   a window it lands on the app's own title bar, so the shell hides it. The
+   store verdict still reports itself through #wmStoreWarn and #wmAlert. */
+.is-embedded .wm-boot { display: none; }
 
 /* ── OS SHELL ──
    TheBonfire.html is the desktop. The reader runs inside the adopted Files
