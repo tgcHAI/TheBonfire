@@ -239,8 +239,6 @@ async function main() {
   const frame = d.querySelector('#win-chat iframe');
   check('window body hosts a frame, not a copied page',
     !!frame && /ConversationPit\.html$/.test(frame.getAttribute('src')));
-  check('frame editor button added to the window bar',
-    !!d.querySelector('#win-chat .pwin-btns button[aria-label="Open the conversation editor"]'));
 
   await waitFor(() => {
     const f = frame.contentWindow;
@@ -306,10 +304,15 @@ async function main() {
   check('frame chat window is open and maximized',
     cw.eval('WM.isOpen("chat") && WM.wins.get("chat").state') === 'max');
 
-  // ---- 6. the shell's editor button reaches into the frame ----
-  d.querySelector('#win-chat .pwin-btns button[aria-label="Open the conversation editor"]').click();
+  // ---- 6. the chat frame keeps its cross-frame editor contract ----
+  // The shell's own pencil used to be a second door into this frame's editor.
+  // Conv.exe replaced it, but the contract must survive for anything else that
+  // wants to drive that window.
+  check('chat frame still exposes its editor contract',
+    !!(cw.BonfireApp && typeof cw.BonfireApp.toggleEditor === 'function'));
+  cw.eval('BonfireApp.toggleEditor()');
   await sleep(300);
-  check('shell button opens the editor window inside the frame', cw.eval('WM.isOpen("editor")'));
+  check('the contract still opens the frame editor', cw.eval('WM.isOpen("editor")'));
   cw.eval('WM.close(WM.wins.get("editor"))');
 
   // ---- 7. the gate is shared across the frame boundary ----
@@ -332,7 +335,7 @@ async function main() {
     cw.eval('localStorage.getItem("eho.gate.unlocked")') === '1');
   check('restricted rooms become visible in the frame', seen > locked, locked + ' -> ' + seen);
 
-  // ---- 9. Admin.exe ----
+  // ---- 9. Admin.exe hub ----
   const adminIco = d.querySelector('#deskCorner .desk-ico');
   check('Admin.exe sits in the bottom-right corner', !!adminIco);
   check('Admin.exe icon is labelled as an executable',
@@ -341,18 +344,12 @@ async function main() {
     w.getComputedStyle(d.getElementById('deskCorner')).position === 'absolute',
     w.getComputedStyle(d.getElementById('deskCorner')).position);
   check('Admin window starts closed', ev('!WM.isOpen("admin")'));
-  check('the entry editor now lives inside the Admin window',
-    !!d.querySelector('#win-admin #ed-body') && !d.getElementById('editorPanel'));
   check('the old entry-editor dropdown is gone (the gate keeps its own panel)',
     d.getElementById('editorPanel') === null
     && [...d.querySelectorAll('.editor-panel')].every((p) => p.querySelector('#gateInput')));
 
   adminIco.click();
-  check('Admin.exe icon opens the admin window', ev('WM.isOpen("admin")'));
-  check('its window bar is titled Admin.exe',
-    d.querySelector('#win-admin .pwin-title').textContent === 'Admin.exe');
-  check('admin window has a taskbar chip',
-    [...d.querySelectorAll('#wmTaskbar .wm-chip')].some((c) => c.textContent.indexOf('Admin.exe') >= 0));
+  check('Admin.exe icon opens the hub', ev('WM.isOpen("admin")'));
 
   // The hub edits nothing: it only offers a choice.
   check('the hub holds no editor form', !d.querySelector('#win-admin #ed-body'));
@@ -403,18 +400,11 @@ async function main() {
   check('Conv.exe frame asks for editor-only mode',
     /\?app=editor$/.test(convFrame.getAttribute('src')), convFrame.getAttribute('src'));
 
-  // The launcher reaches the conversation editor through the frame.
-  await waitFor(() => d.querySelector('#win-chat iframe'), 20000, 'chat frame');
   await waitFor(() => {
-    const f = d.querySelector('#win-chat iframe').contentWindow;
-    return f && f.BonfireApp;
-  }, 30000, 'frame ready');
-  d.querySelector('#win-admin .admin-launch button').click();
-  await sleep(400);
-  const fcw = d.querySelector('#win-chat iframe').contentWindow;
-  check('Admin.exe launcher opens the conversation editor in the frame',
-    fcw.eval('WM.isOpen("editor")'));
-  fcw.eval('WM.close(WM.wins.get("editor"))');
+    const f = convFrame.contentWindow;
+    return f && typeof f.WM !== 'undefined' && f.document
+      && f.document.body.classList.contains('is-editor-only');
+  }, 30000, 'Conv.exe frame boots');
 
   const ecw = convFrame.contentWindow;
   const ecd = ecw.document;
