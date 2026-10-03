@@ -28,6 +28,8 @@ for (const d of ['js', 'json', 'HTML', 'CSS']) {
 }
 fs.copyFileSync(path.join(ROOT, 'server.js'), path.join(TMP, 'server.js'));
 
+const MOBILE = process.env.BONFIRE_VIEWPORT === 'mobile';
+
 // jsdom gives every iframe a brand-new window, so stubs installed from Node -
 // including ones patched onto the Window prototype - never reach the framed app,
 // and it dies on "matchMedia is not a function" before its WM can boot. There is
@@ -36,7 +38,7 @@ fs.copyFileSync(path.join(ROOT, 'server.js'), path.join(TMP, 'server.js'));
 // The real files in the workspace are never modified.
 const STUB = '<script>' + [
   '(function () {',
-  '  window.matchMedia = function (q) { return { matches: false, media: q, onchange: null,',
+  '  window.matchMedia = function (q) { return { matches: __MM__, media: q, onchange: null,',
   '    addListener: function () {}, removeListener: function () {},',
   '    addEventListener: function () {}, removeEventListener: function () {},',
   '    dispatchEvent: function () { return false; } }; };',
@@ -57,7 +59,7 @@ const STUB = '<script>' + [
   '    };',
   '  }',
   '})();',
-].join('\n') + '</script>\n';
+].join('\n').replace('__MM__', MOBILE ? 'true' : 'false') + '</script>\n';
 
 for (const page of ['TheBonfire.html', 'ConversationPit.html']) {
   const f = path.join(TMP, 'HTML', page);
@@ -114,7 +116,7 @@ async function main() {
       // base resolves correctly for the shell and for the framed app.
       const stubFetch = (u, o) => fetch(new URL(String(u), pageUrl).href, o);
       const stubMM = (q) => ({
-        matches: false, media: q,
+        matches: MOBILE, media: q,
         addListener() {}, removeListener() {},
         addEventListener() {}, removeEventListener() {}, onchange: null, dispatchEvent() { return false; },
       });
@@ -147,6 +149,15 @@ async function main() {
   const icons = [...d.querySelectorAll('#deskIcons .desk-ico')];
   check('shell exposes a desktop layer', !!d.getElementById('desktop'));
   check('two desktop icons', icons.length === 2, icons.map((i) => i.textContent.trim()).join(' | '));
+  // Desktop convention: one icon per row, stacked downward, not a side by side row.
+  // Asserted through computed style only: jsdom has no layout engine, so every
+  // getBoundingClientRect() returns 0x0 and a geometry assertion here could never
+  // pass without stubbing the very thing under test.
+  const iconFlex = w.getComputedStyle(d.getElementById('deskIcons')).flexDirection;
+  check('desktop icons stack vertically', iconFlex === 'column', iconFlex);
+  check('desktop icons stay a single column',
+    w.getComputedStyle(d.getElementById('deskIcons')).flexWrap === 'nowrap',
+    w.getComputedStyle(d.getElementById('deskIcons')).flexWrap);
   check('no page-crossing nav links remain', d.querySelectorAll('.topbar-nav a[href]').length === 0);
 
   const filesIco = icons.find((i) => i.getAttribute('data-wm-open') === 'files');
@@ -411,6 +422,35 @@ async function main() {
   check('Conv.exe editor did not fall back to the legacy flat file',
     ecw.eval('DATA_SOURCE') === 'api', ecw.eval('DATA_SOURCE'));
 
+  // A single click must open a room. This regressed once: the folders opened on
+  // dblclick only, so a single press just moved a highlight and looked dead.
+  const folders = () => ecd.querySelectorAll('.exp-folder');
+  check('the editor lists room folders', folders().length === ecw.eval('conversations.length'),
+    folders().length + ' folder(s)');
+  const folderTitle = folders()[1].querySelector('.exp-folder-title').textContent;
+  check('folder tooltip says click, not double-click',
+    /click to open/i.test(folders()[1].title), folders()[1].title);
+  // Real press sequence: pointerdown -> mousedown -> mouseup -> click. A plain
+  // .click() would not catch a handler that only bound to dblclick.
+  const f1 = folders()[1];
+  ['pointerdown', 'mousedown', 'mouseup'].forEach((type) => {
+    f1.dispatchEvent(new ecw.MouseEvent(type, { bubbles: true, cancelable: true }));
+  });
+  f1.dispatchEvent(new ecw.MouseEvent('click', { bubbles: true, cancelable: true }));
+  await sleep(300);
+  check('a SINGLE click opens the room', ecw.eval('Explorer.view') === 'folder',
+    ecw.eval('Explorer.view'));
+  check('the opened room is the one clicked',
+    ecw.eval('conversations.find(function(c){return c.id===Explorer.convId}).title') === folderTitle,
+    folderTitle);
+  check('the folder view rendered message rows for that room',
+    ecd.querySelectorAll('.ex-row').length > 0,
+    ecd.querySelectorAll('.ex-row').length + ' row(s)');
+  ecw.eval('(function(){ var b=document.querySelector(\'[data-exp="root"]\'); if (b) b.click(); })()');
+  await sleep(200);
+  check('Back returns to the room list', ecw.eval('Explorer.view') === 'root',
+    ecw.eval('Explorer.view'));
+
   // Refresh must repaint an already-open editor, not silently do nothing.
   ecw.eval('refreshConversations()');
   await sleep(400);
@@ -463,7 +503,130 @@ async function main() {
     && spawned.x + spawned.w <= 1024 && spawned.y + spawned.h <= 700,
     JSON.stringify(spawned));
 
-  // ---- 11. workspace untouched ----
+  // ---- 13. the embedded roster (AIM-style room switcher) ----
+  // Embed mode hides #sidebar, so this list is the only way to leave a room.
+  const roster = cd.getElementById('roster');
+  check('the chat window has a roster beside the transcript', !!roster);
+  check('roster sits inside the chat window, left of the transcript',
+    !!roster && roster.parentElement.classList.contains('chat-body')
+    && !!roster.parentElement.querySelector('#chatArea'));
+  check('roster is shown when embedded',
+    cw.getComputedStyle(roster).display !== 'none', cw.getComputedStyle(roster).display);
+  check('roster rows are real buttons (keyboard reachable)',
+    [...roster.querySelectorAll('.roster-row')].every((r) => r.tagName === 'BUTTON'));
+
+  const rows = roster.querySelectorAll('.roster-row');
+  check('roster lists every visible room',
+    rows.length === cw.eval('visibleConversations().length'),
+    'rows=' + rows.length + ' visible=' + cw.eval('visibleConversations().length'));
+  check('roster shows a presence dot per room',
+    roster.querySelectorAll('.roster-dot').length === rows.length);
+  check('presence reflects the stored status (padded values trimmed)',
+    roster.querySelectorAll('.roster-dot.is-online').length
+      === cw.eval('conversations.filter(function(c){'
+        + 'return String(c.status||"").trim().toLowerCase()==="online"}).length'),
+    roster.querySelectorAll('.roster-dot.is-online').length + ' online');
+  check('exactly one row is active',
+    roster.querySelectorAll('.roster-row.is-active').length === 1);
+
+  // Switching rooms: click a different row and confirm the chat follows.
+  const beforeIdx = cw.eval('currentIndex');
+  const target = [...rows].find((r) => !r.classList.contains('is-active'));
+  target.click();
+  await sleep(250);
+  check('clicking a roster row switches the open room',
+    cw.eval('currentIndex') !== beforeIdx, beforeIdx + ' -> ' + cw.eval('currentIndex'));
+  check('the active highlight follows the open room',
+    cw.eval('document.querySelector("#roster .roster-row.is-active .roster-name").textContent')
+      === cw.eval('conversations[currentIndex].title'));
+  check('the transcript rebuilt for the new room', cw.eval('stream.length > 0'));
+
+  // Gating: a locked archive must not list restricted rooms in the roster.
+  // Driven through #gateRelock, not Gate.lock(): that export was removed as dead
+  // surface, and the button is the path a user actually takes.
+  const relock = cd.querySelector('#gateRelock');
+  check('the frame builds no gate panel of its own (the parent owns it)',
+    relock === null);
+  // Gating. The frame's own gate panel is never built (embed mode hides the
+  // topbar that opens it), so the frame's locked state cannot be driven from
+  // here. Instead assert the property directly: the roster is EXACTLY the
+  // gate-filtered list, never a superset - and prove that is not vacuous by
+  // requiring the archive to actually contain a restricted room.
+  check('the archive contains restricted rooms (so gating is meaningful)',
+    cw.eval('conversations.some(function(c){return !!c.restricted})'));
+  const shown = [...roster.querySelectorAll('.roster-name')].map((n) => n.textContent);
+  const allowed = cw.eval('visibleConversations().map(function(c){return c.title || c.id})');
+  check('roster is exactly the gate-filtered list, not a superset',
+    JSON.stringify(shown) === JSON.stringify(allowed),
+    'shown=' + shown.length + ' allowed=' + allowed.length);
+  check('every roster row names a conversation that passed the gate',
+    shown.every((t) => allowed.indexOf(t) >= 0));
+  check('an unlocked roster marks the restricted rooms with [OFF-LOG]',
+    cw.eval('Gate.isUnlocked()')
+      ? roster.querySelectorAll('.restricted-badge').length
+          === cw.eval('conversations.filter(function(c){return !!c.restricted}).length')
+      : true,
+    roster.querySelectorAll('.restricted-badge').length + ' badge(s)');
+
+  // ---- 14. mobile / narrow-viewport behaviour ----
+  // Base (non-media) rules are asserted through computed style; the @media
+  // blocks are asserted by inspecting the shipped stylesheet, because jsdom has
+  // no layout engine and does not evaluate media queries in getComputedStyle.
+  check('WM reports the viewport mode under test',
+    ev('WM.isMobile()') === MOBILE, 'isMobile=' + ev('WM.isMobile()'));
+
+  const transport = cd.querySelector('.chat-transport');
+  check('chat transport wraps instead of overflowing',
+    cw.getComputedStyle(transport).flexWrap === 'wrap',
+    cw.getComputedStyle(transport).flexWrap);
+  check('the divider select is capped to its container',
+    cw.getComputedStyle(cd.querySelector('select.chat-btn')).maxWidth === '100%',
+    cw.getComputedStyle(cd.querySelector('select.chat-btn')).maxWidth);
+
+  const sheet = fs.readFileSync(path.join(ROOT, 'CSS', 'TheBonfire.css'), 'utf8');
+  const flat = sheet.replace(/\/\*[\s\S]*?\*\//g, '');
+  check('mobile reclaim rule exists and skips embedded frames',
+    /@media[^{]*max-width:\s*820px\)\s*\{[^@]*?body:not\(\.is-embedded\)\s+\.pwin:not\(\.is-max\)/s.test(flat));
+  check('embedded window fill is important-overridden',
+    /\.is-embedded\s+\.pwin[^}]*inset:\s*0\s*!important/s.test(flat)
+    && /\.is-embedded\s+\.pwin[^}]*border:\s*0\s*!important/s.test(flat));
+  check('a phone transport breakpoint exists at 600px',
+    /@media\s*\(max-width:\s*600px\)/.test(flat));
+  check('the roster is hidden below 600px',
+    /@media\s*\(max-width:\s*600px\)\s*\{[^@]*?\.roster\s*\{\s*display:\s*none\s*!important/s.test(flat));
+
+  // ---- 15. sidebar: no horizontal scrollbar, full-width rows ----
+  // The Files window's entry list is the live instance of .sidebar/.nav-item in
+  // the shell (the framed Conversation Pit hides its own in embed mode).
+  const sb = d.querySelector('#win-files .sidebar');
+  check('the shell sidebar is a flex column', w.getComputedStyle(sb).flexDirection === 'column',
+    w.getComputedStyle(sb).flexDirection);
+  check('the shell sidebar scrolls vertically', w.getComputedStyle(sb).overflowY === 'auto',
+    w.getComputedStyle(sb).overflowY);
+  // The real bug: overflow-y:auto alone computes overflow-x from `visible` to
+  // `auto`, so any title wider than the column grew a bottom scrollbar.
+  check('the shell sidebar cannot scroll horizontally', w.getComputedStyle(sb).overflowX === 'hidden',
+    w.getComputedStyle(sb).overflowX);
+
+  const navItems = sb.querySelectorAll('.nav-item');
+  check('sidebar has items', navItems.length > 0, navItems.length + ' item(s)');
+  check('each item carries its own truncating title element',
+    navItems.length > 0 && [...navItems].every((n) => !!n.querySelector('.nav-title')),
+    (navItems[0] && navItems[0].querySelector('.nav-title')) ? 'yes' : 'no');
+  const tCs = navItems.length ? w.getComputedStyle(navItems[0].querySelector('.nav-title')) : {};
+  check('titles ellipsize instead of overflowing',
+    tCs.overflow === 'hidden' && tCs.textOverflow === 'ellipsis' && tCs.whiteSpace === 'nowrap',
+    (tCs.overflow || '?') + '/' + (tCs.textOverflow || '?') + '/' + (tCs.whiteSpace || '?'));
+  check('items are display:block, not inline-block',
+    w.getComputedStyle(navItems[0]).display === 'block', w.getComputedStyle(navItems[0]).display);
+  check('items are border-box', w.getComputedStyle(navItems[0]).boxSizing === 'border-box',
+    w.getComputedStyle(navItems[0]).boxSizing);
+
+  // The framed app's roster gets the same treatment.
+  check('the roster also cannot scroll horizontally',
+    cw.getComputedStyle(roster).overflowX === 'hidden', cw.getComputedStyle(roster).overflowX);
+
+  // ---- 16. workspace untouched ----
   // Count directories only: index.json lives in the same folder and is not a room.
   const rooms = fs.readdirSync(path.join(ROOT, 'json', 'dialogue'), { withFileTypes: true })
     .filter((e) => e.isDirectory()).map((e) => e.name);

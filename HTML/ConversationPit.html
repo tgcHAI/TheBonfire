@@ -110,7 +110,13 @@
         <span class="chat-progress" id="chatProgress">0 / 0</span>
       </div>
 
-      <div class="chat-area" id="chatArea" aria-live="polite" aria-label="Conversation transcript"></div>
+      <div class="chat-body">
+        <!-- AIM/Messenger roster: the room switcher. Shown only in embedded mode
+             (.is-embedded); the standalone page already has #sidebar for this, and
+             showing both would list the same rooms twice side by side. -->
+        <nav class="roster" id="roster" aria-label="Conversations"></nav>
+        <div class="chat-area" id="chatArea" aria-live="polite" aria-label="Conversation transcript"></div>
+      </div>
 
       <div class="chat-inputbar">
         <span class="chat-input" id="chatInput" aria-hidden="true">observer mode — live feed</span>
@@ -217,6 +223,7 @@ let DATA_DETAIL = '';
     const list = await fetchConversations();
     if (list) conversations = list;
     renderSidebar();
+    renderRoster();
     // The editor paints once, when its window is built. If it was built before
     // the store answered - which is exactly what the Conv.exe frame does, by
     // booting straight into the editor - it is showing an empty list, and
@@ -255,6 +262,7 @@ let DATA_DETAIL = '';
     const list = await fetchConversations();
     if (list) conversations = list;
     renderSidebar();
+    renderRoster();
     // Same reason as loadConversations(): this is what the editor's Refresh
     // button calls, and without the repaint the button did nothing visible.
     if (WM.isOpen('editor')) renderExplorer();
@@ -273,7 +281,11 @@ let DATA_DETAIL = '';
       id.className = 'entry-id';
       id.textContent = c.id;
       a.appendChild(id);
-      a.appendChild(document.createTextNode(c.title));
+      // Its own element so it can ellipsize without clipping the id or badge.
+      const name = document.createElement('span');
+      name.className = 'nav-title';
+      name.textContent = c.title;
+      a.appendChild(name);
       if (c.restricted) {
         const tag = document.createElement('span');
         tag.className = 'restricted-badge';
@@ -282,6 +294,56 @@ let DATA_DETAIL = '';
       }
       a.onclick = (ev) => { ev.preventDefault(); openConversation(i); };
       nav.appendChild(a);
+    });
+  }
+
+  // ── EMBEDDED ROSTER ──
+  // The shell's window layer hides #sidebar, so without this the Conversation Pit
+  // window offers no way to leave the room it opened on - the divider jump only
+  // moves between chapters inside one room. This is the AIM/Messenger contact
+  // list: a narrow left column of rooms with a presence dot.
+  //
+  // Deliberately mirrors renderSidebar() rather than sharing a row-builder: the
+  // two render different markup, standalone mode still needs the sidebar, and
+  // unifying them would mean editing working code for no behavioural gain.
+  function renderRoster() {
+    const nav = document.getElementById('roster');
+    if (!nav) return;
+    nav.innerHTML = '';
+    // Same predicate as renderSidebar(), on purpose. `restricted` is not
+    // consistently typed across rooms ('' , false, true) and this truthiness test
+    // is what already governs gating elsewhere; tightening it to `=== true`
+    // would silently change who can see what.
+    conversations.forEach((c, i) => {
+      if (c.restricted && !Gate.isUnlocked()) return;
+      const row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'roster-row' + (i === currentIndex ? ' is-active' : '');
+      if (i === currentIndex) row.setAttribute('aria-current', 'true');
+
+      // status is stored padded ('Online   '), so normalise before classifying.
+      const status = String(c.status || '').trim();
+      const dot = document.createElement('span');
+      dot.className = 'roster-dot' + (status.toLowerCase() === 'online' ? ' is-online' : '');
+      dot.setAttribute('aria-hidden', 'true');
+
+      const name = document.createElement('span');
+      name.className = 'roster-name';
+      name.textContent = c.title || c.id;
+      name.title = c.id + (status ? '  ·  ' + status : '');
+
+      row.appendChild(dot);
+      row.appendChild(name);
+      if (c.restricted) {
+        const tag = document.createElement('span');
+        tag.className = 'restricted-badge';
+        tag.textContent = '[OFF-LOG]';
+        row.appendChild(tag);
+      }
+      // A real button, not the sidebar's <a href="#">: this list is only
+      // reachable by keyboard once the topbar pencil is gone in the shell.
+      row.addEventListener('click', () => openConversation(i));
+      nav.appendChild(row);
     });
   }
 
@@ -412,6 +474,7 @@ let DATA_DETAIL = '';
     playing = false;
     currentIndex = -1;
     renderSidebar();
+    renderRoster();
     document.getElementById('chatTitle').textContent = 'Conversation Pit';
     document.getElementById('chatStatusText').textContent = 'Locked';
     document.getElementById('chatStatusDot').classList.add('off');
@@ -436,6 +499,7 @@ let DATA_DETAIL = '';
     rebuildStream();
     const conv = conversations[i] || { messages: [] };
     renderSidebar();
+    renderRoster();          // moves the highlight when the room changes
     renderTitlebar(conv);
     resetPlayback();
     renderStream();
@@ -1042,7 +1106,7 @@ let DATA_DETAIL = '';
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'exp-folder';
-      btn.title = 'Double-click to open ' + c.id;
+      btn.title = 'Click to open ' + c.id;
       btn.innerHTML =
         '<span class="exp-folder-img" aria-hidden="true"></span>' +
         '<span class="exp-folder-id"></span>' +
@@ -1053,11 +1117,14 @@ let DATA_DETAIL = '';
       const n = (c.messages || []).length;
       btn.querySelector('.exp-folder-meta').textContent =
         n + (n === 1 ? ' line' : ' lines') + ' · ' + (c.status || 'Offline') + (c.restricted ? ' · OFF-LOG' : '');
+      // Single click opens the room. This used to require a DOUBLE-click, while a
+      // single click only moved a highlight onto a class nothing reads - which
+      // made the room list look like a dead button. A <button> is expected to
+      // act on click. dblclick is dropped so one press cannot open twice.
       btn.addEventListener('click', () => {
         Explorer.selected = c.id;
-        grid.querySelectorAll('.exp-folder').forEach((el) => el.classList.toggle('is-selected', el === btn));
+        openFolder(c.id);
       });
-      btn.addEventListener('dblclick', () => openFolder(c.id));
       btn.addEventListener('keydown', (e) => { if (e.key === 'Enter') openFolder(c.id); });
       grid.appendChild(btn);
     });
@@ -1068,7 +1135,15 @@ let DATA_DETAIL = '';
     Explorer.view = 'folder';
     Explorer.convId = convId;
     const i = conversations.findIndex((c) => c.id === convId);
-    if (i >= 0) { currentIndex = i; openConversation(i); }
+    if (i >= 0) {
+      currentIndex = i;
+      // The editor-only frame (Conv.exe) never shows the chat, so skip the
+      // playback-stream build openConversation() performs. Opening a room here is
+      // for editing its messages, not for playing them - and that build walks
+      // every message in the archive. Gated rooms cannot reach this line at all:
+      // renderRootView() lists visibleConversations() only.
+      if (!EDITOR_ONLY) openConversation(i);
+    }
     renderExplorer();
   }
 
@@ -1474,6 +1549,7 @@ let DATA_DETAIL = '';
     Explorer.view = 'root';
     Explorer.convId = null;
     renderSidebar();
+    renderRoster();          // unlocking may reveal rooms that were gated out
     if (conversations.length) {
       openConversation(currentIndex);
     } else {

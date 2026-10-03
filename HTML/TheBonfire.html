@@ -280,10 +280,23 @@
       a.className = 'nav-item' + (active ? ' active' : '');
       if (active) a.setAttribute('aria-current', 'true');
       a.href = '#';
-      a.innerHTML = `
-        <span class="entry-id">${e.id}</span>
-        ${e.restricted ? '<span class="restricted-badge">&#128274;</span> ' : ''}${e.title}
-      `;
+      // Titles are wrapped rather than interpolated as loose text so they can
+      // ellipsize on their own; room titles run to 50 characters.
+      const name = document.createElement('span');
+      name.className = 'nav-title';
+      name.textContent = e.title;
+      a.innerHTML = '';
+      const id = document.createElement('span');
+      id.className = 'entry-id';
+      id.textContent = e.id;
+      a.appendChild(id);
+      if (e.restricted) {
+        const tag = document.createElement('span');
+        tag.className = 'restricted-badge';
+        tag.textContent = '🔒';
+        a.appendChild(tag);
+      }
+      a.appendChild(name);
       a.onclick = (ev) => { ev.preventDefault(); switchEntry(i); };
       nav.appendChild(a);
     });
