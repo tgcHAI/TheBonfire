@@ -25,6 +25,14 @@
   <script src="../js/wm.js"></script>
 </head>
 <body>
+<!-- A copy hosted in a frame must never paint its own desktop, not even for one
+     frame. This runs before the markup below is parsed, so there is no flash of
+     topbar, tab strip or window controls before initDesktop() gets to run.
+     initDesktop() sets the class again on purpose: it is idempotent, and it is
+     the only path if this script is ever bypassed. -->
+<script>
+  if (window.self !== window.top) document.body.classList.add('is-embedded');
+</script>
 <a class="skip-link" href="#main">Skip to content</a>
 
 <div class="shell">
@@ -730,13 +738,13 @@ let DATA_DETAIL = '';
     // the topbar, the gate trigger and the outer window layer, so this copy
     // drops its own chrome and fills the frame. Detected by framing rather than
     // a query flag, so a hand-pasted iframe URL behaves identically.
-    const embedded = window.self !== window.top;
+    const isEmbedded = window.self !== window.top;
     // Conv.exe frames this page with ?app=editor: that window is only ever the
     // conversation editor, so boot straight into it and leave the chat closed.
-    const editorOnly = embedded &&
+    const editorOnly = isEmbedded &&
       new URLSearchParams(window.location.search).get('app') === 'editor';
     EDITOR_ONLY = editorOnly;
-    if (embedded) {
+    if (isEmbedded) {
       document.body.classList.add('is-embedded');
       WM.layer.style.inset = '0';
     }
@@ -759,7 +767,7 @@ let DATA_DETAIL = '';
       });
     }
     renderTaskbar();
-    if (embedded) {
+    if (isEmbedded) {
       if (editorOnly) {
         // Conv.exe: one window, maximized, with nothing else to switch between -
         // so its own taskbar and status line are noise. Safe to close the chat
@@ -812,7 +820,7 @@ let DATA_DETAIL = '';
         return;
       }
       layer.style.position = 'absolute';
-      layer.style.inset = embedded ? '0' : TOPBAR_H + 'px 0 0 0';
+      layer.style.inset = isEmbedded ? '0' : TOPBAR_H + 'px 0 0 0';
       layer.style.width = '100%';
       console.warn('[wm] desktop layer measured ' + Math.round(lr.width) + 'x' + Math.round(lr.height)
         + ' - applied an explicit work-area box so windows can render');

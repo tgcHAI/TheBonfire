@@ -1110,8 +1110,16 @@ body { -webkit-tap-highlight-color: transparent; }
    ConversationPit.html detects it is framed and drops its own desktop chrome:
    the OS shell (TheBonfire.html) supplies the topbar, the gate trigger and the
    outer window layer, so a second set inside the frame would be stacked bars.
-   The taskbar and alert banner stay - the frame still owns the chat and editor
-   windows, and something has to report a failed boot. */
+   The class is set by an inline script at the top of <body>, before this markup
+   is parsed, so none of this ever flashes.
+
+   What the frame must NOT draw, because the shell already draws it or owns it:
+   its own topbar, its tab strip, its desktop icons, and the draggable title bar
+   with its own min/max/close. Closing an app is the parent shell's job.
+
+   What it KEEPS: the alert banners, and a slim status strip on the window bar -
+   the live Online/Offline dot and the [OFF-LOG] badge are information about the
+   channel, not window furniture. */
 .is-embedded .topbar,
 .is-embedded .body,
 .is-embedded .skip-link { display: none; }
@@ -1120,11 +1128,48 @@ body { -webkit-tap-highlight-color: transparent; }
    is nothing for this toggle to collapse. */
 .is-embedded .sidebar-toggle,
 .is-embedded .sidebar-backdrop { display: none; }
+/* The shell has a taskbar of its own; a second strip down the bottom of the
+   frame just duplicates the window the reader is already looking at. */
+.is-embedded .desk-icons,
+.is-embedded .wm-taskbar,
+.is-embedded .wm-status,
+.is-embedded .topbar-nav,
+.is-embedded .topbar-title,
+.is-embedded .topbar-sub { display: none; }
 /* The "WM ready · N windows · store · backend" line is a one-shot diagnostic for
    opening this page on its own, where it is how you spot a dead server. Inside
    a window it lands on the app's own title bar, so the shell hides it. The
    store verdict still reports itself through #wmStoreWarn and #wmAlert. */
 .is-embedded .wm-boot { display: none; }
+
+/* Window furniture goes; the status strip stays. This leaves the bar collapsed
+   to the dot, the status text and [OFF-LOG] on its own. */
+.is-embedded .pwin-bar .pwin-ico,
+.is-embedded .pwin-bar .pwin-title,
+.is-embedded .pwin-bar .chat-title,
+.is-embedded .pwin-bar .pwin-btns,
+.is-embedded .pwin-bar .chat-winbtns { display: none; }
+/* And it is no longer a drag handle - the parent drags the whole window. */
+.is-embedded .pwin-bar { cursor: default; }
+
+/* The app fills the frame outright: no border, radius or shadow to read as a
+   window inside a window. The WM already maximises it to the full work area,
+   because the layer is inset 0 and the dock is gone, so this matches the inline
+   geometry it writes rather than fighting it.
+
+   .is-focused is matched explicitly on purpose: `.pwin.is-focused` sets its own
+   border colour and ember glow at the SAME specificity (0,2,0) but is declared
+   later, so a bare `.is-embedded .pwin` would lose to it. Naming both selectors
+   here lifts this to (0,3,0), which wins regardless of source order. */
+.is-embedded .pwin,
+.is-embedded .pwin.is-focused {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
 
 /* ── OS SHELL ──
    TheBonfire.html is the desktop. The reader runs inside the adopted Files
@@ -1224,10 +1269,9 @@ body { -webkit-tap-highlight-color: transparent; }
 .conv-body { padding: 0; overflow: hidden; }
 
 /* ── CONV.EXE FRAME ──
-   ?app=editor leaves exactly one window open, so the frame's own dock and
-   status line would only take up space the editor could use. */
-.is-editor-only .wm-taskbar,
-.is-editor-only .wm-status { display: none; }
+   ?app=editor needs nothing beyond what .is-embedded already does: it is framed,
+   so the topbar, dock, status line and window furniture are already gone. Its
+   only extra requirement - one maximized window - is handled in initDesktop(). */
 
 /* pseudo-window */
 .pwin {

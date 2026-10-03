@@ -227,8 +227,45 @@ async function main() {
     cw.getComputedStyle(cd.querySelector('.body')).display === 'none');
   check('frame fills the window (layer inset 0)',
     /^0(px)?$/.test(cd.getElementById('desktop').style.inset), cd.getElementById('desktop').style.inset);
-  check('frame keeps its taskbar for its own windows',
-    !!cd.getElementById('wmTaskbar') && cw.getComputedStyle(cd.getElementById('wmTaskbar')).display !== 'none');
+  check('frame hides its inner taskbar (the parent owns the dock)',
+    !!cd.getElementById('wmTaskbar') && cw.getComputedStyle(cd.getElementById('wmTaskbar')).display === 'none');
+  check('frame hides its transient status line',
+    cw.getComputedStyle(cd.getElementById('wmStatus')).display === 'none');
+  // Option B: the window bar keeps only the live status, so the furniture goes
+  // but the channel's Online/Offline dot and [OFF-LOG] badge survive.
+  const innerBar = cd.querySelector('#win-chat .pwin-bar');
+  check('frame has a window bar for the live status', !!innerBar);
+  // The chat bar uses .chat-title/.chat-winbtns; a WM-built window would use
+  // .pwin-title/.pwin-btns. Resolve by hand so a missing selector is a clean
+  // false rather than getComputedStyle(null) throwing.
+  const barEl = (sel) => (innerBar ? innerBar.querySelector(sel) : null);
+  const barHidden = (sel) => {
+    const e = barEl(sel);
+    return !!e && cw.getComputedStyle(e).display === 'none';
+  };
+  const barVisible = (sel) => {
+    const e = barEl(sel);
+    return !!e && cw.getComputedStyle(e).display !== 'none';
+  };
+  check('frame hides the inner window title', barHidden('.pwin-title') || barHidden('.chat-title'));
+  check('frame hides the inner window icon', barHidden('.pwin-ico'));
+  check('frame hides the inner window controls (close lives in the shell)',
+    barHidden('.pwin-btns') || barHidden('.chat-winbtns'));
+  check('frame KEEPS the live status dot visible', barVisible('.chat-status-dot'));
+  // The badge carries the hidden attribute until a restricted room is showing,
+  // so assert presence here, not visibility.
+  check('frame KEEPS the [OFF-LOG] badge', !!barEl('.restricted-badge'));
+  // The app should fill the frame: no window-inside-a-window framing.
+  const innerWin = cd.querySelector('#win-chat');
+  const winCs = cw.getComputedStyle(innerWin);
+  check('frame window has no border/radius/shadow',
+    (winCs.borderTopWidth === '0px' || winCs.borderTopStyle === 'none')
+    && (winCs.borderTopLeftRadius === '0px' || winCs.boxShadow === 'none'),
+    'border=' + winCs.borderTopWidth + ' radius=' + winCs.borderTopLeftRadius + ' shadow=' + winCs.boxShadow);
+  check('frame window fills the layer',
+    innerWin.style.width === cw.eval('WM.bounds().w + "px"')
+    && innerWin.style.height === cw.eval('WM.bounds().h + "px"'),
+    innerWin.style.width + 'x' + innerWin.style.height);
   check('frame exposes the cross-frame editor contract',
     !!(cw.BonfireApp && typeof cw.BonfireApp.toggleEditor === 'function'));
 
