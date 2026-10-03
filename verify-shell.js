@@ -289,10 +289,54 @@ async function main() {
   check('admin window has a taskbar chip',
     [...d.querySelectorAll('#wmTaskbar .wm-chip')].some((c) => c.textContent.indexOf('Admin.exe') >= 0));
 
-  // The topbar pencil is a second door to the same window.
-  ev('WM.close(WM.wins.get("admin"))');
-  d.querySelector('.editor-toggle').click();
-  check('the topbar pencil opens the same window', ev('WM.isOpen("admin")'));
+  // The hub edits nothing: it only offers a choice.
+  check('the hub holds no editor form', !d.querySelector('#win-admin #ed-body'));
+  check('the hub offers exactly two choices',
+    d.querySelectorAll('#win-admin .hub-card').length === 2);
+  const cardNames = [...d.querySelectorAll('#win-admin .hub-card b')].map((b) => b.textContent);
+  check('choices are named Entry.exe and Conv.exe',
+    cardNames.join(',') === 'Entry.exe,Conv.exe', cardNames.join(', '));
+  check('both cards are real buttons (keyboard reachable)',
+    [...d.querySelectorAll('#win-admin .hub-card')].every((c) => c.tagName === 'BUTTON'));
+
+  // ---- 10. Entry.exe ----
+  d.querySelectorAll('#win-admin .hub-card')[0].click();
+  check('Entry.exe opens as its own window', ev('WM.isOpen("entry")'));
+  check('Entry.exe is titled Entry.exe',
+    d.querySelector('#win-entry .pwin-title').textContent === 'Entry.exe');
+  check('the entry editor form lives inside Entry.exe', !!d.querySelector('#win-entry #ed-body'));
+  check('Entry.exe is a separate window from the hub', ev('WM.isOpen("admin")'));
+  check('Entry.exe has a taskbar chip',
+    [...d.querySelectorAll('#wmTaskbar .wm-chip')].some((c) => c.textContent.indexOf('Entry.exe') >= 0));
+
+  // The topbar pencil is an inert placeholder: Entry.exe is reached only via the hub.
+  ev('WM.close(WM.wins.get("entry"))');
+  const pencil = d.querySelector('.editor-toggle');
+  check('the topbar pencil is still present', !!pencil);
+  check('the topbar pencil is disabled', pencil.disabled === true);
+  check('the topbar pencil cannot open Entry.exe', (() => {
+    pencil.click();
+    return !ev('WM.isOpen("entry")');
+  })());
+  check('the pencil is styled as inert',
+    w.getComputedStyle(pencil).opacity !== '1'
+    || w.getComputedStyle(pencil).cursor === 'default',
+    'opacity=' + w.getComputedStyle(pencil).opacity + ' cursor=' + w.getComputedStyle(pencil).cursor);
+
+  // Entry.exe must remain reachable, but only through the hub.
+  d.querySelectorAll('#win-admin .hub-card')[0].click();
+  check('Entry.exe is still reachable through the hub', ev('WM.isOpen("entry")'));
+
+  // ---- 11. Conv.exe ----
+  check('Conv.exe frame is NOT built before first open', !d.querySelector('#win-conv iframe'));
+  d.querySelectorAll('#win-admin .hub-card')[1].click();
+  check('Conv.exe opens as its own window', ev('WM.isOpen("conv")'));
+  check('Conv.exe is titled Conv.exe',
+    d.querySelector('#win-conv .pwin-title').textContent === 'Conv.exe');
+  await waitFor(() => !!d.querySelector('#win-conv iframe'), 20000, 'Conv.exe frame');
+  const convFrame = d.querySelector('#win-conv iframe');
+  check('Conv.exe frame asks for editor-only mode',
+    /\?app=editor$/.test(convFrame.getAttribute('src')), convFrame.getAttribute('src'));
 
   // The launcher reaches the conversation editor through the frame.
   await waitFor(() => d.querySelector('#win-chat iframe'), 20000, 'chat frame');
@@ -307,7 +351,62 @@ async function main() {
     fcw.eval('WM.isOpen("editor")'));
   fcw.eval('WM.close(WM.wins.get("editor"))');
 
-  // ---- 10. no window spawns on top of an icon ----
+  const ecw = convFrame.contentWindow;
+  const ecd = ecw.document;
+  check('Conv.exe frame is in editor-only mode', ecd.body.classList.contains('is-editor-only'));
+  // The editor now opens only after the store answers, so it lands a beat after
+  // the frame reports itself ready. Wait for it rather than racing it.
+  await waitFor(() => ecw.eval('WM.isOpen("editor")'), 20000, 'Conv.exe editor open');
+  check('Conv.exe frame booted straight into the editor', ecw.eval('WM.isOpen("editor")'));
+  check('Conv.exe frame left the chat closed', ecw.eval('!WM.isOpen("chat")'));
+  check('Conv.exe frame editor is maximized',
+    ecw.eval('WM.wins.get("editor").state') === 'max');
+  check('Conv.exe frame hides its dock and status line',
+    ecw.getComputedStyle(ecd.getElementById('wmTaskbar')).display === 'none');
+  check('Conv.exe frame hides the WM boot diagnostic',
+    ecw.getComputedStyle(ecd.getElementById('wmBoot')).display === 'none');
+  check('the boot line has no leftover text in the frame',
+    (ecd.getElementById('wmBoot').textContent || '') === ''
+    || ecw.getComputedStyle(ecd.getElementById('wmBoot')).display === 'none');
+
+  // The bug this file was extended to catch: the editor window paints once when
+  // it is built, and Conv.exe boots straight into it BEFORE the store answers,
+  // so it rendered an empty list that nothing ever repainted.
+  await waitFor(() => ecw.eval('conversations.length') > 0, 15000, 'Conv.exe frame data');
+  await sleep(300);
+  const expBody = ecd.getElementById('expBody');
+  const folderBtns = expBody ? expBody.querySelectorAll('.exp-folder').length : 0;
+  check('Conv.exe editor lists the real rooms',
+    folderBtns === ecw.eval('conversations.length'),
+    'rows=' + folderBtns + ' conversations=' + ecw.eval('conversations.length'));
+  check('Conv.exe editor is NOT showing the empty-archive state',
+    expBody && expBody.querySelector('.exp-empty') === null);
+  check('Conv.exe editor did not fall back to the legacy flat file',
+    ecw.eval('DATA_SOURCE') === 'api', ecw.eval('DATA_SOURCE'));
+
+  // Refresh must repaint an already-open editor, not silently do nothing.
+  ecw.eval('refreshConversations()');
+  await sleep(400);
+  const after = ecd.getElementById('expBody').querySelectorAll('.exp-folder').length;
+  check('refreshConversations() repaints the open editor', after === ecw.eval('conversations.length'),
+    'rows=' + after);
+  const refreshBtn = ecd.querySelector('[data-exp="refresh"]');
+  check('the editor exposes a Refresh control', !!refreshBtn);
+  refreshBtn.click();
+  await sleep(400);
+  check('the editor Refresh button repaints the list',
+    ecd.getElementById('expBody').querySelectorAll('.exp-folder').length === ecw.eval('conversations.length'));
+
+  // The editor-only frame must not build a chat stream nobody will see.
+  check('Conv.exe frame skipped the chat stream build',
+    ecw.eval('typeof stream === "undefined" || stream.length === 0'),
+    'stream=' + ecw.eval('typeof stream === "undefined" ? "n/a" : stream.length'));
+
+  // The fourth door is gone: the chat window bar no longer carries a pencil.
+  check('the chat window bar no longer has an editor button',
+    d.querySelector('#win-chat .pwin-btns button[aria-label="Open the conversation editor"]') === null);
+
+  // ---- 12. no window spawns on top of an icon ----
   // jsdom has no layout, so every box measures 0x0 and avoidRects() would find
   // nothing to avoid - the avoidance logic would then pass VACUOUSLY. Give the
   // layer and both icon containers synthetic boxes so the geometry is genuinely
