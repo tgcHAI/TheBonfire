@@ -747,7 +747,14 @@ select.chat-btn option {
 .roster {
     display: none;           /* embedded mode opts in; see .is-embedded below */
     width: 168px;
-    flex-shrink: 0;
+    /* Fixed basis in both axes. `flex-shrink: 0` alone left the column free to
+       grow with its content, and `align-content` keeps any spare height pinned
+       to the top instead of distributing it between rows. */
+    flex: 0 0 168px;
+    height: 100%;
+    flex-direction: column;
+    align-content: flex-start;
+    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
     background: var(--panel);
@@ -764,7 +771,14 @@ select.chat-btn option {
     display: flex;
     align-items: center;
     gap: 7px;
+    /* A row is sized by its own content and nothing else: flex:0 0 auto stops it
+       growing to fill the column (which left the first room occupying the whole
+       sidebar) and stops it being squashed when the list overflows. */
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 34px;
     width: 100%;
+    box-sizing: border-box;
     padding: 6px 10px;
     text-align: left;
     background: transparent;
@@ -773,6 +787,7 @@ select.chat-btn option {
     color: var(--text-dim);
     font-family: inherit;
     font-size: 11px;
+    line-height: 1.35;
     cursor: pointer;
     transition: background-color 0.15s, color 0.15s;
 }

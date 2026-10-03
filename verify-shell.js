@@ -512,6 +512,16 @@ async function main() {
     && !!roster.parentElement.querySelector('#chatArea'));
   check('roster is shown when embedded',
     cw.getComputedStyle(roster).display !== 'none', cw.getComputedStyle(roster).display);
+  // Rows must be sized by their own content. A row that grows to fill the column
+  // is what left the first room occupying the whole sidebar.
+  const rCs = cw.getComputedStyle(roster.querySelector('.roster-row'));
+  check('roster rows cannot grow or shrink to fill the column',
+    rCs.flexGrow === '0' && rCs.flexShrink === '0', rCs.flexGrow + '/' + rCs.flexShrink);
+  check('roster rows are content-height, not stretched', rCs.height === 'auto', rCs.height);
+  check('the roster column is a fixed-width, non-growing column',
+    cw.getComputedStyle(roster).flexDirection === 'column'
+    && cw.getComputedStyle(roster).flexGrow === '0',
+    cw.getComputedStyle(roster).flexDirection);
   check('roster rows are real buttons (keyboard reachable)',
     [...roster.querySelectorAll('.roster-row')].every((r) => r.tagName === 'BUTTON'));
 
