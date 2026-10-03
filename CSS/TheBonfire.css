@@ -1090,7 +1090,7 @@ body { -webkit-tap-highlight-color: transparent; }
 .desk-ico:hover .desk-ico-img { filter: brightness(1.05) sepia(1) saturate(2.7) drop-shadow(0 0 6px rgba(196,127,23,0.5)); }
 .desk-ico-files { background-image: url('../mats/icons/Files_icon.png'); }
 .desk-ico-chat { background-image: url('../mats/icons/Conversations_icon.png'); }
-.desk-ico-admin { background-image: url('../mats/icons/Personnel_icon.png'); }
+.desk-ico-admin { background-image: url('../mats/icons/CONV.png'); }
 .desk-ico-editor { background-image: url('../mats/icons/CONV.png'); }
 .desk-ico-label { text-align: center; }
 
@@ -1154,18 +1154,63 @@ body { -webkit-tap-highlight-color: transparent; }
 /* The entry editor was authored as a full-width dropdown; inside a window body
    its own generous padding would double up with .pwin-body's. */
 .admin-body .editor-inner { padding: 2px 2px 14px; }
-.admin-launch {
-    margin-top: 4px;
-    padding-top: 12px;
-    border-top: 1px solid var(--border-dim);
+
+/* ── ADMIN HUB ──
+   Admin.exe edits nothing: it asks which editor you want. The cards are real
+   buttons so they are reachable by keyboard and announced as what they are. */
+.admin-hub { display: flex; flex-direction: column; gap: 10px; }
+.admin-hub-lead {
+    margin: 0 0 2px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
 }
-.admin-launch .editor-heading { margin-bottom: 6px; }
-.admin-hint {
-    margin: 0;
-    font-size: 10.5px;
-    letter-spacing: 0.04em;
-    color: var(--text-faint);
+.hub-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 11px 12px;
+    text-align: left;
+    background: var(--panel);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Courier Prime', monospace;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
 }
+.hub-card:hover,
+.hub-card:focus-visible {
+    border-color: var(--ember);
+    background: var(--panel-raised);
+    outline: none;
+}
+.hub-card:focus-visible { box-shadow: 0 0 0 2px var(--ember-glow); }
+.hub-card-ico {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: brightness(0.9) sepia(0.95) saturate(2.3);
+}
+.hub-card-ico-entry { background-image: url('../mats/icons/Files_icon.png'); }
+.hub-card-ico-conv { background-image: url('../mats/icons/CONV.png'); }
+.hub-card-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.hub-card-text b { font-size: 12px; letter-spacing: 0.06em; color: var(--ember-bright); }
+.hub-card-text span { font-size: 10.5px; letter-spacing: 0.03em; color: var(--text-faint); }
+
+/* Conv.exe's frame fills the window body exactly. */
+.conv-body { padding: 0; overflow: hidden; }
+
+/* ── CONV.EXE FRAME ──
+   ?app=editor leaves exactly one window open, so the frame's own dock and
+   status line would only take up space the editor could use. */
+.is-editor-only .wm-taskbar,
+.is-editor-only .wm-status { display: none; }
 
 /* pseudo-window */
 .pwin {
@@ -1199,7 +1244,9 @@ body { -webkit-tap-highlight-color: transparent; }
 }
 .pwin-ico-files { background-image: url('../mats/icons/Files_icon.png'); }
 .pwin-ico-chat { background-image: url('../mats/icons/Conversations_icon.png'); }
-.pwin-ico-admin { background-image: url('../mats/icons/Personnel_icon.png'); }
+.pwin-ico-admin { background-image: url('../mats/icons/CONV.png'); }
+.pwin-ico-entry { background-image: url('../mats/icons/Files_icon.png'); }
+.pwin-ico-conv { background-image: url('../mats/icons/CONV.png'); }
 .pwin-ico-editor { background-image: url('../mats/icons/CONV.png'); }
 .pwin-title {
     font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-dim);

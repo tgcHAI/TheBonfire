@@ -32,18 +32,46 @@
       </span>
     </nav>
     <span class="topbar-sub">Eternal Hearthlight Office — Lore Archive</span>
-    <button class="editor-toggle" onclick="openAdmin()" title="Open Admin.exe" aria-label="Open the administration tools" aria-expanded="false">&#9998;</button>
+    <button class="editor-toggle" onclick="openEntryEditor()" title="Open Entry.exe" aria-label="Open the entry editor" aria-expanded="false">&#9998;</button>
   </header>
 
-  <!-- ADMIN WINDOW (adopted into the window layer at boot, so it is written here
-       and WM.adopt() relocates it). It holds the entry editor plus a launcher for
-       the conversation editor, which lives inside the framed Conversation Pit and
-       cannot be moved into this document. The entry editor used to be a
-       full-width dropdown hanging off the topbar, which no longer suits a desktop. -->
+  <!-- ADMIN HUB (adopted into the window layer at boot, so it is written here and
+       WM.adopt() relocates it). It edits nothing itself: it asks which editor you
+       want and opens Entry.exe or Conv.exe as a window of its own. -->
   <section class="pwin" id="win-admin" role="dialog" aria-label="Admin.exe">
     <div class="pwin-bar" data-wm-drag>
       <span class="pwin-ico pwin-ico-admin" aria-hidden="true"></span>
       <span class="pwin-title">Admin.exe</span>
+      <span class="pwin-btns">
+        <button type="button" class="pwin-btn" data-wm-act="min" title="Minimize" aria-label="Minimize the window">_</button>
+        <button type="button" class="pwin-btn" data-wm-act="max" title="Maximize" aria-label="Maximize the window">&#9633;</button>
+        <button type="button" class="pwin-btn" data-wm-act="close" title="Close" aria-label="Close the window">&#215;</button>
+      </span>
+    </div>
+    <div class="pwin-body admin-hub">
+      <p class="admin-hub-lead">Which editor?</p>
+      <button type="button" class="hub-card" onclick="openEntryEditor()">
+        <span class="hub-card-ico hub-card-ico-entry" aria-hidden="true"></span>
+        <span class="hub-card-text">
+          <b>Entry.exe</b>
+          <span>Lore archive entries &mdash; fields, body, restriction</span>
+        </span>
+      </button>
+      <button type="button" class="hub-card" onclick="openConvApp()">
+        <span class="hub-card-ico hub-card-ico-conv" aria-hidden="true"></span>
+        <span class="hub-card-text">
+          <b>Conv.exe</b>
+          <span>Conversation rooms &mdash; messages, timing, ordering</span>
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ENTRY.EXE: the entry editor form, adopted into the window layer at boot. -->
+  <section class="pwin" id="win-entry" role="dialog" aria-label="Entry.exe">
+    <div class="pwin-bar" data-wm-drag>
+      <span class="pwin-ico pwin-ico-entry" aria-hidden="true"></span>
+      <span class="pwin-title">Entry.exe</span>
       <span class="pwin-btns">
         <button type="button" class="pwin-btn" data-wm-act="min" title="Minimize" aria-label="Minimize the window">_</button>
         <button type="button" class="pwin-btn" data-wm-act="max" title="Maximize" aria-label="Maximize the window">&#9633;</button>
@@ -107,19 +135,26 @@
       </div>
     </div>
 
-      <!-- The conversation editor is a window inside the framed Conversation Pit,
-           not in this document, so it is reached through that frame rather than
-           by embedding a second copy of the app. -->
-      <div class="admin-launch">
-        <div class="editor-heading">
-          <span>Conversation Editor</span>
-          <div class="editor-actions">
-            <button class="ed-btn" type="button" onclick="openConvEditor()">Open</button>
-          </div>
-        </div>
-        <p class="admin-hint">Opens in the Conversation Pit window, which starts if it is closed.</p>
       </div>
+  </section>
+
+  <!-- CONV.EXE: a second, editor-only frame of the Conversation Pit (?app=editor)
+       that boots straight into the editor window - no chat, no desktop icons. The
+       frame is injected on first open, so this app is not downloaded and booted
+       until it is actually asked for. It is a SEPARATE instance from the
+       Conversation Pit window: the two do not see each other's edits until a
+       reload, though the store underneath is shared, so nothing is lost. -->
+  <section class="pwin" id="win-conv" role="dialog" aria-label="Conv.exe">
+    <div class="pwin-bar" data-wm-drag>
+      <span class="pwin-ico pwin-ico-conv" aria-hidden="true"></span>
+      <span class="pwin-title">Conv.exe</span>
+      <span class="pwin-btns">
+        <button type="button" class="pwin-btn" data-wm-act="min" title="Minimize" aria-label="Minimize the window">_</button>
+        <button type="button" class="pwin-btn" data-wm-act="max" title="Maximize" aria-label="Maximize the window">&#9633;</button>
+        <button type="button" class="pwin-btn" data-wm-act="close" title="Close" aria-label="Close the window">&#215;</button>
+      </span>
     </div>
+    <div class="pwin-body conv-body"></div>
   </section>
 
   <div class="body">
@@ -469,31 +504,21 @@
     // keep the editor form aligned with the entry being viewed when the admin
     // window is open (otherwise the form and editingIndex can silently point at
     // another entry)
-    if (typeof WM !== 'undefined' && WM.isOpen('admin')) loadEditorFields(index);
+    if (typeof WM !== 'undefined' && WM.isOpen('entry')) loadEditorFields(index);
   }
 
   // ── EDITOR LAUNCHERS ──
-  // Both entry points reach the same window: the topbar pencil and the Admin.exe
-  // icon are two doors to one room.
-  function openAdmin() {
-    const win = WM.open('admin');
+  // Admin.exe is a hub: it edits nothing and simply asks which editor you want.
+  // Each answer is a window of its own, and the topbar pencil is a shortcut
+  // straight to Entry.exe - the pencil sits beside the reader, so it means
+  // "edit this entry", not "show me a menu".
+  function openEntryEditor() {
+    const win = WM.open('entry');
     if (win) loadEditorFields(currentIndex);
   }
 
-  // The conversation editor is a window inside the framed Conversation Pit, so
-  // opening it means reaching through that frame. Shared by the Admin window and
-  // the Conversation Pit's own window bar.
-  function openConvEditor() {
-    const win = WM.open('chat');            // opens or refocuses, and builds the frame
-    if (!win || !win.frame) {
-      wmStatus('the Conversation Pit window is still loading', true);
-      return;
-    }
-    try {
-      win.frame.contentWindow.BonfireApp.toggleEditor();
-    } catch (err) {
-      wmStatus('the editor is not ready in that window yet', true);
-    }
+  function openConvApp() {
+    WM.open('conv');
   }
 
   // MOBILE SIDEBAR DRAWER
@@ -670,7 +695,7 @@
     WM.on('change', () => {
       renderTaskbar();
       const toggle = document.querySelector('.editor-toggle');
-      if (toggle) toggle.setAttribute('aria-expanded', WM.isOpen('admin') ? 'true' : 'false');
+      if (toggle) toggle.setAttribute('aria-expanded', WM.isOpen('entry') ? 'true' : 'false');
     });
 
     // Adopted, not rebuilt: the decode engine holds a live reference to
@@ -685,18 +710,55 @@
       });
     }
 
-    // Admin.exe is adopted too, then closed: an app should not be on screen
-    // until it is opened, and the desktop icon is the way in.
+    // Admin.exe and both editors are adopted, then closed: an app should not be
+    // on screen until it is opened, and the desktop icon is the way in.
     const admin = document.getElementById('win-admin');
     if (admin) {
       const win = WM.adopt(admin, {
         appId: 'admin',
         title: 'Admin.exe',
-        icon: '../mats/icons/Personnel_icon.png',
+        icon: '../mats/icons/CONV.png',
+        width: 420, height: 320, minW: 300, minH: 220
+      });
+      if (win) WM.close(win);
+    }
+
+    const entry = document.getElementById('win-entry');
+    if (entry) {
+      const win = WM.adopt(entry, {
+        appId: 'entry',
+        title: 'Entry.exe',
+        icon: '../mats/icons/Files_icon.png',
         width: 760, height: 620, minW: 340, minH: 260
       });
       if (win) WM.close(win);
     }
+
+    const conv = document.getElementById('win-conv');
+    if (conv) {
+      const win = WM.adopt(conv, {
+        appId: 'conv',
+        title: 'Conv.exe',
+        icon: '../mats/icons/CONV.png',
+        width: 820, height: 640, minW: 340, minH: 260
+      });
+      if (win) WM.close(win);
+    }
+
+    // The Conv.exe frame is built on first open, not at boot, so the second copy
+    // of the Conversation Pit is never downloaded until it is asked for.
+    WM.register('conv', {
+      onOpen(win) {
+        if (win.frame) return;
+        const frame = document.createElement('iframe');
+        frame.className = 'app-frame';
+        frame.title = 'Conv.exe — conversation editor';
+        frame.src = 'ConversationPit.html?app=editor';
+        win.el.querySelector('.conv-body').appendChild(frame);
+        win.frame = frame;
+        frame.addEventListener('focus', () => WM.focus(win));
+      }
+    });
 
     WM.register('chat', {
       appId: 'chat',
@@ -714,24 +776,6 @@
         // Clicking into the frame does not bubble to this document, so the
         // window would never come forward on its own.
         frame.addEventListener('focus', () => WM.focus(win));
-
-        // In embed mode the frame hides its own topbar, which carried the
-        // pencil that opens the Conversation Editor. The shell offers it here
-        // instead. Same-origin, so this call is direct, not postMessage.
-        const btns = win.el.querySelector('.pwin-btns');
-        if (btns) {
-          const edit = document.createElement('button');
-          edit.type = 'button';
-          edit.className = 'pwin-btn';
-          edit.title = 'Conversation Editor';
-          edit.setAttribute('aria-label', 'Open the conversation editor');
-          edit.textContent = '✎';
-          edit.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openConvEditor();
-          });
-          btns.insertBefore(edit, btns.firstChild);
-        }
       }
     });
 
