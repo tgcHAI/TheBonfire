@@ -20,6 +20,24 @@ for (const d of ['js', 'json', 'HTML', 'CSS']) {
 }
 fs.copyFileSync(path.join(ROOT, 'server.js'), path.join(TMP, 'server.js'));
 
+// The workspace must come back byte-identical. Checking only the throwaway id
+// is not enough: the store allocates ids as (room count + 1), so the id a run
+// uses shifts as soon as the workspace changes, and a leak left by an EARLIER
+// run carries a different id. That check passed while CONV-007 sat in the
+// workspace untouched by this run. Snapshot the whole tree instead.
+function workspaceSnapshot() {
+  const dir = path.join(ROOT, 'json', 'dialogue');
+  const out = {};
+  for (const name of fs.readdirSync(dir).sort()) {
+    const p = path.join(dir, name);
+    out[name] = fs.statSync(p).isDirectory()
+      ? fs.readdirSync(p).sort().join(',')
+      : fs.readFileSync(p, 'utf8');
+  }
+  return JSON.stringify(out);
+}
+const WORKSPACE_BEFORE = workspaceSnapshot();
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const results = [];
 function check(name, ok, extra) {
@@ -223,8 +241,10 @@ async function main() {
   const list = Array.isArray(d2) ? d2 : d2.conversations;
   check('throwaway room removed from the store', !list.some((c) => c.id === id));
   check('throwaway dir cleaned off disk', !fs.existsSync(path.join(TMP, 'json', 'dialogue', id)));
-  check('workspace json/dialogue untouched',
-    !fs.readdirSync(path.join(ROOT, 'json', 'dialogue')).some((d) => d === id));
+  // Whole-tree comparison, so a leak from THIS run or any previous one fails.
+  const after = workspaceSnapshot();
+  check('workspace json/dialogue untouched', after === WORKSPACE_BEFORE,
+    after === WORKSPACE_BEFORE ? '' : 'workspace dialogue tree changed');
 
   w.close();
 }
