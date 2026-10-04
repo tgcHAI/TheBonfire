@@ -548,6 +548,16 @@
     btn.innerHTML = open ? '&#10094;' : '&#10095;';
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     btn.setAttribute('aria-label', open ? 'Hide the entry list' : 'Show the entry list');
+    // Closing strands focus on a row that is now translated off-screen and
+    // visibility:hidden, i.e. no longer reachable by Tab. Hand it to the panel
+    // the drawer was covering so keyboard users land back in the entry.
+    if (!open) {
+      const main = document.querySelector('.files-main');
+      if (main) {
+        main.setAttribute('tabindex', '-1');
+        main.focus({ preventScroll: true });
+      }
+    }
   }
 
   function toggleSidebar() {
@@ -797,6 +807,10 @@
   trackEntryScrollActivity();
   loadEntries();
   initShell();
+  // A phone boots with the drawer open, because the inline sidebar is part of
+  // the layout until this runs - and an open drawer covers the first entry.
+  // The Conversation Pit page collapses itself for the same reason.
+  if (isMobile()) setSidebar(false);
 </script>
 
 </body>

@@ -605,6 +605,47 @@ async function main() {
   check('the roster is hidden below 600px',
     /@media\s*\(max-width:\s*600px\)\s*\{[^@]*?\.roster\s*\{\s*display:\s*none\s*!important/s.test(flat));
 
+  // ---- 14b. mobile drawers ----
+  // Files: the drawer floats over the reader, so the 820px rule has to carry its
+  // own opaque background - the base --panel let the entry text read through it,
+  // which is what made the open drawer look like an unstyled block.
+  check('the Files drawer is a wide, opaque slide-over',
+    /@media[^{]*max-width:\s*820px\)\s*\{[^@]*?\.sidebar\s*\{[^}]*width:\s*85%[^}]*max-width:\s*320px[^}]*background:\s*var\(--panel\)/s.test(flat),
+    '85% / max 320px / opaque');
+
+  // Conversation Pit: embed mode hides #sidebar AND the toggle, so without an
+  // explicit opt-in below 600px the framed window has no room switcher at all.
+  check('the embedded phone drawer re-enables the toggle',
+    /@media\s*\(max-width:\s*600px\)\s*\{[^@]*?\.is-embedded\s+\.sidebar-toggle\s*\{\s*display:\s*flex/s.test(flat));
+  check('the embedded roster becomes a drawer below 600px',
+    /@media\s*\(max-width:\s*600px\)\s*\{[^@]*?\.is-embedded\s+\.roster\s*\{[^}]*position:\s*absolute[^}]*max-width:\s*320px/s.test(flat));
+  check('collapsing slides the roster out behind a backdrop',
+    /body\.is-embedded\.sidebar-collapsed\s+\.roster\s*\{[^}]*translateX\(-100%\)/s.test(flat)
+    && /\.is-embedded\s+\.roster-backdrop\s*\{[^}]*display:\s*block/s.test(flat));
+  check('the Files drawer boots closed on a phone and open on desktop',
+    d.body.classList.contains('sidebar-collapsed') === MOBILE,
+    'collapsed=' + d.body.classList.contains('sidebar-collapsed') + ' mobile=' + MOBILE);
+
+  const rBackdrop = cd.getElementById('rosterBackdrop');
+  check('the framed Pit carries its own roster backdrop', !!rBackdrop, !!rBackdrop);
+  // The drawer has to actually dismiss, not merely render.
+  if (rBackdrop) {
+    cd.body.classList.remove('sidebar-collapsed');
+    rBackdrop.dispatchEvent(new cw.MouseEvent('click', { bubbles: true }));
+    check('tapping the roster backdrop closes the drawer',
+      cd.body.classList.contains('sidebar-collapsed'),
+      'collapsed=' + cd.body.classList.contains('sidebar-collapsed'));
+  }
+  const rRow = cd.querySelector('.roster-row');
+  if (rRow) {
+    cd.body.classList.remove('sidebar-collapsed');
+    rRow.dispatchEvent(new cw.MouseEvent('click', { bubbles: true }));
+    // Only phones dismiss on pick; on desktop the list stays put.
+    check('picking a room dismisses the drawer on a phone only',
+      cd.body.classList.contains('sidebar-collapsed') === MOBILE,
+      'collapsed=' + cd.body.classList.contains('sidebar-collapsed') + ' mobile=' + MOBILE);
+  }
+
   // ---- 15. sidebar: no horizontal scrollbar, full-width rows ----
   // The Files window's entry list is the live instance of .sidebar/.nav-item in
   // the shell (the framed Conversation Pit hides its own in embed mode).

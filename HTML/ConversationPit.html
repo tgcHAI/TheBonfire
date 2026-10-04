@@ -111,6 +111,11 @@
       </div>
 
       <div class="chat-body">
+        <!-- Phone-only dimmer for the roster drawer. It sits here, inside the
+             window, rather than beside #sidebarBackdrop at body level: that one
+             is hidden in embed mode and is stacked under #desktop, so it would
+             never catch a tap. -->
+        <div class="roster-backdrop" id="rosterBackdrop"></div>
         <!-- AIM/Messenger roster: the room switcher. Shown only in embedded mode
              (.is-embedded); the standalone page already has #sidebar for this, and
              showing both would list the same rooms twice side by side. -->
@@ -197,9 +202,19 @@ let DATA_DETAIL = '';
     return window.matchMedia('(max-width: 820px)').matches;
   }
 
+  // The width at which the roster collapses into a drawer. Below this the
+  // sidebar's inline 168px column would leave too little room to read.
+  function isPhone() {
+    return window.matchMedia('(max-width: 600px)').matches;
+  }
+
   function setSidebar(open) {
     document.body.classList.toggle('sidebar-collapsed', !open);
     const btn = document.getElementById('sidebarToggle');
+    // In embed mode this button opens the roster, because #sidebar is hidden
+    // there - pointing aria-controls at a display:none element would send
+    // assistive tech to the wrong panel.
+    btn.setAttribute('aria-controls', document.body.classList.contains('is-embedded') ? 'roster' : 'sidebar');
     btn.innerHTML = open ? '&#10094;' : '&#10095;';
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     btn.setAttribute('aria-label', open ? 'Hide the conversation list' : 'Show the conversation list');
@@ -211,6 +226,13 @@ let DATA_DETAIL = '';
 
   // tapping the dimmed area under the drawer dismisses it
   document.getElementById('sidebarBackdrop').addEventListener('click', function() {
+    setSidebar(false);
+  });
+
+  // Same dismissal for the roster drawer, which is a different element because
+  // in embed mode #sidebarBackdrop is hidden and sits under #desktop.
+  const rosterBackdrop = document.getElementById('rosterBackdrop');
+  if (rosterBackdrop) rosterBackdrop.addEventListener('click', function() {
     setSidebar(false);
   });
 
@@ -342,7 +364,12 @@ let DATA_DETAIL = '';
       }
       // A real button, not the sidebar's <a href="#">: this list is only
       // reachable by keyboard once the topbar pencil is gone in the shell.
-      row.addEventListener('click', () => openConversation(i));
+      row.addEventListener('click', () => {
+          openConversation(i);
+          // On a phone the drawer covers the transcript it just switched to,
+          // so dismiss it here the way the sidebar list does.
+          if (isPhone()) setSidebar(false);
+        });
       nav.appendChild(row);
     });
   }
@@ -859,6 +886,10 @@ let DATA_DETAIL = '';
         // from outside this document, because the topbar pencil is gone in embed
         // mode. Same-origin, so the parent may call this directly.
         window.BonfireApp = { toggleEditor: toggleConvEditor };
+        // On a phone the roster is the only room switcher this window has
+        // (#sidebar is hidden in embed mode), so it boots as a closed drawer -
+        // same reasoning as the standalone branch below.
+        if (isPhone()) setSidebar(false);
       }
     } else if (WM.isMobile()) {
       // On small screens the drawer is open by default and covers the left strip
@@ -1081,8 +1112,10 @@ let DATA_DETAIL = '';
     if (back) back.disabled = Explorer.view !== 'folder';
     const newConv = document.querySelector('[data-exp="newConv"]');
     if (newConv) newConv.hidden = Explorer.view === 'folder';
-    const customBtn = document.querySelector('[data-exp="myCustomBtn"]');
-    if (customBtn) customBtn.hidden = Explorer.view !== 'folder';
+    // The JSON round-trip acts on the open room, so it stays hidden in the root
+    // view along with the folder-only actions.
+    document.querySelectorAll('[data-exp="exportJson"],[data-exp="importJson"]')
+      .forEach((b) => { b.hidden = Explorer.view !== 'folder'; });
 
     if (Explorer.view === 'folder' && conv) renderFolderView(body, conv);
     else renderRootView(body);
@@ -1159,7 +1192,8 @@ let DATA_DETAIL = '';
           '<button type="button" class="ed-btn" data-exp="root">&#8592; Back</button>' +
           '<span class="exp-crumbs" id="expCrumbs"></span>' +
           '<span class="exp-status" id="expStatus" aria-live="polite"></span>' +
-          '<button type="button" class="ed-btn" data-exp="myCustomBtn">My Action</button>' +
+          '<button type="button" class="ed-btn" data-exp="exportJson">Export JSON</button>' +
+          '<button type="button" class="ed-btn" data-exp="importJson">Import JSON</button>' +
           '<button type="button" class="ed-btn" data-exp="newConv">New Conversation</button>' +
           '<button type="button" class="ed-btn" data-exp="refresh">Refresh</button>' +
         '</div>' +
@@ -1175,7 +1209,8 @@ let DATA_DETAIL = '';
         renderExplorer();
       });
       body.querySelector('[data-exp="newConv"]').addEventListener('click', createConversationFromEditor);
-      body.querySelector('[data-exp="myCustomBtn"]').addEventListener('click', handleMyCustomButtonClick);
+      body.querySelector('[data-exp="exportJson"]').addEventListener('click', exportConversationJson);
+      body.querySelector('[data-exp="importJson"]').addEventListener('click', startImportJson);
     },
     onOpen() {
       renderExplorer();
@@ -1501,15 +1536,189 @@ let DATA_DETAIL = '';
     bindDrag(conv, row, q('.ex-grip'));
     return row;
   }
-  // Placeholder action for the editor toolbar's My Action button. It only acts on
-  // the folder currently open, so it stays hidden in the root view.
-  function handleMyCustomButtonClick() {
-    if (Explorer.view !== 'folder' || !Explorer.convId) return;
+  // ── JSON ROUND-TRIP ──
+  // The store keeps one file per message, so bulk editing means moving between
+  // that layout and a single blob. Export hands out exactly the shape the
+  // importer accepts, so export -> edit -> import is a stable loop.
+  let BLOB = null;
+
+  function blobModal() {
+    let m = document.getElementById('blobModal');
+    if (m) return m;
+    m = document.createElement('div');
+    m.className = 'blob-modal';
+    m.id = 'blobModal';
+    m.hidden = true;
+    m.innerHTML =
+      '<div class="blob-card" role="dialog" aria-modal="true" aria-label="Conversation JSON">' +
+        '<div class="blob-head">' +
+          '<span class="blob-title" id="blobTitle">Conversation JSON</span>' +
+          '<button type="button" class="blob-x" data-blob="close" aria-label="Close">&times;</button>' +
+        '</div>' +
+        '<textarea class="blob-area" id="blobArea" spellcheck="false" aria-label="Conversation JSON"></textarea>' +
+        '<div class="blob-foot">' +
+          '<span class="blob-msg" id="blobMsg" aria-live="polite"></span>' +
+          '<button type="button" class="ed-btn" data-blob="copy">Copy</button>' +
+          '<button type="button" class="ed-btn" data-blob="download">Download as .json</button>' +
+          '<button type="button" class="ed-btn" data-blob="doImport">Import into this room</button>' +
+        '</div>' +
+      '</div>' +
+      '<input type="file" id="blobFile" accept=".json,application/json" hidden>';
+    document.body.appendChild(m);
+    m.querySelector('[data-blob="close"]').addEventListener('click', blobClose);
+    m.addEventListener('click', (ev) => { if (ev.target === m) blobClose(); });
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && !m.hidden) blobClose();
+    });
+    m.querySelector('#blobFile').addEventListener('change', onImportFile);
+    m.querySelector('[data-blob="copy"]').addEventListener('click', blobCopy);
+    m.querySelector('[data-blob="download"]').addEventListener('click', blobDownload);
+    m.querySelector('[data-blob="doImport"]').addEventListener('click', blobDoImport);
+    return m;
+  }
+
+  function blobMsg(m, text) { m.querySelector('#blobMsg').textContent = text; }
+
+  function blobClose() {
+    const m = document.getElementById('blobModal');
+    if (m) m.hidden = true;
+    BLOB = null;
+  }
+
+  function blobOpen(mode, blob) {
+    BLOB = { mode: mode, blob: blob };
+    const m = blobModal();
+    const area = m.querySelector('#blobArea');
+    area.value = blob.text;
+    area.readOnly = mode === 'export';
+    m.querySelector('#blobTitle').textContent =
+      (mode === 'export' ? 'Export ' : 'Import into ') + blob.convId;
+    m.querySelector('[data-blob="download"]').hidden = mode !== 'export';
+    m.querySelector('[data-blob="doImport"]').hidden = mode !== 'import';
+    blobMsg(m, blob.note || '');
+    m.hidden = false;
+    if (mode === 'export') area.focus();
+  }
+
+  function blobRoom() {
+    if (Explorer.view !== 'folder' || !Explorer.convId) {
+      expStatus('Open a room first'); return null;
+    }
     const conv = conversations.find((c) => c.id === Explorer.convId);
-    if (!conv) { expStatus('No conversation is open'); return; }
-    // TODO: mutate conv here, then call touch(conv) to schedule the write and
-    // repaintEditor() / syncPlayer() to refresh the views.
-    expStatus('Action performed');
+    if (!conv) { expStatus('No conversation is open'); return null; }
+    return conv;
+  }
+
+  async function exportConversationJson() {
+    const conv = blobRoom();
+    if (!conv) return;
+    // A queued burst would not be in the file, so land it before reading.
+    if (hasPendingWork()) await flushNow();
+    // Built field by field so the export is exactly the import format: meta
+    // keys, then the message array. writeFiles() copies every non-messages
+    // key into meta.json, so this round-trips.
+    const out = {
+      id: conv.id, title: conv.title, status: conv.status,
+      restricted: !!conv.restricted, messages: conv.messages || []
+    };
+    blobOpen('export', {
+      convId: conv.id,
+      text: JSON.stringify(out, null, 2) + '\n',
+      note: (conv.messages || []).length + ' lines - edit elsewhere, then use Import JSON'
+    });
+  }
+
+  function blobDownload() {
+    if (!BLOB) return;
+    const url = URL.createObjectURL(new Blob([BLOB.blob.text], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = BLOB.blob.convId + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function blobCopy() {
+    if (!BLOB) return;
+    const area = document.getElementById('blobArea');
+    area.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    blobMsg(blobModal(), ok ? 'Copied' : 'Select the text and copy manually');
+  }
+
+  // Structural check only. The per-line rules (text / screenName / delayMs)
+  // live in js/dialogue.js behind /api/dialogue and are the authority; copying
+  // them here would make a second table to keep in sync, and the store's own
+  // rejection is surfaced verbatim a few lines below.
+  function parseBlobText(text, convId) {
+    // Windows editors and PowerShell's `Set-Content -Encoding UTF8` prepend a
+    // BOM, which JSON.parse rejects outright.
+    const clean = String(text).replace(/^\uFEFF/, '');
+    let v;
+    try { v = JSON.parse(clean); }
+    catch (e) { return { error: 'not valid JSON: ' + e.message }; }
+    if (!v || typeof v !== 'object' || Array.isArray(v)) return { error: 'expected a JSON object' };
+    if (!Array.isArray(v.messages)) return { error: 'expected a "messages" array' };
+    if (v.messages.some((m) => !m || typeof m !== 'object' || Array.isArray(m))) {
+      return { error: 'every entry in "messages" must be an object' };
+    }
+    const differs = typeof v.id === 'string' && v.id.trim() && v.id !== convId;
+    return { value: v, differs: differs };
+  }
+
+  function startImportJson() {
+    const conv = blobRoom();
+    if (!conv) return;
+    // A queued burst would be flushed AFTER the import and silently overwrite it.
+    if (hasPendingWork()) { expStatus('Wait for the save to finish'); return; }
+    blobModal().querySelector('#blobFile').click();
+  }
+
+  function onImportFile(ev) {
+    const conv = blobRoom();
+    const file = ev.target.files && ev.target.files[0];
+    ev.target.value = '';                       // allow re-picking the same file
+    if (!file || !conv) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const parsed = parseBlobText(reader.result, conv.id);
+      if (parsed.error) { expStatus('Import rejected - ' + parsed.error); return; }
+      const v = parsed.value;
+      blobOpen('import', {
+        convId: conv.id,
+        parsed: v,
+        text: JSON.stringify(v, null, 2) + '\n',
+        note: (conv.messages || []).length + ' -> ' + v.messages.length + ' lines'
+          + (parsed.differs ? ' - file says ' + v.id + ', keeping ' + conv.id : '')
+      });
+    };
+    reader.onerror = () => expStatus('Could not read that file');
+    reader.readAsText(file);
+  }
+
+  async function blobDoImport() {
+    const conv = blobRoom();
+    if (!BLOB || BLOB.mode !== 'import' || !conv) return;
+    if (hasPendingWork()) { expStatus('Wait for the save to finish'); blobClose(); return; }
+    const before = (conv.messages || []).length;
+    // Option 1: the file lands IN the open room and the room keeps its own id.
+    // Honouring the file's id would make the store read the difference as a
+    // rename - saveConversation() writes the new folder and deletes the old one.
+    // The current room is the base so a file with no title/status is still valid.
+    const next = Object.assign({}, conv, BLOB.blob.parsed, { id: conv.id });
+    pushUndo(conv.id, snapshotOf(conv));         // seeded before the write lands
+    try {
+      await apiSave(conv.id, next);
+      await refreshConversations();
+      renderExplorer();
+      expStatus('Imported ' + next.messages.length + ' lines (was ' + before + ')');
+      blobClose();
+    } catch (err) {
+      expStatus('Import rejected - ' + (err && err.message ? err.message : String(err)));
+    }
   }
 
   async function createConversationFromEditor() {

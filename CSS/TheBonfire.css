@@ -743,6 +743,9 @@ select.chat-btn option {
     display: flex;
     flex: 1;
     min-height: 0;
+    /* Containing block for the roster's mobile backdrop, so the dimming stays
+       inside this window instead of covering the whole frame. */
+    position: relative;
 }
 .roster {
     display: none;           /* embedded mode opts in; see .is-embedded below */
@@ -1029,10 +1032,15 @@ body { -webkit-tap-highlight-color: transparent; }
         top: 0;
         bottom: 0;
         left: 0;
-        width: min(300px, 85%);
+        width: 85%;
+        max-width: 320px;
         z-index: 60;
         padding-top: 12px;
-        box-shadow: 2px 0 18px rgba(0,0,0,0.55);
+        /* Stated explicitly here because the drawer floats over the reader: the
+           base rule's translucent --panel let the paragraph text read through
+           the list, which is what made it look like an unstyled block. */
+        background: var(--panel);
+        box-shadow: 4px 0 16px rgba(0,0,0,0.8);
         transform: translateX(0);
         transition: transform 0.25s ease, visibility 0.25s;
     }
@@ -1066,7 +1074,7 @@ body { -webkit-tap-highlight-color: transparent; }
         justify-content: center;
         position: absolute;
         top: 50%;
-        left: calc(min(300px, 85%) - 22px);
+        left: calc(min(320px, 85%) - 22px);
         transform: translate(0, -50%);
         width: 44px;
         height: 44px;
@@ -1082,7 +1090,7 @@ body { -webkit-tap-highlight-color: transparent; }
         transition: transform 0.25s ease, color 0.15s;
     }
     body.sidebar-collapsed .sidebar-toggle {
-        transform: translate(calc(22px - min(300px, 85%)), -50%);
+        transform: translate(calc(22px - min(320px, 85%)), -50%);
     }
     .sidebar-toggle:hover { color: var(--ember); }
 
@@ -1299,6 +1307,54 @@ body { -webkit-tap-highlight-color: transparent; }
    job and the roster stays out of the way - two identical lists side by side
    would be noise. */
 .is-embedded .roster { display: flex; }
+
+/* ── EMBEDDED PHONE DRAWER ──
+   The 600px rule above takes the roster away on phones, because there was no
+   affordance to bring it back. In embed mode that left the window with NO way
+   to change room at all: #sidebar is gone (.is-embedded .body {display:none})
+   and the toggle is suppressed by .is-embedded .sidebar-toggle. So below this
+   width the roster becomes a drawer driven by that same toggle, and the
+   backdrop lives inside .chat-body so the dimming stays in this window instead
+   of washing over the whole frame.
+
+   Written after the .is-embedded rules on purpose: at equal specificity
+   (0,2,0) later source order wins, and a @media block adds none. */
+.roster-backdrop { display: none; }
+@media (max-width: 600px) {
+    .is-embedded .sidebar-toggle { display: flex; }
+    .is-embedded .roster {
+        display: flex !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 85%;
+        max-width: 320px;
+        flex: 0 0 auto;          /* drop the 168px column basis from the base rule */
+        z-index: 60;
+        background: var(--panel);
+        box-shadow: 4px 0 16px rgba(0,0,0,0.8);
+        transform: translateX(0);
+        transition: transform 0.25s ease, visibility 0.25s;
+    }
+    body.is-embedded.sidebar-collapsed .roster {
+        transform: translateX(-100%);
+        visibility: hidden;
+    }
+    .is-embedded .roster-backdrop {
+        display: block;
+        position: absolute;
+        inset: 0;
+        z-index: 55;
+        background: rgba(0,0,0,0.45);
+        transition: opacity 0.25s;
+    }
+    body.is-embedded.sidebar-collapsed .roster-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+}
 
 /* The app fills the frame outright: no border, radius or shadow to read as a
    window inside a window. The WM already maximises it to the full work area,
