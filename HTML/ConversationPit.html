@@ -1570,6 +1570,7 @@ let DATA_DETAIL = '';
     document.addEventListener('keydown', (ev) => {
       if (ev.key === 'Escape' && !m.hidden) blobClose();
     });
+    m.querySelector('#blobArea').addEventListener('input', blobLiveCount);
     m.querySelector('#blobFile').addEventListener('change', onImportFile);
     m.querySelector('[data-blob="copy"]').addEventListener('click', blobCopy);
     m.querySelector('[data-blob="download"]').addEventListener('click', blobDownload);
@@ -1691,6 +1692,7 @@ let DATA_DETAIL = '';
         convId: conv.id,
         parsed: v,
         text: JSON.stringify(v, null, 2) + '\n',
+        baseCount: (conv.messages || []).length,
         note: (conv.messages || []).length + ' -> ' + v.messages.length + ' lines'
           + (parsed.differs ? ' - file says ' + v.id + ', keeping ' + conv.id : '')
       });
@@ -1703,12 +1705,23 @@ let DATA_DETAIL = '';
     const conv = blobRoom();
     if (!BLOB || BLOB.mode !== 'import' || !conv) return;
     if (hasPendingWork()) { expStatus('Wait for the save to finish'); blobClose(); return; }
+    // Re-read the textarea instead of trusting BLOB.blob.parsed, which is only
+    // what the file picker produced BEFORE any live edits. The box is editable
+    // on purpose, so what is on screen is what gets written.
+    const m = blobModal();
+    const edited = parseBlobText(m.querySelector('#blobArea').value, conv.id);
+    if (edited.error) {
+      // Keep the modal open: the point is to let the user fix the JSON in place.
+      blobMsg(m, edited.error);
+      expStatus('Import rejected - ' + edited.error);
+      return;
+    }
     const before = (conv.messages || []).length;
     // Option 1: the file lands IN the open room and the room keeps its own id.
     // Honouring the file's id would make the store read the difference as a
     // rename - saveConversation() writes the new folder and deletes the old one.
     // The current room is the base so a file with no title/status is still valid.
-    const next = Object.assign({}, conv, BLOB.blob.parsed, { id: conv.id });
+    const next = Object.assign({}, conv, edited.value, { id: conv.id });
     pushUndo(conv.id, snapshotOf(conv));         // seeded before the write lands
     try {
       await apiSave(conv.id, next);
@@ -1719,6 +1732,16 @@ let DATA_DETAIL = '';
     } catch (err) {
       expStatus('Import rejected - ' + (err && err.message ? err.message : String(err)));
     }
+  }
+
+  // Keep the "N -> M lines" note honest while the JSON is being edited.
+  function blobLiveCount() {
+    if (!BLOB || BLOB.mode !== 'import') return;
+    const m = document.getElementById('blobModal');
+    const parsed = parseBlobText(m.querySelector('#blobArea').value, BLOB.blob.convId);
+    if (parsed.error) { blobMsg(m, parsed.error); return; }
+    blobMsg(m, BLOB.blob.baseCount + ' -> ' + parsed.value.messages.length + ' lines'
+      + (parsed.differs ? ' - file says ' + parsed.value.id + ', keeping ' + BLOB.blob.convId : ''));
   }
 
   async function createConversationFromEditor() {

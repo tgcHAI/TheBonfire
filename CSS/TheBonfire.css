@@ -1620,6 +1620,89 @@ body { -webkit-tap-highlight-color: transparent; }
 
 /* ── FILE EXPLORER (Conversation Editor window body) ── */
 .exp-toolbar { display: flex; align-items: center; gap: 6px; margin-bottom: 9px; flex-wrap: wrap; }
+
+/* ── JSON ROUND-TRIP MODAL ──
+   Export/Import hand the room out as one blob and take one back, because the
+   store keeps a file per message. Fixed rather than absolute so the overlay
+   covers the whole frame; the editor is maximized whenever it is reachable. */
+.blob-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;                 /* above the gate panel (100) and the drawer */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.6);
+}
+.blob-modal[hidden] { display: none; }
+.blob-card {
+    display: flex;
+    flex-direction: column;
+    width: min(680px, 100%);
+    max-height: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+}
+.blob-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-dim);
+}
+.blob-title {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--ember-bright);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.blob-x {
+    margin-left: auto;
+    padding: 0 6px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+.blob-x:hover { color: var(--ember); }
+.blob-area {
+    flex: 1;
+    min-height: 220px;
+    padding: 10px;
+    background: var(--bg);
+    border: none;
+    color: var(--text);
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    resize: vertical;
+    tab-size: 2;
+}
+.blob-area:focus { outline: 1px solid var(--ember); outline-offset: -1px; }
+.blob-area[readonly] { color: var(--text-dim); }
+.blob-foot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 8px 10px;
+    border-top: 1px solid var(--border-dim);
+}
+.blob-msg {
+    flex: 1;
+    min-width: 120px;
+    font-size: 10px;
+    color: var(--ember-bright);
+    letter-spacing: 0.04em;
+}
 .exp-crumbs { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 11px; letter-spacing: 0.06em; }
 .exp-crumb { color: var(--text-faint); }
 .exp-crumb-current { color: var(--ember-bright); font-weight: 700; }

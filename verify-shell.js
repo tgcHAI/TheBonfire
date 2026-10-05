@@ -28,6 +28,23 @@ for (const d of ['js', 'json', 'HTML', 'CSS']) {
 }
 fs.copyFileSync(path.join(ROOT, 'server.js'), path.join(TMP, 'server.js'));
 
+// The workspace must come back byte-identical. A fixed `rooms.length === 6` is
+// not that: it fails the moment the workspace legitimately gains a room (a new
+// conversation saved in the editor), and it still passes if a run leaks one room
+// while deleting another. Snapshot the tree instead.
+function workspaceSnapshot() {
+  const dir = path.join(ROOT, 'json', 'dialogue');
+  const out = {};
+  for (const name of fs.readdirSync(dir).sort()) {
+    const p = path.join(dir, name);
+    out[name] = fs.statSync(p).isDirectory()
+      ? fs.readdirSync(p).sort().join(',')
+      : fs.readFileSync(p, 'utf8');
+  }
+  return JSON.stringify(out);
+}
+const WORKSPACE_BEFORE = workspaceSnapshot();
+
 const MOBILE = process.env.BONFIRE_VIEWPORT === 'mobile';
 
 // jsdom gives every iframe a brand-new window, so stubs installed from Node -
@@ -678,10 +695,11 @@ async function main() {
     cw.getComputedStyle(roster).overflowX === 'hidden', cw.getComputedStyle(roster).overflowX);
 
   // ---- 16. workspace untouched ----
-  // Count directories only: index.json lives in the same folder and is not a room.
-  const rooms = fs.readdirSync(path.join(ROOT, 'json', 'dialogue'), { withFileTypes: true })
-    .filter((e) => e.isDirectory()).map((e) => e.name);
-  check('workspace json/dialogue untouched', rooms.length === 6, rooms.length + ' rooms');
+  // Whole-tree comparison, so a leak from THIS run or any previous one fails,
+  // while a legitimately added room in the workspace does not.
+  const afterTree = workspaceSnapshot();
+  check('workspace json/dialogue untouched', afterTree === WORKSPACE_BEFORE,
+    afterTree === WORKSPACE_BEFORE ? '' : 'workspace dialogue tree changed');
 
   w.close();
 }

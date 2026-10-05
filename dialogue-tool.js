@@ -33,6 +33,7 @@ function usage(code) {
     '  dialogue-tool.js pull <CONV-ID> [--stdout] [--out FILE]',
     '  dialogue-tool.js push <CONV-ID> (--file FILE | --stdin) [--dry-run]',
     '  dialogue-tool.js new (--file FILE | --stdin) [--title TITLE] [--dry-run]',
+    '  dialogue-tool.js validate (--file FILE | --stdin)',
   ].join('\n'));
   process.exit(code === undefined ? 0 : code);
 }
@@ -63,9 +64,11 @@ function readStdin() {
 }
 
 async function readBlob(flags) {
-  const raw = flags['file']
+  // `--file -` means stdin, so a caller can pipe without knowing about --stdin.
+  const fromFile = flags['file'] && String(flags['file']) !== '-';
+  const raw = fromFile
     ? fs.readFileSync(String(flags['file']), 'utf8')
-    : (flags['stdin'] ? await readStdin() : '');
+    : (flags['stdin'] || flags['file'] ? await readStdin() : '');
   // Windows editors and PowerShell's `Set-Content -Encoding UTF8` prepend a BOM,
   // which JSON.parse rejects outright - and this file is exactly what people
   // will open in Notepad and hand-edit.
@@ -125,23 +128,29 @@ function cmdPull(flags) {
 async function cmdPush(flags) {
   const id = flags._[1];
   if (!id) usage(1);
-  const conv = await readBlob(flags);
+  const incoming = await readBlob(flags);
   Dialogue.ensureReady();
-  let before = 0;
-  try { before = (Dialogue.readConversation(id).messages || []).length; }
+  let target;
+  try { target = Dialogue.readConversation(id); }
   catch (e) { die('no such conversation: ' + id + ' (' + e.message + ')'); }
 
   // The blob is imported INTO id. Honouring the blob's own id would make
   // saveConversation() read the difference as a RENAME: it writes the new
   // folder and deletes the old one, silently destroying a different room.
-  if (typeof conv.id === 'string' && conv.id.trim() && conv.id !== id) {
-    console.log('  note: blob says id "' + conv.id + '", importing into "' + id + '"');
+  if (typeof incoming.id === 'string' && incoming.id.trim() && incoming.id !== id) {
+    console.log('  note: blob says id "' + incoming.id + '", importing into "' + id + '"');
   }
-  conv.id = id;
-  if (!Array.isArray(conv.messages)) die('blob needs a messages array');
+  if (!Array.isArray(incoming.messages)) die('blob needs a messages array');
+
+  // Merge onto the target rather than replacing it wholesale - this is the same
+  // rule the editor's Import follows: the file overrides the fields it names
+  // and anything it omits (title, status) is inherited, so a blob stripped of
+  // metadata is still accepted instead of being rejected for a missing title.
+  const conv = Object.assign({}, target, incoming, { id: id });
   validate(conv);
 
-  console.log('  ' + id + ': ' + before + ' -> ' + conv.messages.length + ' lines');
+  console.log('  ' + id + ': ' + (target.messages || []).length + ' -> ' +
+    conv.messages.length + ' lines');
   if (flags['dry-run'] === true) { console.log('  dry run, nothing written'); return; }
   Dialogue.saveConversation(id, conv);
   console.log('  saved ' + id);
@@ -163,6 +172,23 @@ async function cmdNew(flags) {
     (conv.title || '') + ')');
 }
 
+// Check a file WITHOUT touching the store or naming a room: the pre-flight for
+// "will this import work?". A stand-in supplies the fields an import would
+// inherit from the target room, so this matches what the store will see.
+async function cmdValidate(flags) {
+  const incoming = await readBlob(flags);
+  if (!Array.isArray(incoming.messages)) die('expected a "messages" array');
+  validate(Object.assign({ id: 'CONV-PROBE', title: 'probe', status: 'Online' }, incoming));
+  const counts = {};
+  for (const m of incoming.messages) {
+    const k = m.type || 'chat';
+    counts[k] = (counts[k] || 0) + 1;
+  }
+  console.log('  ok - ' + incoming.messages.length + ' line(s)');
+  console.log('  by type: ' + JSON.stringify(counts));
+  console.log('  file id: "' + (incoming.id || '(none)') + '" (ignored on import; the open room keeps its own)');
+}
+
 async function main() {
   const flags = parseArgs(process.argv.slice(2));
   const cmd = flags._[0];
@@ -170,6 +196,7 @@ async function main() {
   if (cmd === 'pull') return cmdPull(flags);
   if (cmd === 'push') return cmdPush(flags);
   if (cmd === 'new') return cmdNew(flags);
+  if (cmd === 'validate') return cmdValidate(flags);
   usage(1);
 }
 
