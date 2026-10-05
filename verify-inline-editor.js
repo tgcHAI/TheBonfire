@@ -19,6 +19,9 @@ for (const d of ['js', 'json', 'HTML', 'CSS']) {
   fs.cpSync(path.join(ROOT, d), path.join(TMP, d), { recursive: true });
 }
 fs.copyFileSync(path.join(ROOT, 'server.js'), path.join(TMP, 'server.js'));
+// The CLI ships alongside the harness, so exercise the real one against the
+// sandbox store rather than trusting a separate manual run.
+fs.copyFileSync(path.join(ROOT, 'dialogue-tool.js'), path.join(TMP, 'dialogue-tool.js'));
 
 // The workspace must come back byte-identical. Checking only the throwaway id
 // is not enough: the store allocates ids as (room count + 1), so the id a run
@@ -233,6 +236,179 @@ async function main() {
   await async2('syncPlayer()');
   check('playback stream still built', ev('typeof currentIndex') === "number" && conv().messages.length > 0,
     'currentIndex=' + ev('currentIndex'));
+
+  // ---- 12. JSON round-trip: export guards ----
+  // The store keeps a file per message, so bulk editing goes through a blob.
+  ev('if (!WM.isOpen("editor")) WM.open("editor"); openFolder(' + Q + ');');
+  await sleep(300);
+  const modal = () => w.document.getElementById('blobModal');
+  const area = () => w.document.getElementById('blobArea');
+
+  await async2('exportConversationJson()');
+  const expText = area().value;
+  const expParsed = JSON.parse(expText);
+  check('export opens the modal with the room JSON',
+    modal() && !modal().hidden && expParsed.messages.length > 0,
+    expParsed.messages.length + ' lines');
+  check('export carries every field the importer reads',
+    expParsed.id === id && typeof expParsed.title === 'string'
+    && typeof expParsed.status === 'string' && typeof expParsed.restricted === 'boolean'
+    && Array.isArray(expParsed.messages),
+    'id=' + expParsed.id);
+  check('export line count matches the room',
+    expParsed.messages.length === conv().messages.length,
+    expParsed.messages.length + ' vs ' + conv().messages.length);
+  check('export offers Download and hides Import',
+    !w.document.querySelector('[data-blob="download"]').hidden
+    && w.document.querySelector('[data-blob="doImport"]').hidden);
+  // The exported text must itself satisfy the importer's own parser.
+  check('exported text passes the import parser',
+    ev('parseBlobText(' + JSON.stringify(expText) + ', ' + Q + ').error === undefined'));
+  await async2('blobClose()');
+
+  check('a file with a different id is flagged',
+    ev('parseBlobText(' + JSON.stringify(JSON.stringify({ id: 'CONV-999', title: 'x', messages: [] })) + ', ' + Q + ').differs') === true);
+  check('malformed JSON is rejected',
+    ev('parseBlobText("{not json", ' + Q + ').error') !== undefined);
+  check('a non-object blob is rejected',
+    ev('parseBlobText("[]", ' + Q + ').error') !== undefined);
+  check('a blob without messages is rejected',
+    ev('parseBlobText(\'{"id":"x","title":"y"}\', ' + Q + ').error') !== undefined);
+  // Windows editors and PowerShell's Set-Content -Encoding UTF8 both add one.
+  check('a UTF-8 BOM does not break parsing',
+    ev('parseBlobText("\\uFEFF{\\"id\\":\\"x\\",\\"title\\":\\"y\\",\\"messages\\":[]}", ' + Q + ').error') === undefined);
+
+  // A queued burst would be flushed AFTER the import and overwrite it.
+  ev('touch(conversations.find(function(c){return c.id===' + Q + '}))');
+  check('a dirty room makes the import refuse', ev('hasPendingWork()') === true);
+  ev('startImportJson()');
+  check('import refuses while a burst is pending', modal().hidden !== false);
+  await async2('flushNow()');
+  await sleep(700);
+
+  // ---- 13. import, undo, refusal, CLI ----
+  const goodBlob = {
+    id: 'CONV-999', title: 'Imported Room', status: 'Online', restricted: false,
+    messages: [
+      { type: 'divider', label: 'Imported' },
+      { type: 'chat', text: 'imported line', screenName: 'Zulu', time: '00:00', delayMs: 1200 }
+    ]
+  };
+  const beforeImport = conv().messages.length;
+  // The textarea is what actually gets written, so a blob argument must always
+// carry the same JSON in `text` - an empty box is (correctly) a rejection.
+  const importArg = (o) => 'convId:' + Q + ', parsed:' + JSON.stringify(o)
+    + ', text:' + JSON.stringify(JSON.stringify(o, null, 2)) + ', baseCount: 0, note:""';
+  await async2('blobOpen("import", {' + importArg(goodBlob) + '})');
+  await async2('blobDoImport()');
+  await sleep(900);
+  const afterImport = await storeOf(id);
+  check('import replaces the room wholesale',
+    !!afterImport && afterImport.messages.length === 2,
+    (afterImport ? afterImport.messages.length : '?') + ' lines (was ' + beforeImport + ')');
+  check('import applied the file title', afterImport.title === 'Imported Room', afterImport.title);
+  // Option 1: the file lands IN the open room. saveConversation() treats a
+  // changed id as a rename, so honouring the file id would delete this folder.
+  check('import preserves the open room id, ignoring the file id',
+    afterImport.id === id && !(await storeOf('CONV-999')), afterImport.id);
+  check('import modal closed on success', modal().hidden === true);
+  check('imported lines reached the editor', conv().messages.length === 2, conv().messages.length);
+
+  ev('undoLastChange()');
+  await sleep(900);
+  const afterUndo = await storeOf(id);
+  check('undo reverts the import',
+    !!afterUndo && afterUndo.messages.length === beforeImport,
+    (afterUndo ? afterUndo.messages.length : '?') + ' lines');
+  check('undo restored the title', afterUndo.title !== 'Imported Room', afterUndo.title);
+
+  // A blob the store refuses must leave the room exactly as it was.
+  const preReject = await storeOf(id);
+  const ruleBreak = { id: 'CONV-999', title: 'Bad Room', status: 'Online',
+    messages: [{ type: 'chat', text: 'no speaker here' }] };
+  await async2('blobOpen("import", {' + importArg(ruleBreak) + '})');
+  await async2('blobDoImport()');
+  await sleep(900);
+  const postReject = await storeOf(id);
+  check('the store refuses a chat line with no screenName',
+    !!postReject && postReject.messages.length === preReject.messages.length
+    && postReject.title === preReject.title, postReject.title);
+  check('a refused import reports the reason and keeps the modal open',
+    /rejected/i.test(w.document.getElementById('expStatus').textContent)
+    && modal().hidden === false,
+    w.document.getElementById('expStatus').textContent);
+  await async2('blobClose()');
+
+  // The import textarea is editable, so what is on screen must be what lands.
+  const typedBlob = { id: 'CONV-999', title: 'Typed In', status: 'Online',
+    messages: [{ type: 'divider', label: 'Typed' }] };
+  const blobArg = 'convId:' + Q + ', parsed:' + JSON.stringify(typedBlob)
+    + ', text:' + JSON.stringify(JSON.stringify(typedBlob, null, 2)) + ', baseCount: 99, note:""';
+  await async2('blobOpen("import", {' + blobArg + '})');
+  check('the import textarea is editable (not read-only)', area().readOnly === false);
+  area().value = JSON.stringify(Object.assign({}, typedBlob, {
+    title: 'Edited In The Box',
+    messages: [{ type: 'divider', label: 'FromBox' },
+      { type: 'chat', text: 'added by hand', screenName: 'Yankee', time: '00:00', delayMs: 900 }]
+  }), null, 2);
+  await async2('blobLiveCount()');
+  check('the confirm note tracks live edits',
+    /99 -> 2 lines/.test(w.document.getElementById('blobMsg').textContent),
+    w.document.getElementById('blobMsg').textContent);
+  await async2('blobDoImport()');
+  await sleep(900);
+  const typedStore = await storeOf(id);
+  check('live textarea edits are what actually land',
+    !!typedStore && typedStore.title === 'Edited In The Box' && typedStore.messages.length === 2
+    && typedStore.messages[1].text === 'added by hand',
+    typedStore.title + ' / ' + typedStore.messages.length + ' lines');
+
+  // Broken JSON typed into the box must block the write and stay fixable.
+  await async2('blobOpen("import", {' + blobArg + '})');
+  const preBad = await storeOf(id);
+  area().value = '{ this is not json';
+  await async2('blobDoImport()');
+  await sleep(300);
+  const postBad = await storeOf(id);
+  check('garbage typed in the box blocks the commit and keeps it open',
+    postBad.messages.length === preBad.messages.length && modal().hidden === false
+    && w.document.getElementById('blobMsg').textContent.length > 0,
+    w.document.getElementById('blobMsg').textContent);
+  await async2('blobClose()');
+
+  const cli = (args, input) => require('child_process').spawnSync(process.execPath,
+    ['dialogue-tool.js'].concat(args), { cwd: TMP, encoding: 'utf8', input: input });
+  const lsOut = cli(['ls']);
+  check('CLI ls lists the sandbox rooms',
+    lsOut.status === 0 && lsOut.stdout.indexOf(id) >= 0,
+    (lsOut.stdout.trim().match(/\n/g) || []).length + ' rows');
+  const pullOut = cli(['pull', id, '--stdout']);
+  let cliMsgs = null;
+  try { cliMsgs = JSON.parse(pullOut.stdout).messages.length; } catch (e) { /* reported below */ }
+  // Compare against the store as it is NOW: postReject was captured before the
+  // live-edit tests ran, so comparing it here would compare a stale snapshot.
+  const nowStore = await storeOf(id);
+  check('CLI pull emits the same blob the page exports',
+    pullOut.status === 0 && cliMsgs === nowStore.messages.length,
+    cliMsgs + ' vs store ' + nowStore.messages.length);
+  const dryOut = cli(['push', id, '--file', '-', '--dry-run'], pullOut.stdout);
+  check('CLI dry-run reports a no-op',
+    /dry run/i.test(dryOut.stdout + dryOut.stderr),
+    (dryOut.stdout + dryOut.stderr).trim().split('\n').slice(-1)[0]);
+
+  // The CLI must be as forgiving as the page: a blob stripped of metadata
+  // inherits the target's fields instead of being rejected for a missing title.
+  const titleKeep = (await storeOf(id)).title;
+  const noTitle = JSON.stringify({ messages: [{ type: 'divider', label: 'CLI Merge' }] });
+  const mergeOut = cli(['push', id, '--file', '-'], noTitle);
+  check('CLI push accepts a blob carrying no title',
+    mergeOut.status === 0 && /saved/.test(mergeOut.stdout),
+    (mergeOut.stdout + mergeOut.stderr).trim().split('\n').slice(-1)[0]);
+  const merged = await storeOf(id);
+  check('CLI push inherited the room title and applied the new lines',
+    !!merged && merged.title === titleKeep && merged.messages.length === 1,
+    (merged ? merged.title : '?') + ' / ' + (merged ? merged.messages.length : '?') + ' lines');
+  check('CLI push kept the target room id', !!merged && merged.id === id, merged && merged.id);
 
   // ---- 12. cleanup ----
   await async2('deleteConversationFromEditor(conversations.find(function(x){return x.id===' + Q + '}))');
