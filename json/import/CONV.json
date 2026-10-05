@@ -1,0 +1,1286 @@
+{
+  "id": "CONV-007",
+  "title": "Post-combat logs",
+  "status": "Online",
+  "restricted": false,
+  "messages": [
+    {
+      "type": "divider",
+      "label": "A Gank Gone Sour"
+    },
+    {
+      "type": "chat",
+      "text": "ASS",
+      "screenName": "Clockwise",
+      "time": "00:00",
+      "delayMs": 400
+    },
+    {
+      "type": "chat",
+      "text": "Yo zipper what the fuck are you actually doing right now lol",
+      "screenName": "Ezzy_pzzy",
+      "time": "00:01",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "Uhm",
+      "screenName": "Zips'n'zooms",
+      "time": "00:02",
+      "delayMs": 500
+    },
+    {
+      "type": "chat",
+      "text": "I only left the grid cus i wanted to go do a library run with a friend",
+      "screenName": "Zips'n'zooms",
+      "time": "00:04",
+      "delayMs": 1600
+    },
+    {
+      "type": "chat",
+      "text": "I was legit getting chased by a whole ass group of blue star user so I couldn't see any of y'all",
+      "screenName": "Delmira",
+      "time": "00:07",
+      "delayMs": 2200
+    },
+    {
+      "type": "chat",
+      "text": "And i did not know",
+      "screenName": "Zips'n'zooms",
+      "time": "00:08",
+      "delayMs": 800
+    },
+    {
+      "type": "chat",
+      "text": "That the person named 'Outis' is running through the Backstreets was Clockwise-",
+      "screenName": "Zips'n'zooms",
+      "time": "00:10",
+      "delayMs": 1800
+    },
+    {
+      "type": "chat",
+      "text": "!!Clockwise bruh look at this guy",
+      "screenName": "Delmira",
+      "time": "00:12",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "Plus i got ganked by those fuckers in the alley before Outis even tried ganking!",
+      "screenName": "Zips'n'zooms",
+      "time": "00:14",
+      "delayMs": 2000
+    },
+    {
+      "type": "chat",
+      "text": "ZIPPER STFU",
+      "screenName": "Clockwise",
+      "time": "00:15",
+      "delayMs": 600
+    },
+    {
+      "type": "chat",
+      "text": "Ok...",
+      "screenName": "Zips'n'zooms",
+      "time": "00:16",
+      "delayMs": 600
+    },
+    {
+      "type": "chat",
+      "text": "I SENT 2 MESSAGES IN THE COMMS",
+      "screenName": "Clockwise",
+      "time": "00:17",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "We owe Outis rewound fees now, this is so cooked",
+      "screenName": "Delmira",
+      "time": "00:19",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "I LITERALLY TYPED \"@GANK\" \"I AM CLOCKWISE\"",
+      "screenName": "Clockwise",
+      "time": "00:21",
+      "delayMs": 1300
+    },
+    {
+      "type": "chat",
+      "text": "Mf really dragged me straight into a 1v3 wipeout",
+      "screenName": "Delmira",
+      "time": "00:23",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "I",
+      "screenName": "Clockwise",
+      "time": "00:23",
+      "delayMs": 300
+    },
+    {
+      "type": "chat",
+      "text": "Am",
+      "screenName": "Clockwise",
+      "time": "00:24",
+      "delayMs": 300
+    },
+    {
+      "type": "chat",
+      "text": "CLOCKWISE",
+      "screenName": "Clockwise",
+      "time": "00:24",
+      "delayMs": 500
+    },
+    {
+      "type": "chat",
+      "text": "I WROTE IT DOWN IN THE SYSTEM CHAT MAN",
+      "screenName": "Clockwise",
+      "time": "00:26",
+      "delayMs": 1200
+    },
+    {
+      "type": "chat",
+      "text": "I am a surgeon! I am a surgeon!",
+      "screenName": "Delmira",
+      "time": "00:28",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "Wipe my data at this point I'm done",
+      "screenName": "Zips'n'zooms",
+      "time": "00:30",
+      "delayMs": 1200
+    },
+    {
+      "type": "chat",
+      "text": "YOU RAN AFTER ME THEN LEFT ME TO DIE WHILE YOU WERE TALKING TO RANDOMS ON THE STREETS",
+      "screenName": "Clockwise",
+      "time": "00:33",
+      "delayMs": 2200
+    },
+    {
+      "type": "chat",
+      "text": "Oh boy... alrightI'll let ya'll sort this disaster on your own.",
+      "screenName": "Director",
+      "time": "00:35",
+      "delayMs": 1800
+    },
+    {
+      "type": "chat",
+      "text": "YES I WILL",
+      "screenName": "Clockwise",
+      "time": "00:36",
+      "delayMs": 600
+    },
+    {
+      "type": "chat",
+      "text": "I'll fucking dox them in The City registry I swear to god",
+      "screenName": "Clockwise",
+      "time": "00:38",
+      "delayMs": 1600
+    },
+    {
+      "type": "chat",
+      "text": "I think zipper literally read your ping as \"gank clockwise\"",
+      "screenName": "Delmira",
+      "time": "00:40",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "don't",
+      "screenName": "Director",
+      "time": "00:41",
+      "delayMs": 500
+    },
+    {
+      "type": "chat",
+      "text": "I did not!",
+      "screenName": "Zips'n'zooms",
+      "time": "00:42",
+      "delayMs": 600
+    },
+    {
+      "type": "chat",
+      "text": "Bro??? You literally turned around and ran",
+      "screenName": "Delmira",
+      "time": "00:44",
+      "delayMs": 1300
+    },
+    {
+      "type": "chat",
+      "text": "I was chatting in a completely different server network that whole time",
+      "screenName": "Zips'n'zooms",
+      "time": "00:46",
+      "delayMs": 1700
+    },
+    {
+      "type": "chat",
+      "text": "All i saw in the HUD overlay was just 'gank' ok?",
+      "screenName": "Zips'n'zooms",
+      "time": "00:48",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "they're stupid, but it does not warrant such a breach of protocol",
+      "screenName": "Director",
+      "time": "00:51",
+      "delayMs": 1700
+    },
+    {
+      "type": "chat",
+      "text": "Find",
+      "screenName": "Clockwise",
+      "time": "00:52",
+      "delayMs": 400
+    },
+    {
+      "type": "chat",
+      "text": "Fine*",
+      "screenName": "Clockwise",
+      "time": "00:53",
+      "delayMs": 400
+    },
+    {
+      "type": "chat",
+      "text": "Shit. that's fantastic, my contract invitation just got voided because of this mess",
+      "screenName": "Director",
+      "time": "00:56",
+      "delayMs": 2100
+    },
+    {
+      "type": "chat",
+      "text": "I'm never joining another one of your calls zipper",
+      "screenName": "Delmira",
+      "time": "00:58",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "ggs omd my head hurts",
+      "screenName": "Clockwise",
+      "time": "01:00",
+      "delayMs": 1000
+    },
+    {
+      "type": "chat",
+      "text": "Why are y'all ganking in the first place when you know we don't have active backup units on call?",
+      "screenName": "Ezzy_pzzy",
+      "time": "01:03",
+      "delayMs": 2300
+    },
+    {
+      "type": "chat",
+      "text": "Idk what was going through zipper's head honestly",
+      "screenName": "Delmira",
+      "time": "01:05",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "I mean he knew my combat stats are washed",
+      "screenName": "Delmira",
+      "time": "01:07",
+      "delayMs": 1300
+    },
+    {
+      "type": "chat",
+      "text": "Vro i was the one getting GANKED",
+      "screenName": "Clockwise",
+      "time": "01:09",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "Yet he still called me over like I'm an Grade 1 fixer",
+      "screenName": "Delmira",
+      "time": "01:11",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "O fairs",
+      "screenName": "Ezzy_pzzy",
+      "time": "01:12",
+      "delayMs": 600
+    },
+    {
+      "type": "chat",
+      "text": "Fine I'll just pay for the rewounds myself out of pocket.",
+      "screenName": "Zips'n'zooms",
+      "time": "01:15",
+      "delayMs": 1600
+    },
+    {
+      "type": "chat",
+      "text": "I got an invitation token anyway so whatever",
+      "screenName": "Zips'n'zooms",
+      "time": "01:17",
+      "delayMs": 1300
+    },
+    {
+      "type": "chat",
+      "text": "I got the rewounds covered !!Clockwise",
+      "screenName": "Director",
+      "time": "01:19",
+      "delayMs": 1200
+    },
+    {
+      "type": "chat",
+      "text": "lucky break for you two",
+      "screenName": "Director",
+      "time": "01:21",
+      "delayMs": 900
+    },
+    {
+      "type": "chat",
+      "text": "I'll secure the rest of the rewounds tomorrow or something",
+      "screenName": "Zips'n'zooms",
+      "time": "01:23",
+      "delayMs": 1600
+    },
+    {
+      "type": "chat",
+      "text": "Good night.",
+      "screenName": "Zips'n'zooms",
+      "time": "01:24",
+      "delayMs": 700
+    },
+    {
+      "type": "chat",
+      "text": "My whole day is ruined",
+      "screenName": "Delmira",
+      "time": "01:26",
+      "delayMs": 1000
+    },
+    {
+      "type": "chat",
+      "text": "Night*",
+      "screenName": "Delmira",
+      "time": "01:27",
+      "delayMs": 500
+    },
+    {
+      "type": "chat",
+      "text": "anyways, chill down and don't let this get you guys down, obvs a lot of factors cause ya'll to get fucked, mostly human factors but factors nontheless lol",
+      "screenName": "Director",
+      "time": "01:31",
+      "delayMs": 3200
+    },
+    {
+      "type": "chat",
+      "text": "Do it. Dox him.",
+      "screenName": "Ezzy_pzzy",
+      "time": "01:33",
+      "delayMs": 800
+    },
+    {
+      "type": "chat",
+      "text": "This whole thing is gonna inflict permanent trauma on my record",
+      "screenName": "Delmira",
+      "time": "01:36",
+      "delayMs": 1700
+    },
+    {
+      "type": "chat",
+      "text": "Wait zipper don't log off yet where are you going",
+      "screenName": "Clockwise",
+      "time": "01:38",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "ZIPPER",
+      "screenName": "Clockwise",
+      "time": "01:39",
+      "delayMs": 500
+    },
+    {
+      "type": "chat",
+      "text": "HE ACTUALLY LOGGED OUT LMAOOO",
+      "screenName": "Ezzy_pzzy",
+      "time": "01:41",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "Oh boy.",
+      "screenName": "Director",
+      "time": "01:42",
+      "delayMs": 600
+    },
+    {
+      "type": "chat",
+      "text": "I'm going to check up on them lol",
+      "screenName": "Delmira",
+      "time": "01:44",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "I lost a lot of stuff on that body. Goddamn it.",
+      "screenName": "Clockwise",
+      "time": "01:47",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "My whole kit's just disintegrated.",
+      "screenName": "Clockwise",
+      "time": "01:49",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "!!Delmira did you at least salvage my extra magazine?",
+      "screenName": "Clockwise",
+      "time": "01:51",
+      "delayMs": 1600
+    },
+    {
+      "type": "chat",
+      "text": "Brother I was running for my absolute life from those blue star assholes",
+      "screenName": "Delmira",
+      "time": "01:54",
+      "delayMs": 2000
+    },
+    {
+      "type": "chat",
+      "text": "Do you think I had time to loot your corpse while screaming in proximity voice chat?",
+      "screenName": "Delmira",
+      "time": "01:57",
+      "delayMs": 2300
+    },
+    {
+      "type": "chat",
+      "text": "You were screaming pretty loud ngl",
+      "screenName": "Ezzy_pzzy",
+      "time": "01:59",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "I recorded it on my comms channel for archive purposes",
+      "screenName": "Ezzy_pzzy",
+      "time": "02:02",
+      "delayMs": 1600
+    },
+    {
+      "type": "chat",
+      "text": "Delete that right now ezra",
+      "screenName": "Delmira",
+      "time": "02:03",
+      "delayMs": 900
+    },
+    {
+      "type": "chat",
+      "text": "No leave it, we can submit it to the office as evidence of gross incompetence",
+      "screenName": "Director",
+      "time": "02:06",
+      "delayMs": 2200
+    },
+    {
+      "type": "chat",
+      "text": "DIRECTOR PLEASE NO",
+      "screenName": "Delmira",
+      "time": "02:07",
+      "delayMs": 700
+    },
+    {
+      "type": "chat",
+      "text": "I have a family to feed and a reputation to maintain",
+      "screenName": "Delmira",
+      "time": "02:10",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "Fixer license covers combat field deployments anyway",
+      "screenName": "Director",
+      "time": "02:12",
+      "delayMs": 1600
+    },
+    {
+      "type": "chat",
+      "text": "Which makes me wonder why Zipper brought you as heavy vanguard in the first place",
+      "screenName": "Director",
+      "time": "02:16",
+      "delayMs": 2300
+    },
+    {
+      "type": "chat",
+      "text": "HE SAID HE NEEDED BACKUP",
+      "screenName": "Delmira",
+      "time": "02:17",
+      "delayMs": 900
+    },
+    {
+      "type": "chat",
+      "text": "He literally pinged the emergency signal three times!!",
+      "screenName": "Delmira",
+      "time": "02:19",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "And you fell for it without checking?",
+      "screenName": "Ezzy_pzzy",
+      "time": "02:21",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "Rookie mistake Delmira",
+      "screenName": "Ezzy_pzzy",
+      "time": "02:22",
+      "delayMs": 800
+    },
+    {
+      "type": "chat",
+      "text": "Shut up Ezra you weren't even deployed today",
+      "screenName": "Delmira",
+      "time": "02:24",
+      "delayMs": 1300
+    },
+    {
+      "type": "chat",
+      "text": "Yeah because I have functional braincells and saw what they've been doing. Those Time-Distortion Field Implants has to be a Taboo breaking technology, not to mention M. Corp's foreccast.",
+      "screenName": "Ezzy_pzzy",
+      "time": "02:30",
+      "delayMs": 4800
+    },
+    {
+      "type": "chat",
+      "text": "Wait what was wrong with today's forecast?",
+      "screenName": "Clockwise",
+      "time": "02:32",
+      "delayMs": 1200
+    },
+    {
+      "type": "chat",
+      "text": "Night in the Backstreets TOA 23:00.",
+      "screenName": "Ezzy_pzzy",
+      "time": "02:34",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "It was literally printed on the terminal board at HQ",
+      "screenName": "Ezzy_pzzy",
+      "time": "02:36",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "...",
+      "screenName": "Clockwise",
+      "time": "02:37",
+      "delayMs": 500
+    },
+    {
+      "type": "chat",
+      "text": "...",
+      "screenName": "Delmira",
+      "time": "02:38",
+      "delayMs": 500
+    },
+    {
+      "type": "chat",
+      "text": "Neither of you checked the board, did you?",
+      "screenName": "Director",
+      "time": "02:40",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "I was out in the streets already!",
+      "screenName": "Clockwise",
+      "time": "02:42",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "I didn't check.",
+      "screenName": "Delmira",
+      "time": "02:43",
+      "delayMs": 700
+    },
+    {
+      "type": "chat",
+      "text": "Astonishing field preparation from our finest operatives",
+      "screenName": "Director",
+      "time": "02:46",
+      "delayMs": 1700
+    },
+    {
+      "type": "chat",
+      "text": "lmfao good thing the Recall System was warmed up.",
+      "screenName": "Director",
+      "time": "02:48",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "Director stop SARCASTICALLY TORMENTING US",
+      "screenName": "Clockwise",
+      "time": "02:50",
+      "delayMs": 1300
+    },
+    {
+      "type": "chat",
+      "text": "I am taking severe emotional damage right now",
+      "screenName": "Clockwise",
+      "time": "02:52",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "Emotional damage doesn't cost rewounds, physical gear loss does",
+      "screenName": "Director",
+      "time": "02:55",
+      "delayMs": 1800
+    },
+    {
+      "type": "chat",
+      "text": "Speaking of rewounds... Director how many do we have left in the vault?",
+      "screenName": "Ezzy_pzzy",
+      "time": "02:58",
+      "delayMs": 2000
+    },
+    {
+      "type": "chat",
+      "text": "Enough to cover this disaster, barely",
+      "screenName": "Director",
+      "time": "03:00",
+      "delayMs": 1200
+    },
+    {
+      "type": "chat",
+      "text": "But Zipper is paying back his portion from next week's bounty split",
+      "screenName": "Director",
+      "time": "03:03",
+      "delayMs": 1900
+    },
+    {
+      "type": "chat",
+      "text": "I'm marking his account balance negative as we speak",
+      "screenName": "Director",
+      "time": "03:05",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "GOOD. MAKE HIM PAY double",
+      "screenName": "Clockwise",
+      "time": "03:07",
+      "delayMs": 900
+    },
+    {
+      "type": "chat",
+      "text": "He ruined my killstreak and my mood",
+      "screenName": "Clockwise",
+      "time": "03:09",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "You had a killstreak?",
+      "screenName": "Ezzy_pzzy",
+      "time": "03:10",
+      "delayMs": 700
+    },
+    {
+      "type": "chat",
+      "text": "I was 2-0 against low tier syndicate goons, then those blue star shitfucks came by.",
+      "screenName": "Clockwise",
+      "time": "03:14",
+      "delayMs": 2400
+    },
+    {
+      "type": "chat",
+      "text": "'killstreak'",
+      "screenName": "Delmira",
+      "time": "03:15",
+      "delayMs": 600
+    },
+    {
+      "type": "chat",
+      "text": "Delmira. you know damn well I have access to your quarters and if it means I get hunted by The Head, I will shoot you in your sleep.",
+      "screenName": "Clockwise",
+      "time": "03:20",
+      "delayMs": 3500
+    },
+    {
+      "type": "chat",
+      "text": "Got it?",
+      "screenName": "Clockwise",
+      "time": "03:21",
+      "delayMs": 400
+    },
+    {
+      "type": "chat",
+      "text": "At least I didn't run away screaming from a bum like some people",
+      "screenName": "Clockwise",
+      "time": "03:24",
+      "delayMs": 1800
+    },
+    {
+      "type": "chat",
+      "text": "IT WAS A BLUE STAR, CLOCKWISE",
+      "screenName": "Delmira",
+      "time": "03:25",
+      "delayMs": 900
+    },
+    {
+      "type": "chat",
+      "text": "DO YOU KNOW HOW MUCH DAMAGE THEY DO TO ME?",
+      "screenName": "Delmira",
+      "time": "03:27",
+      "delayMs": 1300
+    },
+    {
+      "type": "chat",
+      "text": "THEY PULLED SOME BULLSHIT OUT THEIR ASS AND I GET FORCED TO BITE THE CURB",
+      "screenName": "Delmira",
+      "time": "03:30",
+      "delayMs": 2100
+    },
+    {
+      "type": "chat",
+      "text": "You can block btw.",
+      "screenName": "Ezzy_pzzy",
+      "time": "03:31",
+      "delayMs": 700
+    },
+    {
+      "type": "chat",
+      "text": "...",
+      "screenName": "Delmira",
+      "time": "03:32",
+      "delayMs": 500
+    },
+    {
+      "type": "chat",
+      "text": "mfer",
+      "screenName": "Delmira",
+      "time": "03:33",
+      "delayMs": 400
+    },
+    {
+      "type": "chat",
+      "text": "I am WASHED. I have not been in combat for a while since I've been busy doing other things.",
+      "screenName": "Delmira",
+      "time": "03:37",
+      "delayMs": 2600
+    },
+    {
+      "type": "chat",
+      "text": "And I wanted to keep up with Zipper's speed",
+      "screenName": "Delmira",
+      "time": "03:39",
+      "delayMs": 1300
+    },
+    {
+      "type": "chat",
+      "text": "Catch up with Zipper? Mfer you were going to run away with him?",
+      "screenName": "Director",
+      "time": "03:42",
+      "delayMs": 1800
+    },
+    {
+      "type": "chat",
+      "text": "I'm going to make tea, holy shit",
+      "screenName": "Director",
+      "time": "03:44",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "When you put it like that it sounds really dumb ma'am",
+      "screenName": "Delmira",
+      "time": "03:46",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "It sounds really dumb because it IS really dumb Delmira",
+      "screenName": "Ezzy_pzzy",
+      "time": "03:48",
+      "delayMs": 1600
+    },
+    {
+      "type": "chat",
+      "text": "Hey guys",
+      "screenName": "Zips'n'zooms",
+      "time": "03:50",
+      "delayMs": 500
+    },
+    {
+      "type": "chat",
+      "text": "YOU'RE BACK",
+      "screenName": "Clockwise",
+      "time": "03:51",
+      "delayMs": 400
+    },
+    {
+      "type": "chat",
+      "text": "GET HIM",
+      "screenName": "Clockwise",
+      "time": "03:51",
+      "delayMs": 400
+    },
+    {
+      "type": "chat",
+      "text": "Wait wait don't ping me I just reconnected to check something",
+      "screenName": "Zips'n'zooms",
+      "time": "03:54",
+      "delayMs": 1700
+    },
+    {
+      "type": "chat",
+      "text": "Zipper you better have a good explanation for why you led a monster train into Clockwise",
+      "screenName": "Director",
+      "time": "03:58",
+      "delayMs": 2500
+    },
+    {
+      "type": "chat",
+      "text": "Okay look!! I thought Clockwise was in a party with the enemy team!!",
+      "screenName": "Zips'n'zooms",
+      "time": "04:01",
+      "delayMs": 1900
+    },
+    {
+      "type": "chat",
+      "text": "WHY WOULD I BE IN A PARTY WITH THE ENEMY TEAM",
+      "screenName": "Clockwise",
+      "time": "04:03",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "I AM IN YOUR OFFICE, IT LITERALLY SAYS ON THE HUD",
+      "screenName": "Clockwise",
+      "time": "04:06",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "I HAVE THE GUILD TAG ABOVE MY HEAD IN BRIGHT NEON GREEN",
+      "screenName": "Clockwise",
+      "time": "04:09",
+      "delayMs": 1700
+    },
+    {
+      "type": "chat",
+      "text": "I didn't no have my visor on...",
+      "screenName": "Zips'n'zooms",
+      "time": "04:11",
+      "delayMs": 1000
+    },
+    {
+      "type": "chat",
+      "text": "YOU TURNED OFF PLAYER TAGS IN THE FUCKING BACKSTREETS?",
+      "screenName": "Delmira",
+      "time": "04:14",
+      "delayMs": 1700
+    },
+    {
+      "type": "chat",
+      "text": "I need glasses and the visors gets in the way...",
+      "screenName": "Zips'n'zooms",
+      "time": "04:16",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "Clockwise, you have to train them again.",
+      "screenName": "Director",
+      "time": "04:18",
+      "delayMs": 1200
+    },
+    {
+      "type": "chat",
+      "text": "Please no.",
+      "screenName": "Zips'n'zooms",
+      "time": "04:19",
+      "delayMs": 500
+    },
+    {
+      "type": "chat",
+      "text": "Zipper, it needs to happen",
+      "screenName": "Director",
+      "time": "04:21",
+      "delayMs": 900
+    },
+    {
+      "type": "chat",
+      "text": "I already said I'll pay for the rewounds tmrw!!",
+      "screenName": "Zips'n'zooms",
+      "time": "04:23",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "With what? You can't even fight back",
+      "screenName": "Ezzy_pzzy",
+      "time": "04:25",
+      "delayMs": 1200
+    },
+    {
+      "type": "chat",
+      "text": "IMMA THINK OF SOMTHNIG",
+      "screenName": "Zips'n'zooms",
+      "time": "04:26",
+      "delayMs": 700
+    },
+    {
+      "type": "chat",
+      "text": "Whatever it is, you better come to it fast.",
+      "screenName": "Director",
+      "time": "04:28",
+      "delayMs": 1300
+    },
+    {
+      "type": "chat",
+      "text": "Do the math.",
+      "screenName": "Director",
+      "time": "04:29",
+      "delayMs": 500
+    },
+    {
+      "type": "chat",
+      "text": "hfgujdfgbkjfgnhjk",
+      "screenName": "Zips'n'zooms",
+      "time": "04:31",
+      "delayMs": 600
+    },
+    {
+      "type": "chat",
+      "text": "He's freaking out lol",
+      "screenName": "Ezzy_pzzy",
+      "time": "04:32",
+      "delayMs": 800
+    },
+    {
+      "type": "chat",
+      "text": "lmfao",
+      "screenName": "Delmira",
+      "time": "04:33",
+      "delayMs": 400
+    },
+    {
+      "type": "chat",
+      "text": "Delmira you are joining him on training too",
+      "screenName": "Director",
+      "time": "04:35",
+      "delayMs": 1300
+    },
+    {
+      "type": "chat",
+      "text": "WHAT??? DIRECTOR NOOO",
+      "screenName": "Delmira",
+      "time": "04:36",
+      "delayMs": 700
+    },
+    {
+      "type": "chat",
+      "text": "Clockwise will literally break my back and call it training!",
+      "screenName": "Delmira",
+      "time": "04:39",
+      "delayMs": 1800
+    },
+    {
+      "type": "chat",
+      "text": "That's better than it happening again.",
+      "screenName": "Director",
+      "time": "04:41",
+      "delayMs": 1200
+    },
+    {
+      "type": "chat",
+      "text": "Both of you report to the training board tomorrow at 06:00",
+      "screenName": "Director",
+      "time": "04:44",
+      "delayMs": 1700
+    },
+    {
+      "type": "chat",
+      "text": "Karma is real and it is glorious",
+      "screenName": "Clockwise",
+      "time": "04:46",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "My repair bill is suddenly feeling a lot lighter emotionally",
+      "screenName": "Clockwise",
+      "time": "04:49",
+      "delayMs": 1700
+    },
+    {
+      "type": "chat",
+      "text": "Clockwise don't celebrate too early, you still have to fill out the post-combat incident report",
+      "screenName": "Ezzy_pzzy",
+      "time": "04:53",
+      "delayMs": 2800
+    },
+    {
+      "type": "chat",
+      "text": "The 12-page PDF one?",
+      "screenName": "Clockwise",
+      "time": "04:54",
+      "delayMs": 800
+    },
+    {
+      "type": "chat",
+      "text": "Yes.",
+      "screenName": "Director",
+      "time": "04:55",
+      "delayMs": 300
+    },
+    {
+      "type": "chat",
+      "text": "I WAS SEPARATED BECAUSE ZIPPER RAN THE OTHER WAY",
+      "screenName": "Clockwise",
+      "time": "04:58",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "Write that down too",
+      "screenName": "Director",
+      "time": "04:59",
+      "delayMs": 700
+    },
+    {
+      "type": "chat",
+      "text": "I hate paperwork so much man",
+      "screenName": "Clockwise",
+      "time": "05:01",
+      "delayMs": 900
+    },
+    {
+      "type": "chat",
+      "text": "I'd rather fight two blue star demons at once than fill out forms",
+      "screenName": "Clockwise",
+      "time": "05:04",
+      "delayMs": 1900
+    },
+    {
+      "type": "chat",
+      "text": "Careful what you wish for, Backstreets has plenty of them right now",
+      "screenName": "Ezzy_pzzy",
+      "time": "05:07",
+      "delayMs": 2000
+    },
+    {
+      "type": "chat",
+      "text": "Hey Director, can I get an exemption from training if I have some important to do?",
+      "screenName": "Zips'n'zooms",
+      "time": "05:11",
+      "delayMs": 2400
+    },
+    {
+      "type": "chat",
+      "text": "Oh right, you're a working student... Gosh, that really puts things to a halt.",
+      "screenName": "Director",
+      "time": "05:14",
+      "delayMs": 2300
+    },
+    {
+      "type": "chat",
+      "text": "I got exams and a mid-terms paper coming up...",
+      "screenName": "Zips'n'zooms",
+      "time": "05:17",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "6 courses...",
+      "screenName": "Zips'n'zooms",
+      "time": "05:18",
+      "delayMs": 600
+    },
+    {
+      "type": "chat",
+      "text": "Zipper... my guy, you already used this excuse already",
+      "screenName": "Ezzy_pzzy",
+      "time": "05:21",
+      "delayMs": 1600
+    },
+    {
+      "type": "chat",
+      "text": "Please do not remind me",
+      "screenName": "Zips'n'zooms",
+      "time": "05:23",
+      "delayMs": 800
+    },
+    {
+      "type": "chat",
+      "text": "You failed like 3 of your courses because your groupmates reported you to the dean for not doing any work lol",
+      "screenName": "Delmira",
+      "time": "05:28",
+      "delayMs": 3300
+    },
+    {
+      "type": "chat",
+      "text": "I got that covered, told them internship got in the schedule. It's a one-time trick Zipper.",
+      "screenName": "Director",
+      "time": "05:32",
+      "delayMs": 2700
+    },
+    {
+      "type": "chat",
+      "text": "but I do have to list down the lost gears. I'm adding those to your debt ledger right now",
+      "screenName": "Director",
+      "time": "05:36",
+      "delayMs": 2600
+    },
+    {
+      "type": "chat",
+      "text": "NO WAIT DIRECTOR DON'T ADD",
+      "screenName": "Zips'n'zooms",
+      "time": "05:38",
+      "delayMs": 900
+    },
+    {
+      "type": "chat",
+      "text": "Kidding. I know you're in debt at J. Corp.",
+      "screenName": "Director",
+      "time": "05:40",
+      "delayMs": 1300
+    },
+    {
+      "type": "chat",
+      "text": "But I can't even gamble.",
+      "screenName": "Zips'n'zooms",
+      "time": "05:42",
+      "delayMs": 800
+    },
+    {
+      "type": "chat",
+      "text": "Really? Then why is your payroll saying you have some debts?",
+      "screenName": "Director",
+      "time": "05:45",
+      "delayMs": 1800
+    },
+    {
+      "type": "chat",
+      "text": "Zipper, what have you been spending on?",
+      "screenName": "Delmira",
+      "time": "05:47",
+      "delayMs": 1200
+    },
+    {
+      "type": "chat",
+      "text": "Uhhh... custom mobility augments?",
+      "screenName": "Zips'n'zooms",
+      "time": "05:50",
+      "delayMs": 1100
+    },
+    {
+      "type": "chat",
+      "text": "YOU BOUGHT MORE SPEED IMPLANTS INSTEAD OF A WORKING VISOR???",
+      "screenName": "Clockwise",
+      "time": "05:54",
+      "delayMs": 2000
+    },
+    {
+      "type": "chat",
+      "text": "They were on sale at a Backstreet workshop okay!!",
+      "screenName": "Zips'n'zooms",
+      "time": "05:57",
+      "delayMs": 1500
+    },
+    {
+      "type": "chat",
+      "text": "50% off leg thrusters, you cannot pass that up",
+      "screenName": "Zips'n'zooms",
+      "time": "06:00",
+      "delayMs": 1400
+    },
+    {
+      "type": "chat",
+      "text": "So you spent your entire paycheck to run away faster without being able to see where you're running.",
+      "screenName": "Ezzy_pzzy",
+      "time": "06:04",
+      "delayMs": 3000
+    },
+    {
+      "type": "chat",
+      "text": "incredible. pure art.",
+      "screenName": "Ezzy_pzzy",
+      "time": "06:06",
+      "delayMs": 800
+    },
+    {
+      "type": "chat",
+      "text": "That explains why you zoomed past me at Mach 3 into a dead end alleyway",
+      "screenName": "Delmira",
+      "time": "06:10",
+      "delayMs": 2200
+    },
+    {
+      "type": "chat",
+      "text": "Alright. I've heard enough.",
+      "screenName": "Director",
+      "time": "06:12",
+      "delayMs": 1000
+    },
+    {
+      "type": "chat",
+      "text": "Zipper, your augments are getting impounded for safety evaluation tomorrow morning.",
+      "screenName": "Director",
+      "time": "06:16",
+      "delayMs": 2500
+    },
+    {
+      "type": "chat",
+      "text": "DIRECTOR NO PLEASE NOT MY LEGS",
+      "screenName": "Zips'n'zooms",
+      "time": "06:18",
+      "delayMs": 1000
+    },
+    {
+      "type": "chat",
+      "text": "HOW AM I SUPPOSED TO ZOOM",
+      "screenName": "Zips'n'zooms",
+      "time": "06:20",
+      "delayMs": 900
+    },
+    {
+      "type": "chat",
+      "text": "You'll zoom on the treadmill during Clockwise's training block. 06:00 sharp.",
+      "screenName": "Director",
+      "time": "06:24",
+      "delayMs": 2400
+    },
+    {
+      "type": "chat",
+      "text": "I'm setting your incline to 15%. Welcome to hell, Zipper.",
+      "screenName": "Clockwise",
+      "time": "06:27",
+      "delayMs": 1800
+    },
+    {
+      "type": "chat",
+      "text": "I hate this office so much bro",
+      "screenName": "Zips'n'zooms",
+      "time": "06:30",
+      "delayMs": 1200
+    },
+    {
+      "type": "chat",
+      "text": "Signing off before I get assigned to paperwork duty too. ggs",
+      "screenName": "Ezzy_pzzy",
+      "time": "06:33",
+      "delayMs": 1900
+    }
+  ]
+}

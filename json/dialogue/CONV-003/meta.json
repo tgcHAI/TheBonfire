@@ -1,5 +1,6 @@
 {
   "id": "CONV-003",
   "title": "Emergency Sector Assembly — Breach Investigation",
-  "status": "Online"
+  "status": "Offline",
+  "restricted": false
 }
