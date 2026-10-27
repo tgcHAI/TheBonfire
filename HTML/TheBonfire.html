@@ -255,12 +255,21 @@
 
   // ── LOAD ──
   async function loadEntries() {
+    // Try server JSON first (when served via server.js).
     try {
       const res = await fetch('../json/entries.json?nocache=' + Date.now());
       if (res.ok) entries = await res.json();
     } catch(e) {
-      // fetch unavailable (e.g. file://) — no embedded copy, so the archive
-      // starts empty until it is served and the JSON can be fetched
+      // Server unavailable (e.g. file://) — fall back to localStorage below.
+    }
+    // If entries still empty, try localStorage (offline / saved-copy fallback).
+    if (entries.length === 0) {
+      try {
+        const stored = localStorage.getItem('eho.entries');
+        if (stored) entries = JSON.parse(stored);
+      } catch(e) {
+        // localStorage unavailable or corrupt — keep in-memory only.
+      }
     }
     renderSidebar();
     // Restricted entries are hidden while the archive is locked, so land on
@@ -302,6 +311,22 @@
     });
   }
 
+  // Inline markdown parser for entry bodies — hoisted out of renderEntry so
+  // its regexes compile once instead of on every entry switch.
+  const INLINE_BOLD = /\\*\\*(.+?)\\*\\*/g;
+  const INLINE_ITALIC = /\\*([^*\\s][^*]*?)\\*/g;
+  const INLINE_UNDERLINE = /\\_(.+?)\\_/g;
+  function parseInline(text) {
+    return text
+      // bold — **word**
+      .replace(INLINE_BOLD, '<strong>$1</strong>')
+      // italic — *word* (no lookbehind, so it parses on every browser;
+      // bold is replaced first, so any remaining * is a single italic marker)
+      .replace(INLINE_ITALIC, '<em>$1</em>')
+      // underline — _word_
+      .replace(INLINE_UNDERLINE, '<u>$1</u>');
+  }
+
   // ── RENDER ENTRY ──
   function renderEntry(index) {
     if (!entries.length) return;
@@ -320,18 +345,6 @@
         <span class="entry-tags">${(e.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</span>
       </div>
     `;
-
-    // inline markdown parser
-    function parseInline(text) {
-      return text
-        // bold — **word**
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        // italic — *word* (no lookbehind, so it parses on every browser;
-        // bold is replaced first, so any remaining * is a single italic marker)
-        .replace(/\*([^*\s][^*]*?)\*/g, '<em>$1</em>')
-        // underline — _word_
-        .replace(/\_(.+?)\_/g, '<u>$1</u>');
-    }
 
     // Split on 3 newlines first (spacer) then 2 (paragraph).
     // We tag each chunk so we know which gap preceded it.

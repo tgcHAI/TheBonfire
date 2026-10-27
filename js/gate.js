@@ -226,15 +226,8 @@
 
   function persistConfig(done) {
     try {
-      fetch('../api/gate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config)
-      }).then(function (res) {
-        done(res.ok);
-      }).catch(function () {
-        done(false); // browser-only save: the change stays in memory until served
-      });
+      localStorage.setItem('eho.gate.config', JSON.stringify(config));
+      done(true);
     } catch (e) {
       done(false);
     }

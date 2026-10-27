@@ -11,6 +11,20 @@ const Dialogue = require('./js/dialogue.js');
 
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT) || 4173;
+const WRITE_TOKEN = process.env.BONFIRE_WRITE_TOKEN || null;
+
+// Require a bearer token for any API write if BONFIRE_WRITE_TOKEN is set.
+// Without this env var every write is allowed (local dev default).
+function checkWriteAuth(req, res) {
+  if (!WRITE_TOKEN) return true;
+  const auth = req.headers.authorization;
+  if (!auth || auth !== 'Bearer ' + WRITE_TOKEN) {
+    res.writeHead(401, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'write auth required' }));
+    return false;
+  }
+  return true;
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -262,6 +276,10 @@ const server = http.createServer((req, res) => {
     res.end();
     return;
   }
+
+  // Require a bearer token for any API write if BONFIRE_WRITE_TOKEN is set.
+  const isWrite = req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'OPTIONS';
+  if (isWrite && urlPath.indexOf('/api/') === 0 && !checkWriteAuth(req, res)) return;
 
   // API: replace the archive in place (Save/Delete POST the full array).
   if (req.method === 'POST' && urlPath === '/api/entries') {
