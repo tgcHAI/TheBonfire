@@ -10,6 +10,20 @@ const path = require('path');
 
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT) || 4173;
+const WRITE_TOKEN = process.env.BONFIRE_WRITE_TOKEN || null;
+
+// Require a bearer token for any API write if BONFIRE_WRITE_TOKEN is set.
+// Without this env var every write is allowed (local dev default).
+function checkWriteAuth(req, res) {
+  if (!WRITE_TOKEN) return true;
+  const auth = req.headers.authorization;
+  if (!auth || auth !== 'Bearer ' + WRITE_TOKEN) {
+    res.writeHead(401, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'write auth required' }));
+    return false;
+  }
+  return true;
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -117,6 +131,18 @@ function saveConversations(text) {
 
 const server = http.createServer((req, res) => {
   const urlPath = urlPathOf(req.url);
+
+  // CORS headers ride along on every response - JSON, errors and static alike -
+  // because setHeader merges into any later writeHead, so one call covers all.
+  applyCors(req, res);
+
+  // Preflight for the editor's JSON writes. Without this the browser refuses
+  // cross-origin POST/PUT/DELETE before they ever reach the routes below.
+  if (req.method === 'OPTIONS' && urlPath.indexOf('/api/') === 0) {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
 
   // API: replace the archive in place (Save/Delete POST the full array).
   if (req.method === 'POST' && urlPath === '/api/entries') {
