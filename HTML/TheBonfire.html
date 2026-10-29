@@ -245,6 +245,7 @@
   let entries = [];
   let currentIndex = 0;
   let editingIndex = -1;
+  let editorDirty = false;
 
   // ── READER CONTROLS: skip-decode + idle auto-scroll ──
   let activeDecode = null;          // live scramble: { token, nodes, finish }
@@ -312,8 +313,8 @@
   }
 
   // Inline markdown parser for entry bodies — hoisted out of renderEntry so
-  // its regexes compile once instead of on every entry switch.
-  const INLINE_BOLD = /\\*\\*(.+?)\\*\\*/g;
+  // test
+  const INLINE_BOLD = /\\\\*(.+?)\\*\\*/g;
   const INLINE_ITALIC = /\\*([^*\\s][^*]*?)\\*/g;
   const INLINE_UNDERLINE = /\\_(.+?)\\_/g;
   function parseInline(text) {
@@ -594,7 +595,19 @@
     document.getElementById('ed-tags').value     = (e.tags||[]).join(', ');
     document.getElementById('ed-restricted').checked = e.restricted || false;
     document.getElementById('ed-body').value     = e.body     || '';
+    editorDirty = false;
   }
+
+  // Track edits in the entry editor so an accidental reload warns first.
+  (function wireEditorDirty() {
+    const fields = ['ed-id','ed-title','ed-author','ed-date','ed-status','ed-category','ed-tags','ed-body'];
+    fields.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', () => { editorDirty = true; });
+    });
+    const restricted = document.getElementById('ed-restricted');
+    if (restricted) restricted.addEventListener('change', () => { editorDirty = true; });
+  })();
 
   function fieldsToEntry() {
     // Normalize body: collapse 3+ newlines to 2, ensure paragraph breaks
@@ -664,10 +677,10 @@
     // ("browser only" below = opened without server.js — change lives in memory
     // but won't survive a reload until the server writes it to disk.)
 
-
     const wrote = await persistEntries();
     const msg = wrote === 'written' ? 'Saved to file!' : 'Saved (browser only)';
     flashBtn('ed-save', msg);
+    editorDirty = false;
   }
 
   // ── DELETE ENTRY ──
@@ -689,6 +702,7 @@
       emptyBox.removeAttribute('aria-busy');
     }
     await persistEntries().then(w => flashBtn('ed-delete', w === 'written' ? 'Deleted' : 'Deleted (browser only)'));
+    editorDirty = false;
   }
 
   // ── EXPORT JSON ──
@@ -723,6 +737,15 @@
       currentIndex = fv < 0 ? 0 : fv;
     }
     renderEntry(currentIndex);
+  });
+
+  // Warn before reload if the entry editor has unsaved changes.
+  window.addEventListener('beforeunload', (ev) => {
+    if (editorDirty) {
+      ev.preventDefault();
+      ev.returnValue = 'You have unsaved entry changes. Leave anyway?';
+      return ev.returnValue;
+    }
   });
 
   // ── OS SHELL BOOT ──

@@ -2,3 +2,4 @@ node_modules/
 *.tmp
 json/import/importmastertemplate.json
 json/import/README.md
+mats/debug_images/error_1_files.png

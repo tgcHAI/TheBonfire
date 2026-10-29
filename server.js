@@ -111,6 +111,27 @@ function saveEntries(text) {
     if (!entry || typeof entry !== 'object') {
       throw new Error('Every entry must be a JSON object');
     }
+    if (typeof entry.id !== 'string' || !entry.id.trim()) {
+      throw new Error('Every entry needs a non-empty id');
+    }
+    if (typeof entry.title !== 'string' || !entry.title.trim()) {
+      throw new Error('Every entry needs a non-empty title');
+    }
+    if (typeof entry.body !== 'string') {
+      throw new Error('Every entry needs a body string');
+    }
+    if (typeof entry.status !== 'string') {
+      throw new Error('Every entry needs a status string');
+    }
+    if (typeof entry.category !== 'string') {
+      throw new Error('Every entry needs a category string');
+    }
+    if (!Array.isArray(entry.tags)) {
+      throw new Error('Every entry needs a tags array');
+    }
+    if (typeof entry.restricted !== 'boolean') {
+      throw new Error('Every entry needs a restricted boolean');
+    }
   }
   const file = path.join(ROOT, 'json', 'entries.json');
   const tmp = file + '.tmp';
