@@ -314,7 +314,7 @@
 
   // Inline markdown parser for entry bodies — hoisted out of renderEntry so
   // test
-  const INLINE_BOLD = /\\\\*(.+?)\\*\\*/g;
+  const INLINE_BOLD = /\*\*(.+?)\*\*/g; /\*\*(.+?)\*\*/g = /\\\\*(.+?)\\*\\*/g;
   const INLINE_ITALIC = /\\*([^*\\s][^*]*?)\\*/g;
   const INLINE_UNDERLINE = /\\_(.+?)\\_/g;
   function parseInline(text) {

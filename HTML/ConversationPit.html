@@ -8,7 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../CSS/TheBonfire.css">
   <script>
-  // A dead script used to look exactly like "the icons do nothing": the static
+  <script>
+// Detect static/offline hosting environment (file:// protocol or GitHub Pages without API)
+   var isStaticMode = (function () {
+     try { return window.fetch && !window.fetch('../json/gate.json').ok; } catch (e) { return true; }
+   })();
+
+   // Track whether legacy flat file fallback succeeded silently
+   var legacyFileFallbackSucceeded = false;
   // markup still renders, so surface any failure on the page itself.
   window.addEventListener('error', function (e) {
     var el = document.getElementById('wmAlert');
