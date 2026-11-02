@@ -1643,6 +1643,7 @@ body { -webkit-tap-highlight-color: transparent; }
 /* pseudo-window */
 .pwin {
     position: absolute; display: flex; flex-direction: column;
+    width: 600px; height: 400px;
     min-width: 240px; min-height: 140px;
     pointer-events: auto;
     background: var(--panel-raised);
