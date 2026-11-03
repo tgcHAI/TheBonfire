@@ -215,8 +215,61 @@
     });
   }
 
-  // Open toggles the dropdown like the editor panels; each open re-syncs the
-  // panel with the current lock state.
+  function flashEditorBtn(text) {
+    var btn = panel.querySelector('#gateSave');
+    if (!btn) return;
+    var orig = btn.textContent;
+    btn.textContent = text;
+    btn.style.color = 'var(--ember-bright)';
+    setTimeout(function () {
+      btn.textContent = orig;
+      btn.style.color = '';
+    }, 1800);
+  }
+
+  function persistConfig(done) {
+    try {
+      fetch('../api/gate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+      }).then(function (res) {
+        done(res.ok);
+      }).catch(function () {
+        done(false); // browser-only save: the change stays in memory until served
+      });
+    } catch (e) {
+      done(false);
+    }
+  }
+
+  // Programmatic save (also used by the panel); merges over the current config
+  // and persists atomically on the server. `done` receives true on success.
+  function saveConfig(next, done) {
+    config = Object.assign({}, DEFAULTS, config, next || {});
+    persistConfig(function (ok) {
+      if (done) done(ok);
+    });
+  }
+
+  function saveConfigFromPanel() {
+    var next = {
+      code: panel.querySelector('#gateCode').value.trim(),
+      title: panel.querySelector('#gatePanelTitle').value.trim(),
+      hintLocked: panel.querySelector('#gateHintLocked').value.trim(),
+      hintOpen: panel.querySelector('#gateHintOpen').value.trim(),
+      placeholder: panel.querySelector('#gatePlaceholder').value.trim(),
+      error: panel.querySelector('#gateError').value.trim()
+    };
+    if (!next.code) { flashEditorBtn('Code required'); return; }
+    saveConfig(next, function (ok) {
+      flashEditorBtn(ok ? 'Saved!' : 'Saved (browser only)');
+      if (ok) setTimeout(close, 450);
+    });
+  }
+
+  // Open toggles the dropdown like the editor panels; each open rebuilds the
+  // unlock view so the latest settings (fetched config or a saved edit) show.
   function open() {
     if (!panel) buildPanel();
     var isOpen = unlocked;
@@ -292,6 +345,9 @@
   } else {
     wireLogo();
   }
+
+  // Load persisted settings (backed by the gate route in server.js when served).
+  loadConfig();
 
   // Load persisted settings (backed by the gate route in server.js when served).
   loadConfig();
