@@ -140,6 +140,7 @@
 // embedded copy. DATA_SOURCE records which read answered, so an unreachable
 // store shows an explanation instead of an empty archive.
 let conversations = [];
+let EDITOR_ONLY = false;
 let DATA_SOURCE = 'none';
 let DATA_DETAIL = '';
 
@@ -230,7 +231,8 @@ let DATA_DETAIL = '';
     const list = await fetchConversations();
     if (list) conversations = list;
     renderSidebar();
-    if (conversations.length) openConversation(firstVisibleIndex());
+    if (WM.isOpen('editor')) renderExplorer();
+    if (conversations.length && !EDITOR_ONLY) openConversation(firstVisibleIndex());
   }
 
   // The dialogue store is the source of truth; when it is unreachable (page
@@ -805,10 +807,14 @@ let DATA_DETAIL = '';
     // drops its own chrome and fills the frame. Detected by framing rather than
     // a query flag, so a hand-pasted iframe URL behaves identically.
     const embedded = window.self !== window.top;
+    const editorOnly = embedded &&
+      new URLSearchParams(window.location.search).get('app') === 'editor';
+    EDITOR_ONLY = editorOnly;
     if (embedded) {
       document.body.classList.add('is-embedded');
       WM.layer.style.inset = '0';
     }
+    if (editorOnly) document.body.classList.add('is-editor-only');
     WM.on('change', () => {
       renderTaskbar();
       const toggle = document.querySelector('.editor-toggle');
@@ -828,15 +834,22 @@ let DATA_DETAIL = '';
     }
     renderTaskbar();
     if (embedded) {
-      // There is no drawer to collapse here, and the app should fill its frame:
-      // the chat window opens docked on the standalone page but maximized inside
-      // the shell, where no desktop surface exists for it to sit on.
-      const win = WM.wins.get('chat');
-      if (win) WM.maximize(win);
-      // Cross-frame contract: the shell's window bar drives the editor window
-      // from outside this document, because the topbar pencil is gone in embed
-      // mode. Same-origin, so the parent may call this directly.
-      window.BonfireApp = { toggleEditor: toggleConvEditor };
+      if (editorOnly) {
+        const chatWin = WM.wins.get('chat');
+        if (chatWin) WM.close(chatWin);
+        const editorWin = WM.open('editor');
+        if (editorWin) WM.maximize(editorWin);
+      } else {
+        // There is no drawer to collapse here, and the app should fill its frame:
+        // the chat window opens docked on the standalone page but maximized inside
+        // the shell, where no desktop surface exists for it to sit on.
+        const win = WM.wins.get('chat');
+        if (win) WM.maximize(win);
+        // Cross-frame contract: the shell's window bar drives the editor window
+        // from outside this document, because the topbar pencil is gone in embed
+        // mode. Same-origin, so the parent may call this directly.
+        window.BonfireApp = { toggleEditor: toggleConvEditor };
+      }
     } else if (WM.isMobile()) {
       // On small screens the drawer is open by default and covers the left strip
       // where the desktop icons sit, so start it collapsed and let the toggle
