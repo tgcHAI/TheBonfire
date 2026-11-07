@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TheBonfire: Eternal Hearthlight Office</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="desktop.css"></head><body>
+<div class="top">Eternal Hearthlight Office | Lore Archive</div>
+<div class="desk" id="desk"><div class="icons" id="icons"></div><div class="adm" id="adm"></div>
+  <!-- WINDOWS: each layout is a container; edit the markup here. JS only opens, moves and fills them. -->
+  <section class="win" id="win-lore" data-title="LoreEntries" hidden>
+    <header><span>LoreEntries</span><div><button data-a="min" aria-label="Minimize">_</button><button data-a="max" aria-label="Maximize">&#9633;</button><button data-a="x" aria-label="Close">&times;</button></div></header>
+    <div class="body">
+      <aside class="side"></aside>
+      <div class="main">
+        <div class="view">Pick a file.</div>
+        <button class="btn skip" hidden>skip</button>
+      </div>
+    </div>
+  </section>
+  <section class="win" id="win-pit" data-title="ConversationPit" hidden>
+    <header><span>ConversationPit</span><div><button data-a="min" aria-label="Minimize">_</button><button data-a="max" aria-label="Maximize">&#9633;</button><button data-a="x" aria-label="Close">&times;</button></div></header>
+    <div class="body">
+      <aside class="side"></aside>
+      <div class="main">
+        <div class="bar"><select aria-label="Chapter"></select><button class="btn" data-c="play">Play</button><button class="btn" data-c="pause">Pause</button><button class="btn" data-c="replay">Replay</button></div>
+        <div class="view">Pick a room, then press Play.</div>
+      </div>
+    </div>
+  </section>
+  <section class="win" id="win-mem" data-title="MemberFiles" hidden>
+    <header><span>MemberFiles</span><div><button data-a="min" aria-label="Minimize">_</button><button data-a="max" aria-label="Maximize">&#9633;</button><button data-a="x" aria-label="Close">&times;</button></div></header>
+    <div class="body">
+      <aside class="side"></aside>
+      <div class="main">
+        <div class="view">Pick a file.</div>
+      </div>
+    </div>
+  </section>
+  <section class="win" id="win-jux" data-title="JuxFiles" hidden>
+    <header><span>JuxFiles</span><div><button data-a="min" aria-label="Minimize">_</button><button data-a="max" aria-label="Maximize">&#9633;</button><button data-a="x" aria-label="Close">&times;</button></div></header>
+    <div class="body">
+      <aside class="side"></aside>
+      <div class="main">
+        <div class="view">Pick a file.</div>
+      </div>
+    </div>
+  </section>
+  <section class="win" id="win-adm" data-title="Admin.exe" hidden>
+    <header><span>Admin.exe</span><div><button data-a="min" aria-label="Minimize">_</button><button data-a="max" aria-label="Maximize">&#9633;</button><button data-a="x" aria-label="Close">&times;</button></div></header>
+    <div class="body">
+      <div class="main"><div class="view">
+        <button class="btn adb" data-e="LoreEntries">Editor for LoreEntries</button>
+        <button class="btn adb" data-e="ConversationPit">Editor for ConversationPit</button>
+        <button class="btn adb" data-e="Files">Editor for Files</button>
+        <button class="btn adb" data-e="JuxFiles">Editor for JuxFiles</button>
+        <button class="btn adb" data-e="credits">Website Credits</button>
+        <p class="out"></p>
+      </div></div>
+    </div>
+  </section>
+</div>
+<div class="task" id="task"></div>
+<script>
+/* Data files sit next to this page. Change these paths when moving to WordPress. */
+const $=(s,e=document)=>e.querySelector(s),desk=$('#desk'),task=$('#task');
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const SE=[{id:'EHO-000',title:'Sample entry',category:'Test',status:'Active',body:'**Bold**, *italic*, _underline_.\n\nNew paragraph.\n\n\nSpaced paragraph.\n\n>> THALIREA: A line.\n>> MELPHONSE: A reply.\n>> BOTH: Together.'}];
+const SC=[{id:'CONV-000',title:'Sample room',messages:[{screenName:'Director',text:'Testing.',delayMs:800,time:'00:00'},{type:'end'},{screenName:'Geramiah',text:'Chapter two.',delayMs:800,time:'00:01'}]}];
+const IC={file:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6',chat:'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',person:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8',eye:'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6',term:'M4 4h16v16H4zM8 10l3 2-3 2M13 15h3'};
+async function load(f,fb){try{const r=await fetch(f+'?'+Date.now());if(!r.ok)throw 0;return await r.json()}catch(e){return fb}}
+
+/* markdown: **bold** *italic* _underline_, blank line = paragraph, two blank lines = spacer, ">> NAME: text" = Audience */
+const AUD=/^&gt;&gt; (THALIREA|MELPHONSE|BOTH): ?(.*)$/;
+const inl=s=>s.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(?<!\*)\*(?!\*)(.+?)\*(?!\*)/g,'<i>$1</i>').replace(/_(.+?)_/g,'<u>$1</u>');
+function md(t){return esc(t.replace(/\r/g,'')).split(/\n{3}/).map(sec=>sec.split(/\n\n/).filter(p=>p.trim()).map(p=>'<p>'+p.split('\n').map(l=>{const a=AUD.exec(l);return a?`<span class="aud ${a[1][0]}"><b>${a[1]}</b> ${inl(a[2])}</span>`:inl(l)+'<br>'}).join('')+'</p>').join('')).join('<div class="sp"></div>')}
+
+/* decrypt: one loop per skip button; a new entry or a skip cancels the old loop */
+let curSkip=null;
+function decrypt(view,sk){
+ const my=sk.t=(sk.t||0)+1,nodes=[],tw=document.createTreeWalker(view,NodeFilter.SHOW_TEXT);let total=0;
+ while(tw.nextNode()){nodes.push([tw.currentNode,tw.currentNode.nodeValue]);total+=tw.currentNode.nodeValue.length}
+ const done=()=>{nodes.forEach(([n,o])=>n.nodeValue=o);sk.hidden=true};
+ if(!total||matchMedia('(prefers-reduced-motion:reduce)').matches){sk.hidden=true;return}
+ const dur=Math.min(4000,Math.max(1200,total*3)),t0=performance.now(),G='01#%&$@*+=?<>/\\|';
+ sk.hidden=false;curSkip=sk;sk.onclick=()=>{sk.t++;done()};
+ (function f(now){if(my!==sk.t)return;const R=(now-t0)/dur*total;if(R>=total)return done();let seen=0;
+  nodes.forEach(([n,o])=>{const r=Math.max(0,Math.min(o.length,R-seen));seen+=o.length;n.nodeValue=o.slice(0,r)+o.slice(r).replace(/[A-Za-z0-9]/g,()=>G[Math.random()*G.length|0])});
+  requestAnimationFrame(f)})(t0);
+}
+addEventListener('keydown',e=>{if((e.key==='Escape'||e.key===' ')&&curSkip&&!curSkip.hidden&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();curSkip.click()}});
+
+/* windows: containers live in the HTML above; this only wires them */
+const W={};let z=10;
+document.querySelectorAll('.win').forEach(w=>{
+ const h=w.firstElementChild,t=document.createElement('button');t.className='btn';t.textContent=w.dataset.title;
+ const f=()=>{w.hidden=false;w.style.zIndex=++z};
+ t.onclick=()=>{!w.hidden&&w.style.zIndex==z?w.hidden=true:f()};w.onpointerdown=f;
+ h.querySelector('div').onclick=e=>{const a=e.target.dataset.a;if(a==='min')w.hidden=true;if(a==='max')w.classList.toggle('max');if(a==='x'){w.hidden=true;w.classList.remove('max');t.remove()}};
+ h.onpointerdown=e=>{if(e.target.closest('button')||w.classList.contains('max'))return;const r=w.getBoundingClientRect(),d=desk.getBoundingClientRect(),dx=e.clientX-r.left,dy=e.clientY-r.top;h.setPointerCapture(e.pointerId);h.onpointermove=m=>{w.style.left=Math.max(0,Math.min(d.width-80,m.clientX-d.left-dx))+'px';w.style.top=Math.max(0,Math.min(d.height-30,m.clientY-d.top-dy))+'px'};h.onpointerup=()=>{h.onpointermove=null}};
+ W[w.id]={w,t,f,placed:0};
+});
+function openWin(id){const o=W[id];if(!o.t.isConnected)task.append(o.t);if(!o.placed){o.placed=1;const k=Object.values(W).filter(x=>x.placed).length-1;o.w.style.left=150+k*28+'px';o.w.style.top=20+k*28+'px'}o.f()}
+
+/* list + display window (LoreEntries, MemberFiles, JuxFiles) */
+function viewer(body,items,dec){
+ const side=$('.side',body),view=$('.view',body),sk=$('.skip',body);
+ items.forEach(e=>{const b=document.createElement('button');b.className='li';b.textContent=e.id+' '+e.title;b.onclick=()=>{side.querySelectorAll('.li').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  view.innerHTML=`<h2>${esc(e.title)}</h2><div class="meta">${esc([e.id,e.category,e.status].filter(Boolean).join(' | '))}</div>`+md(e.body||'');view.scrollTop=0;if(dec)decrypt(view,sk)};side.append(b)});
+ if(!items.length)view.textContent='No files here yet.';
+}
+
+/* conversation window: chapters come from {"type":"end"} markers */
+let ac;function ding(n){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain(),T=ac.currentTime;o.frequency.value=700+[...n].reduce((a,c)=>a+c.charCodeAt(0),0)%300;g.gain.setValueAtTime(.06,T);g.gain.exponentialRampToValueAtTime(.001,T+.3);o.connect(g).connect(ac.destination);o.start();o.stop(T+.3)}catch(e){}}
+function pit(body,convs){
+ const side=$('.side',body),sel=$('select',body),view=$('.view',body);let ch=[],ci=0,ix=0,tm=0;
+ const stop=()=>clearTimeout(tm);
+ function add(m){let h;const n=m.screenName||'';
+  if(m.type==='action'){const t=m.text||'';h=`<div class="act">${esc(n.includes(t)?n:t.includes(n)?t:n+' '+t)}</div>`}
+  else{ding(n);h=`<div class="msg"><b style="color:hsl(${[...n].reduce((a,c)=>a+c.charCodeAt(0),0)*37%360},45%,62%)">${esc(n)}</b><small>${esc(m.time||'')}</small><p>${esc(m.text||'')}</p></div>`}
+  view.insertAdjacentHTML('beforeend',h);view.scrollTop=view.scrollHeight}
+ function step(){if(!ch.length)return;if(ix>=ch[ci].length){if(ci>=ch.length-1)return;view.insertAdjacentHTML('beforeend','<div class="end">end of chapter</div>');ci++;ix=0;sel.value=ci}
+  const m=ch[ci][ix];tm=setTimeout(()=>{add(m);ix++;step()},Math.min(m.delayMs||1500,12000))}
+ const reset=()=>{stop();view.innerHTML='';ci=ix=0;sel.value=0};
+ convs.forEach(c=>{const b=document.createElement('button');b.className='li';b.textContent=c.id+' '+c.title;b.onclick=()=>{side.querySelectorAll('.li').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  ch=[[]];c.messages.forEach(m=>m.type==='end'?ch.push([]):ch.at(-1).push(m));ch=ch.filter(a=>a.length);sel.innerHTML=ch.map((_,i)=>`<option value="${i}">Chapter ${i+1}</option>`).join('');reset()};side.append(b)});
+ sel.onchange=()=>{stop();ci=+sel.value;ix=0;view.innerHTML='';step()};
+ $('.bar',body).onclick=e=>{const c=e.target.dataset.c;if(c==='play'){stop();step()}if(c==='pause')stop();if(c==='replay'){reset();step()}};
+ view.textContent='Pick a room, then press Play.';
+}
+
+/* Admin.exe: editors arrive with the WordPress login build */
+function admin(body){
+ body.onclick=e=>{const k=e.target.dataset.e;if(k)$('.out',body).textContent=k==='credits'?'Built by Fen for the Eternal Hearthlight Office.':'Editor locked. Sign-in arrives with the WordPress build.'};
+}
+
+(async()=>{
+ const [E,C,M,J]=await Promise.all([load('entries.json',SE),load('conversations.json',SC),load('memberfiles.json',[]),load('juxfiles.json',[])]);
+ viewer($('#win-lore'),E,1);viewer($('#win-mem'),M,0);viewer($('#win-jux'),J,0);pit($('#win-pit'),C);admin($('#win-adm'));
+ const icon=(host,id,name,path)=>{const el=document.createElement('button');el.className='ic';el.innerHTML=`<svg viewBox="0 0 24 24"><path d="${path}"/></svg>${name}`;el.onclick=()=>openWin('win-'+id);host.append(el)};
+ [['lore','LoreEntries',IC.file],['pit','ConversationPit',IC.chat],['mem','MemberFiles',IC.person],['jux','JuxFiles',IC.eye]].forEach(d=>icon($('#icons'),...d));
+ icon($('#adm'),'adm','Admin.exe',IC.term);
+})();
+</script></body></html>
